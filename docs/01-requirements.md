@@ -41,10 +41,10 @@ EdgePulse is a **multi-tenant Industrial IoT Device Management Platform** that:
 
 ### 1.3 Real-World Context
 
-**Reference Customer:** Stora Enso  
+**Reference Customer:** NordPulp Industries  
 **Mills in scope:**
-- Imatra Mill — Imatra, Finland
-- Skoghall Mill — Skoghall, Sweden
+- Lakewood Mill — Lakewood, Finland
+- Riverside Mill — Riverside, Sweden
 
 Each mill has multiple operational areas (Paper Machines, Pulp Processing, Water Treatment). Each area contains multiple industrial devices.
 
@@ -65,10 +65,10 @@ Each mill has multiple operational areas (Paper Machines, Pulp Processing, Water
 | Stakeholder | Role in System | Example |
 |-------------|---------------|---------|
 | EdgePulse Platform Team | Owns and operates the platform | Platform Admin |
-| Customer IT Admin | Manages their organization's instance | Stora Enso IT Manager |
-| Mill Manager | Oversees one physical facility | Imatra Mill Plant Manager |
+| Customer IT Admin | Manages their organization's instance | NordPulp Industries IT Manager |
+| Mill Manager | Oversees one physical facility | Lakewood Mill Plant Manager |
 | Operator / Technician | Day-to-day device operations | Floor technician on PM1 |
-| Executive | Reads cross-mill reports and KPIs | Stora Enso CEO |
+| Executive | Reads cross-mill reports and KPIs | NordPulp Industries CEO |
 
 ---
 
@@ -84,35 +84,35 @@ Platform (EdgePulse)
                   └── Device (Physical Equipment)
 ```
 
-### 3.1 Hierarchy Example — Stora Enso
+### 3.1 Hierarchy Example — NordPulp Industries
 
 ```
-Customer: Stora Enso
+Customer: NordPulp Industries
 │
-├── Mill: Imatra Mill (Imatra, Finland)
+├── Mill: Lakewood Mill (Lakewood, Finland)
 │     ├── Area: Paper Machine 1
-│     │     ├── PUMP-IM-001   Feed Pump
-│     │     ├── MOTOR-IM-001  Drive Motor
-│     │     └── SENSOR-IM-001 Temperature Sensor
+│     │     ├── PUMP-LW-001   Feed Pump
+│     │     ├── MOTOR-LW-001  Drive Motor
+│     │     └── SENSOR-LW-001 Temperature Sensor
 │     ├── Area: Paper Machine 2
-│     │     ├── PUMP-IM-002
-│     │     └── VALVE-IM-001
+│     │     ├── PUMP-LW-002
+│     │     └── VALVE-LW-001
 │     └── Area: Pulp Processing
-│           ├── PUMP-IM-003
-│           └── SENSOR-IM-002
+│           ├── PUMP-LW-003
+│           └── SENSOR-LW-002
 │
-└── Mill: Skoghall Mill (Skoghall, Sweden)
+└── Mill: Riverside Mill (Riverside, Sweden)
       ├── Area: Paper Machine 1
-      │     ├── PUMP-SK-001
-      │     ├── MOTOR-SK-001
-      │     └── SENSOR-SK-001
+      │     ├── PUMP-RV-001
+      │     ├── MOTOR-RV-001
+      │     └── SENSOR-RV-001
       ├── Area: Paper Machine 2
-      │     ├── PUMP-SK-002
-      │     └── SENSOR-SK-002
+      │     ├── PUMP-RV-002
+      │     └── SENSOR-RV-002
       └── Area: Water Treatment
-            ├── PUMP-SK-003
-            ├── VALVE-SK-001
-            └── SENSOR-SK-003
+            ├── PUMP-RV-003
+            ├── VALVE-RV-001
+            └── SENSOR-RV-003
 ```
 
 ### 3.2 Hierarchy Rules
@@ -203,12 +203,12 @@ Customer: Stora Enso
 | User | Role | Scope |
 |------|------|-------|
 | platform.admin@edgepulse.com | SuperAdmin | All tenants |
-| it.admin@storaenso.com | Customer Admin | All Stora Enso mills |
-| manager.imatra@storaenso.com | Mill Manager | Imatra Mill only |
-| manager.skoghall@storaenso.com | Mill Manager | Skoghall Mill only |
-| tech.pm1.imatra@storaenso.com | Operator | Imatra → PM1 area |
-| tech.skoghall@storaenso.com | Operator | Skoghall → PM1 + PM2 |
-| ceo@storaenso.com | Executive | All Stora Enso mills (read only) |
+| it.admin@nordpulp.com | Customer Admin | All NordPulp Industries mills |
+| manager.lakewood@nordpulp.com | Mill Manager | Lakewood Mill only |
+| manager.riverside@nordpulp.com | Mill Manager | Riverside Mill only |
+| tech.pm1.lakewood@nordpulp.com | Operator | Lakewood → PM1 area |
+| tech.riverside@nordpulp.com | Operator | Riverside → PM1 + PM2 |
+| ceo@nordpulp.com | Executive | All NordPulp Industries mills (read only) |
 
 ### 4.4 Default Role for New Users
 
@@ -414,7 +414,7 @@ All open questions have been resolved. Final decisions recorded below:
 ## 9. Assumptions
 
 - Devices can communicate over the internet and reach the telemetry API
-- Stora Enso has an existing Azure Active Directory tenant for SSO
+- NordPulp Industries has an existing Azure Active Directory tenant for SSO
 - All users access the system via modern web browser (Chrome, Edge, Firefox)
 - Alert thresholds are configured manually — no auto-learning in v1
 - One timezone per mill for telemetry display (UTC storage, local display)
@@ -425,7 +425,7 @@ All open questions have been resolved. Final decisions recorded below:
 
 | Term | Definition |
 |------|-----------|
-| Tenant | A customer organization using EdgePulse (e.g. Stora Enso) |
+| Tenant | A customer organization using EdgePulse (e.g. NordPulp Industries) |
 | Mill | A physical industrial facility belonging to a tenant |
 | Area | A department or production line within a Mill |
 | Device | A physical piece of industrial equipment (pump, motor, sensor etc.) |

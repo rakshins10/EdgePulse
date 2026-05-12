@@ -43,7 +43,7 @@ It enables industrial organizations to:
 - **Notify the right people** based on their role and operational scope
 - **Visualize** device health and performance trends on a real-time dashboard
 
-> **Real-world context:** This platform is modelled after industrial operations at companies like Stora Enso, UPM, and Sappi — managing multiple paper mills across different countries, each with hundreds of industrial devices.
+> **Real-world context:** This platform is modelled after industrial operations at companies like NordPulp Industries, AlpineBoard GmbH, and RiverPaper AG — managing multiple paper mills across different countries, each with hundreds of industrial devices.
 
 ---
 
@@ -205,25 +205,25 @@ EdgePulse models real industrial organizations with a 4-level hierarchy:
 
 ```
 Platform (EdgePulse)
-└── Customer (e.g. Stora Enso)
-      └── Mill (e.g. Imatra Mill, Finland)
+└── Customer (e.g. NordPulp Industries)
+      └── Mill (e.g. Lakewood Mill, Finland)
             └── Area (e.g. Paper Machine 1)
-                  └── Device (e.g. PUMP-IM-001)
+                  └── Device (e.g. PUMP-LW-001)
 ```
 
-**Example — Stora Enso:**
+**Example — NordPulp Industries:**
 
 ```
-Stora Enso
-├── Imatra Mill (Imatra, Finland)
-│     ├── Paper Machine 1 → PUMP-IM-001, MOTOR-IM-001, SENSOR-IM-001
-│     ├── Paper Machine 2 → PUMP-IM-002, VALVE-IM-001
-│     └── Pulp Processing → PUMP-IM-003, SENSOR-IM-002
+NordPulp Industries
+├── Lakewood Mill (Tampere, Finland)
+│     ├── Paper Machine 1 → PUMP-LW-001, MOTOR-LW-001, SENSOR-LW-001
+│     ├── Paper Machine 2 → PUMP-LW-002, VALVE-IM-001
+│     └── Pulp Processing → PUMP-LW-003, SENSOR-LW-002
 │
-└── Skoghall Mill (Skoghall, Sweden)
-      ├── Paper Machine 1 → PUMP-SK-001, MOTOR-SK-001, SENSOR-SK-001
-      ├── Paper Machine 2 → PUMP-SK-002, SENSOR-SK-002
-      └── Water Treatment → PUMP-SK-003, VALVE-SK-001, SENSOR-SK-003
+└── Riverside Mill (Gothenburg, Sweden)
+      ├── Paper Machine 1 → PUMP-RV-001, MOTOR-RV-001, SENSOR-RV-001
+      ├── Paper Machine 2 → PUMP-RV-002, SENSOR-RV-002
+      └── Water Treatment → PUMP-RV-003, VALVE-RV-001, SENSOR-RV-003
 ```
 
 ---
