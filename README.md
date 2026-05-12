@@ -10,7 +10,7 @@
 [![Azure](https://img.shields.io/badge/Azure-Cloud-0078D4?style=flat-square&logo=microsoft-azure)](https://azure.microsoft.com)
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=flat-square&logo=docker)](https://docker.com)
 [![Keycloak](https://img.shields.io/badge/Keycloak-SSO-4D4D4D?style=flat-square&logo=keycloak)](https://keycloak.org)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-red?style=flat-square)](LICENSE)
 
 ---
 
@@ -403,6 +403,25 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 ---
 
+## ⚠️ License & Usage
+
+Copyright (c) 2026 **Rakshith N S**. All rights reserved.
+
+This project is licensed under [CC BY-NC-ND 4.0](LICENSE).
+
+```
+✅ You MAY view and reference this project for learning purposes
+✅ You MAY share a link to this repository
+❌ You MAY NOT copy, clone, or redistribute this code
+❌ You MAY NOT use this commercially
+❌ You MAY NOT modify and redistribute this work
+```
+
+> This project represents original work developed as part of a personal
+> career portfolio. Unauthorized copying or redistribution is prohibited.
+
+---
+
 <div align="center">
-  <sub>Built with ❤️ to demonstrate real-world industrial IoT architecture</sub>
+  <sub>Built with heart to demonstrate real-world industrial IoT architecture</sub>
 </div>
