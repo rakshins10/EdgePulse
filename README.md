@@ -67,7 +67,7 @@ By the time a problem is identified, significant damage, unplanned downtime, or 
 ┌─────────────────────────────────────────────────────────────────┐
 │                         EdgePulse Platform                      │
 │                                                                 │
-│  ┌─────────────────┐        ┌──────────────────────────────┐   │
+│  ┌─────────────────┐        ┌──────────────────────────────┐    │
 │  │  React Dashboard │        │   Keycloak Identity Provider │   │
 │  │  (TypeScript)    │◄──────►│   + PostgreSQL               │   │
 │  │  Azure Static    │        │   Azure AD SSO (OIDC)        │   │
@@ -88,17 +88,17 @@ By the time a problem is identified, significant damage, unplanned downtime, or 
 │  └────────┬────────┘                                            │
 │           │ consume                                             │
 │           ▼                                                     │
-│  ┌─────────────────┐        ┌──────────────────────────────┐   │
-│  │ Processor Svc   │───────►│   Azure Cosmos DB            │   │
-│  │ (.NET 9 Worker) │        │   (Telemetry Storage)        │   │
-│  │ Anomaly detect  │        └──────────────────────────────┘   │
+│  ┌─────────────────┐        ┌──────────────────────────────┐    │
+│  │ Processor Svc   │───────►│   Azure Cosmos DB            │    │
+│  │ (.NET 9 Worker) │        │   (Telemetry Storage)        │    │
+│  │ Anomaly detect  │        └──────────────────────────────┘    │
 │  │ + OpenAI alerts │                                            │
 │  └─────────────────┘                                            │
 │                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  Azure Key Vault · App Insights · Container Apps         │  │
-│  │  GitHub Actions CI/CD · Docker · Self-hosted Runner      │  │
-│  └──────────────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  Azure Key Vault · App Insights · Container Apps         │   │
+│  │  GitHub Actions CI/CD · Docker · Self-hosted Runner      │   │
+│  └──────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
