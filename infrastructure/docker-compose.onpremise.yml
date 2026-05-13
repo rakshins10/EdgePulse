@@ -1,0 +1,200 @@
+# EdgePulse -- On-Premise Docker Compose
+# Run with: docker compose -f infrastructure/docker-compose.onpremise.yml up -d
+# Stop with: docker compose -f infrastructure/docker-compose.onpremise.yml down
+#
+# Services started:
+#   HAProxy       -> http://localhost:80       (load balancer)
+#   HAProxy Stats -> http://localhost:8404     (stats dashboard)
+#   Keycloak      -> http://localhost:8080     (identity provider)
+#   PostgreSQL    -> localhost:5432            (Keycloak DB)
+#   SQL Server    -> localhost:1433            (devices, alerts)
+#   MongoDB       -> localhost:27017           (telemetry)
+#   RabbitMQ      -> http://localhost:15672    (message queue UI)
+#   RabbitMQ AMQP -> localhost:5672            (message queue)
+
+name: edgepulse-onpremise
+
+services:
+
+  # ============================================================
+  # HAProxy -- Load Balancer
+  # Stats dashboard: http://localhost:8404/stats
+  # Login: admin / edgepulse123
+  # ============================================================
+  haproxy:
+    image: haproxy:2.8-alpine
+    container_name: edgepulse-haproxy
+    ports:
+      - "80:80"
+      - "8404:8404"
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    networks:
+      - edgepulse-network
+    restart: unless-stopped
+    depends_on:
+      - keycloak
+
+  # ============================================================
+  # PostgreSQL -- Keycloak Database
+  # Only used by Keycloak internally
+  # Do not connect application code to this database
+  # ============================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: edgepulse-postgres
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak_pass_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - edgepulse-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================
+  # Keycloak -- Identity Provider
+  # Admin console: http://localhost:8080
+  # Admin login: admin / admin
+  # Realm: EdgePulse (configured manually after first start)
+  # ============================================================
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: edgepulse-keycloak
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak_pass_2026
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_PORT: 8080
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+    ports:
+      - "8080:8080"
+    networks:
+      - edgepulse-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ============================================================
+  # SQL Server 2022 -- Primary Application Database
+  # Stores: devices, mills, areas, alerts, users, audit logs
+  # Connection: localhost:1433
+  # User: sa / EdgePulse@2026
+  # ============================================================
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: edgepulse-sqlserver
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: EdgePulse@2026
+      MSSQL_PID: Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./sql/init:/docker-entrypoint-initdb.d
+    networks:
+      - edgepulse-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P EdgePulse@2026 -Q 'SELECT 1' -No || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ============================================================
+  # MongoDB -- Telemetry Storage
+  # Replaces Azure Cosmos DB for on-premise deployment
+  # Stores: high-volume telemetry readings (time-series)
+  # Connection: localhost:27017
+  # ============================================================
+  mongodb:
+    image: mongo:7.0
+    container_name: edgepulse-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: edgepulse
+      MONGO_INITDB_ROOT_PASSWORD: EdgePulse@2026
+      MONGO_INITDB_DATABASE: edgepulse_telemetry
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
+    networks:
+      - edgepulse-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================
+  # RabbitMQ -- Message Queue
+  # Replaces Azure Service Bus for on-premise deployment
+  # Management UI: http://localhost:15672
+  # Login: edgepulse / EdgePulse@2026
+  # AMQP: localhost:5672
+  # ============================================================
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: edgepulse-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: edgepulse
+      RABBITMQ_DEFAULT_PASS: EdgePulse@2026
+      RABBITMQ_DEFAULT_VHOST: edgepulse
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - edgepulse-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# ============================================================
+# Networks
+# ============================================================
+networks:
+  edgepulse-network:
+    driver: bridge
+    name: edgepulse-network
+
+# ============================================================
+# Volumes -- persistent data survives container restarts
+# ============================================================
+volumes:
+  postgres_data:
+    name: edgepulse_postgres_data
+  sqlserver_data:
+    name: edgepulse_sqlserver_data
+  mongodb_data:
+    name: edgepulse_mongodb_data
+  rabbitmq_data:
+    name: edgepulse_rabbitmq_data
