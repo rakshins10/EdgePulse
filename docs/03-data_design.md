@@ -1,3 +1,4 @@
+
 # EdgePulse -- Data Design Document
 
 **Version:** 1.0
@@ -13,18 +14,19 @@
 1. [Data Architecture Overview](#1-data-architecture-overview)
 2. [Database Responsibilities](#2-database-responsibilities)
 3. [Azure SQL -- Schema Design](#3-azure-sql--schema-design)
-4. [Entity Relationship Diagram](#4-entity-relationship-diagram)
-5. [Cosmos DB -- Telemetry Design](#5-cosmos-db--telemetry-design)
-6. [PostgreSQL -- Keycloak Schema](#6-postgresql--keycloak-schema)
-7. [On-Premise Database Design](#7-on-premise-database-design)
-8. [Tenant Isolation Strategy](#8-tenant-isolation-strategy)
-9. [Soft Delete Strategy](#9-soft-delete-strategy)
-10. [Audit Log Design](#10-audit-log-design)
-11. [Read Replica Strategy](#11-read-replica-strategy)
-12. [Telemetry Retention Strategy](#12-telemetry-retention-strategy)
-13. [Data Flow Diagrams](#13-data-flow-diagrams)
-14. [Indexing Strategy](#14-indexing-strategy)
-15. [Scalability Decisions](#15-scalability-decisions)
+4. [Configurable Lookup Tables](#4-configurable-lookup-tables)
+5. [Entity Relationship Diagram](#5-entity-relationship-diagram)
+6. [Cosmos DB -- Telemetry Design](#6-cosmos-db--telemetry-design)
+7. [PostgreSQL -- Keycloak Schema](#7-postgresql--keycloak-schema)
+8. [On-Premise Database Design](#8-on-premise-database-design)
+9. [Tenant Isolation Strategy](#9-tenant-isolation-strategy)
+10. [Soft Delete Strategy](#10-soft-delete-strategy)
+11. [Audit Log Design](#11-audit-log-design)
+12. [Read Replica Strategy](#12-read-replica-strategy)
+13. [Telemetry Retention Strategy](#13-telemetry-retention-strategy)
+14. [Data Flow Diagrams](#14-data-flow-diagrams)
+15. [Indexing Strategy](#15-indexing-strategy)
+16. [Scalability Decisions](#16-scalability-decisions)
 
 ---
 
@@ -33,26 +35,26 @@
 EdgePulse uses three databases, each chosen for a specific workload:
 
 ```
-+==========================================================+
-|                  DATA ARCHITECTURE                       |
-|                                                          |
++===========================================================+
+|                  DATA ARCHITECTURE                        |
+|                                                           |
 |  +------------------+  Purpose: Structured relational    |
 |  |   Azure SQL      |  data -- devices, users, alerts,   |
 |  |   (Primary DB)   |  audit logs, config                |
 |  +------------------+  Engine: SQL Server 2022           |
-|                        ORM: EF Core 9                    |
-|                                                          |
+|                        ORM: EF Core 9                     |
+|                                                           |
 |  +------------------+  Purpose: High-volume time-series  |
 |  |   Cosmos DB      |  telemetry readings from devices   |
 |  |   (Telemetry)    |  Partition: deviceId               |
 |  +------------------+  TTL: 12 months auto-expire        |
-|                                                          |
+|                                                           |
 |  +------------------+  Purpose: Keycloak identity data   |
 |  |   PostgreSQL     |  Users, sessions, realms, clients  |
 |  |   (Identity)     |  Managed entirely by Keycloak      |
 |  +------------------+  Never accessed by app directly    |
-|                                                          |
-+==========================================================+
+|                                                           |
++===========================================================+
 ```
 
 ### Design Decisions Summary
@@ -115,7 +117,7 @@ POSTGRESQL owns:
 
 ## 3. Azure SQL -- Schema Design
 
-### 4.1 Tenants Table
+### 3.1 Tenants Table
 
 ```sql
 CREATE TABLE Tenants (
@@ -135,7 +137,7 @@ CREATE TABLE Tenants (
 );
 ```
 
-### 4.2 Mills Table
+### 3.2 Mills Table
 
 ```sql
 CREATE TABLE Mills (
@@ -160,7 +162,7 @@ CREATE TABLE Mills (
 );
 ```
 
-### 4.3 Areas Table
+### 3.3 Areas Table
 
 ```sql
 CREATE TABLE Areas (
@@ -182,7 +184,7 @@ CREATE TABLE Areas (
 );
 ```
 
-### 4.4 Devices Table
+### 3.4 Devices Table
 
 ```sql
 CREATE TABLE Devices (
@@ -213,7 +215,7 @@ CREATE TABLE Devices (
 );
 ```
 
-### 4.5 DeviceApiKeys Table
+### 3.5 DeviceApiKeys Table
 
 ```sql
 CREATE TABLE DeviceApiKeys (
@@ -240,7 +242,7 @@ CREATE TABLE DeviceApiKeys (
 );
 ```
 
-### 4.6 AlertThresholds Table
+### 3.6 AlertThresholds Table
 
 ```sql
 CREATE TABLE AlertThresholds (
@@ -270,7 +272,7 @@ CREATE TABLE AlertThresholds (
 );
 ```
 
-### 4.7 Alerts Table
+### 3.7 Alerts Table
 
 ```sql
 CREATE TABLE Alerts (
@@ -309,7 +311,7 @@ CREATE TABLE Alerts (
 );
 ```
 
-### 4.8 AlertAssignments Table
+### 3.8 AlertAssignments Table
 
 ```sql
 CREATE TABLE AlertAssignments (
@@ -327,7 +329,7 @@ CREATE TABLE AlertAssignments (
 );
 ```
 
-### 4.9 UserProfiles Table
+### 3.9 UserProfiles Table
 
 ```sql
 -- EdgePulse-specific user data.
@@ -362,7 +364,7 @@ CREATE TABLE UserProfiles (
 );
 ```
 
-### 4.10 Roles Table
+### 3.10 Roles Table
 
 ```sql
 -- Master list of all roles in EdgePulse.
@@ -395,7 +397,7 @@ CREATE TABLE Roles (
 -- Executive     -> Scope: Tenant (read only)
 ```
 
-### 4.11 UserRoles Table
+### 3.11 UserRoles Table
 
 ```sql
 -- Assigns a role to a user within a specific scope.
@@ -431,7 +433,7 @@ CREATE TABLE UserRoles (
 );
 ```
 
-### 4.12 RolePermissions Table
+### 3.12 RolePermissions Table
 
 ```sql
 -- Defines what each role is allowed to do.
@@ -467,7 +469,7 @@ CREATE TABLE RolePermissions (
 -- Executive     -> read only across all entities
 ```
 
-### 4.13 OperatorAreaAssignments Table
+### 3.13 OperatorAreaAssignments Table
 
 ```sql
 -- Many-to-many: one Operator can cover multiple Areas
@@ -490,7 +492,7 @@ CREATE TABLE OperatorAreaAssignments (
 );
 ```
 
-### 4.14 Notifications Table
+### 3.14 Notifications Table
 
 ```sql
 CREATE TABLE Notifications (
@@ -514,7 +516,7 @@ CREATE TABLE Notifications (
 );
 ```
 
-### 4.15 AuditLogs Table
+### 3.15 AuditLogs Table
 
 ```sql
 -- Immutable. No UPDATE or DELETE ever runs on this table.
@@ -548,43 +550,699 @@ CREATE TABLE AuditLogs (
 
 ---
 
-## 4. Entity Relationship Diagram
+## 4. Configurable Lookup Tables
+
+### 4.1 Design Philosophy
+
+EdgePulse is designed for multiple industries beyond Pulp & Paper.
+Rather than hardcoding device types, statuses, and alert severities,
+all lookup values are fully configurable at three levels:
 
 ```
-+----------+       +----------+       +----------+
-| Tenants  |1-----*|  Mills   |1-----*|  Areas   |
-+----------+       +----------+       +-----+----+
-     |                  |                   |1
-     |                  |             +-----+------+
-     |                  |             |   Devices  |
-     |                  |             +-----+------+
-     |                  |                   |1
-     |                  |      +------------+------------+
-     |                  |      |            |            |
-     |              +---+--+  ++----------+ +----------+ |
-     |              |Alerts|  |AlertThresh| |DeviceApi | |
-     |              +---+--+  |olds       | |Keys      | |
-     |                  |1    +-----------+ +----------+ |
-     |             +----+-----------+
-     |             | AlertAssignments
-     |             +-----------------+
-     |
-     |1
-+----+--------+       +------------------------+
-| UserProfiles|1-----*| OperatorAreaAssignments|
-+----+--------+       +------------------------+
-     |1
-     |
-+----+--------+       +----------+       +------------------+
-| UserRoles   |*-----1|  Roles   |1-----*|  RolePermissions |
-+-------------+       +----------+       +------------------+
-     |
-     |1
-+----+---------+
-| Notifications|
-+--------------+
+LEVEL 1: Industry Templates (SuperAdmin)
+  Predefined sets of lookup values per industry.
+  Examples: Pulp & Paper, Manufacturing, Generic.
+  SuperAdmin creates and manages templates.
 
-+------------------+   (no FK -- immutable, standalone)
+LEVEL 2: Tenant Configuration (CustomerAdmin)
+  Each tenant is assigned one industry template.
+  CustomerAdmin can:
+    -> Rename template values to their vocabulary
+    -> Deactivate values they don't use
+    -> Add custom values specific to their org
+    -> Cannot delete system template values
+
+LEVEL 3: Well-Known GUIDs (Application Code)
+  System template values have fixed predictable GUIDs.
+  Referenced in code by name, not by string or integer.
+  No magic strings. Full compile-time safety.
+```
+
+### 4.2 Industry Templates Table
+
+```sql
+CREATE TABLE IndustryTemplates (
+    Id          UNIQUEIDENTIFIER    NOT NULL
+                DEFAULT NEWSEQUENTIALID(),
+    Name        NVARCHAR(200)       NOT NULL,
+    -- "Pulp & Paper", "Manufacturing", "Generic"
+    Description NVARCHAR(500)       NULL,
+    IsDefault   BIT                 NOT NULL DEFAULT 0,
+    -- IsDefault = true -> assigned when no template selected
+    CreatedAt   DATETIME2           NOT NULL
+                DEFAULT GETUTCDATE(),
+
+    CONSTRAINT PK_IndustryTemplates PRIMARY KEY (Id),
+    CONSTRAINT UQ_IndustryTemplates_Name UNIQUE (Name)
+);
+
+-- Seed data (inserted at startup):
+-- Pulp & Paper  (IsDefault = false)
+-- Manufacturing (IsDefault = false)
+-- Generic       (IsDefault = true)
+```
+
+### 4.3 TenantTemplates Table
+
+```sql
+-- Assigns one industry template to one tenant.
+-- Done by SuperAdmin during tenant onboarding.
+
+CREATE TABLE TenantTemplates (
+    Id          UNIQUEIDENTIFIER    NOT NULL
+                DEFAULT NEWSEQUENTIALID(),
+    TenantId    UNIQUEIDENTIFIER    NOT NULL,
+    TemplateId  UNIQUEIDENTIFIER    NOT NULL,
+    AssignedAt  DATETIME2           NOT NULL
+                DEFAULT GETUTCDATE(),
+    AssignedBy  NVARCHAR(200)       NOT NULL,
+
+    CONSTRAINT PK_TenantTemplates PRIMARY KEY (Id),
+    CONSTRAINT FK_TenantTemplates_Tenants
+        FOREIGN KEY (TenantId) REFERENCES Tenants(Id),
+    CONSTRAINT FK_TenantTemplates_Templates
+        FOREIGN KEY (TemplateId)
+        REFERENCES IndustryTemplates(Id),
+    CONSTRAINT UQ_TenantTemplates_Tenant
+        UNIQUE (TenantId)
+    -- One template per tenant
+);
+```
+
+### 4.4 DeviceTypes Lookup Table
+
+```sql
+-- TemplateId SET, TenantId NULL  -> template value (system)
+-- TemplateId NULL, TenantId SET  -> tenant custom value
+
+CREATE TABLE DeviceTypes (
+    Id          UNIQUEIDENTIFIER    NOT NULL
+                DEFAULT NEWSEQUENTIALID(),
+    TemplateId  UNIQUEIDENTIFIER    NULL,
+    TenantId    UNIQUEIDENTIFIER    NULL,
+    Name        NVARCHAR(100)       NOT NULL,
+    Code        NVARCHAR(50)        NOT NULL,
+    Description NVARCHAR(300)       NULL,
+    Icon        NVARCHAR(50)        NULL,
+    IsSystem    BIT                 NOT NULL DEFAULT 0,
+    -- System values cannot be deleted
+    IsActive    BIT                 NOT NULL DEFAULT 1,
+    SortOrder   INT                 NOT NULL DEFAULT 0,
+    CreatedAt   DATETIME2           NOT NULL
+                DEFAULT GETUTCDATE(),
+
+    CONSTRAINT PK_DeviceTypes PRIMARY KEY (Id),
+    CONSTRAINT FK_DeviceTypes_Templates
+        FOREIGN KEY (TemplateId)
+        REFERENCES IndustryTemplates(Id)
+);
+
+-- Seed data per template:
+
+-- Pulp & Paper Template:
+--   Pump, Motor, Valve, Digester,
+--   Chip Feeder, Pulper, Refiner
+
+-- Manufacturing Template:
+--   CNC Machine, Robot Arm, Conveyor,
+--   Press, Lathe, Welding Station
+
+-- Generic Template:
+--   Sensor, Controller, Actuator, Motor, Pump
+```
+
+### 4.5 DeviceStatuses Lookup Table
+
+```sql
+CREATE TABLE DeviceStatuses (
+    Id          UNIQUEIDENTIFIER    NOT NULL
+                DEFAULT NEWSEQUENTIALID(),
+    TemplateId  UNIQUEIDENTIFIER    NULL,
+    TenantId    UNIQUEIDENTIFIER    NULL,
+    Name        NVARCHAR(100)       NOT NULL,
+    Code        NVARCHAR(50)        NOT NULL,
+    Description NVARCHAR(300)       NULL,
+    Color       NVARCHAR(20)        NULL,
+    -- Hex color for UI display e.g. "#22c55e"
+    IsSystem    BIT                 NOT NULL DEFAULT 0,
+    IsActive    BIT                 NOT NULL DEFAULT 1,
+    SortOrder   INT                 NOT NULL DEFAULT 0,
+    CreatedAt   DATETIME2           NOT NULL
+                DEFAULT GETUTCDATE(),
+
+    CONSTRAINT PK_DeviceStatuses PRIMARY KEY (Id),
+    CONSTRAINT FK_DeviceStatuses_Templates
+        FOREIGN KEY (TemplateId)
+        REFERENCES IndustryTemplates(Id)
+);
+
+-- Generic Template seed (shared across all):
+--   Online        (#22c55e green)
+--   Offline       (#ef4444 red)
+--   Maintenance   (#f59e0b amber)
+--   Decommissioned (#6b7280 grey)
+
+-- Manufacturing Template extras:
+--   Setup         (#3b82f6 blue)
+--   Calibrating   (#8b5cf6 purple)
+
+-- Pulp & Paper Template extras:
+--   Standby       (#06b6d4 teal)
+```
+
+### 4.6 AlertSeverities Lookup Table
+
+```sql
+CREATE TABLE AlertSeverities (
+    Id          UNIQUEIDENTIFIER    NOT NULL
+                DEFAULT NEWSEQUENTIALID(),
+    TemplateId  UNIQUEIDENTIFIER    NULL,
+    TenantId    UNIQUEIDENTIFIER    NULL,
+    Name        NVARCHAR(100)       NOT NULL,
+    Code        NVARCHAR(50)        NOT NULL,
+    Description NVARCHAR(300)       NULL,
+    Color       NVARCHAR(20)        NULL,
+    Priority    INT                 NOT NULL DEFAULT 0,
+    -- Lower number = higher priority
+    -- Critical = 1, High = 2, Medium = 3, Low = 4
+    IsSystem    BIT                 NOT NULL DEFAULT 0,
+    IsActive    BIT                 NOT NULL DEFAULT 1,
+    SortOrder   INT                 NOT NULL DEFAULT 0,
+    CreatedAt   DATETIME2           NOT NULL
+                DEFAULT GETUTCDATE(),
+
+    CONSTRAINT PK_AlertSeverities PRIMARY KEY (Id),
+    CONSTRAINT FK_AlertSeverities_Templates
+        FOREIGN KEY (TemplateId)
+        REFERENCES IndustryTemplates(Id)
+);
+
+-- Generic Template seed:
+--   Critical (Priority 1, #ef4444)
+--   High     (Priority 2, #f97316)
+--   Medium   (Priority 3, #f59e0b)
+--   Low      (Priority 4, #22c55e)
+```
+
+### 4.7 AlertStatuses Lookup Table
+
+```sql
+CREATE TABLE AlertStatuses (
+    Id          UNIQUEIDENTIFIER    NOT NULL
+                DEFAULT NEWSEQUENTIALID(),
+    TemplateId  UNIQUEIDENTIFIER    NULL,
+    TenantId    UNIQUEIDENTIFIER    NULL,
+    Name        NVARCHAR(100)       NOT NULL,
+    Code        NVARCHAR(50)        NOT NULL,
+    Description NVARCHAR(300)       NULL,
+    IsTerminal  BIT                 NOT NULL DEFAULT 0,
+    -- IsTerminal = true means no further transitions allowed
+    -- Closed and Resolved are terminal states
+    IsSystem    BIT                 NOT NULL DEFAULT 0,
+    IsActive    BIT                 NOT NULL DEFAULT 1,
+    SortOrder   INT                 NOT NULL DEFAULT 0,
+    CreatedAt   DATETIME2           NOT NULL
+                DEFAULT GETUTCDATE(),
+
+    CONSTRAINT PK_AlertStatuses PRIMARY KEY (Id),
+    CONSTRAINT FK_AlertStatuses_Templates
+        FOREIGN KEY (TemplateId)
+        REFERENCES IndustryTemplates(Id)
+);
+
+-- Generic Template seed:
+--   Open          (IsTerminal = false)
+--   Acknowledged  (IsTerminal = false)
+--   Assigned      (IsTerminal = false)
+--   Resolved      (IsTerminal = true)
+--   Closed        (IsTerminal = true)
+```
+
+### 4.8 MetricTypes Lookup Table
+
+```sql
+-- Defines what measurements a device can report.
+-- Different industries have different metrics.
+
+CREATE TABLE MetricTypes (
+    Id              UNIQUEIDENTIFIER    NOT NULL
+                    DEFAULT NEWSEQUENTIALID(),
+    TemplateId      UNIQUEIDENTIFIER    NULL,
+    TenantId        UNIQUEIDENTIFIER    NULL,
+    Name            NVARCHAR(100)       NOT NULL,
+    Code            NVARCHAR(50)        NOT NULL,
+    DefaultUnit     NVARCHAR(20)        NOT NULL,
+    -- e.g. "C", "bar", "mm/s", "L/min", "kW"
+    Description     NVARCHAR(300)       NULL,
+    IsSystem        BIT                 NOT NULL DEFAULT 0,
+    IsActive        BIT                 NOT NULL DEFAULT 1,
+    SortOrder       INT                 NOT NULL DEFAULT 0,
+    CreatedAt       DATETIME2           NOT NULL
+                    DEFAULT GETUTCDATE(),
+
+    CONSTRAINT PK_MetricTypes PRIMARY KEY (Id)
+);
+
+-- Generic Template seed:
+--   Temperature   (C)
+--   Pressure      (bar)
+--   Vibration     (mm/s)
+--   Flow Rate     (L/min)
+--   Power         (kW)
+--   Speed         (RPM)
+
+-- Manufacturing Template extras:
+--   Position      (mm)
+--   Torque        (Nm)
+--   Current       (A)
+```
+
+### 4.9 Units Lookup Table
+
+```sql
+CREATE TABLE Units (
+    Id          UNIQUEIDENTIFIER    NOT NULL DEFAULT NEWSEQUENTIALID(),
+    TemplateId  UNIQUEIDENTIFIER    NULL,
+    TenantId    UNIQUEIDENTIFIER    NULL,
+    Name        NVARCHAR(100)       NOT NULL,
+    Code        NVARCHAR(50)        NOT NULL,
+    Symbol      NVARCHAR(20)        NOT NULL,
+    Category    NVARCHAR(100)       NOT NULL,
+    Description NVARCHAR(300)       NULL,
+    IsSystem    BIT                 NOT NULL DEFAULT 0,
+    IsActive    BIT                 NOT NULL DEFAULT 1,
+    SortOrder   INT                 NOT NULL DEFAULT 0,
+    CreatedAt   DATETIME2           NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT PK_Units PRIMARY KEY (Id)
+);
+-- Seed: Celsius, Bar, PSI, mm/s, L/min, m3/h, kW, RPM
+```
+
+### 4.10 DeviceManufacturers Lookup Table
+
+```sql
+CREATE TABLE DeviceManufacturers (
+    Id          UNIQUEIDENTIFIER    NOT NULL DEFAULT NEWSEQUENTIALID(),
+    TemplateId  UNIQUEIDENTIFIER    NULL,
+    TenantId    UNIQUEIDENTIFIER    NULL,
+    Name        NVARCHAR(200)       NOT NULL,
+    Code        NVARCHAR(50)        NOT NULL,
+    Website     NVARCHAR(300)       NULL,
+    Country     NVARCHAR(100)       NULL,
+    Description NVARCHAR(300)       NULL,
+    IsSystem    BIT                 NOT NULL DEFAULT 0,
+    IsActive    BIT                 NOT NULL DEFAULT 1,
+    SortOrder   INT                 NOT NULL DEFAULT 0,
+    CreatedAt   DATETIME2           NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT PK_DeviceManufacturers PRIMARY KEY (Id)
+);
+-- Seed: ABB, Siemens, Bosch, Honeywell, Schneider Electric, Rockwell, Other
+```
+
+### 4.11 DeviceModels Lookup Table
+
+```sql
+CREATE TABLE DeviceModels (
+    Id              UNIQUEIDENTIFIER    NOT NULL DEFAULT NEWSEQUENTIALID(),
+    TemplateId      UNIQUEIDENTIFIER    NULL,
+    TenantId        UNIQUEIDENTIFIER    NULL,
+    ManufacturerId  UNIQUEIDENTIFIER    NOT NULL,
+    Name            NVARCHAR(200)       NOT NULL,
+    Code            NVARCHAR(50)        NOT NULL,
+    ModelNumber     NVARCHAR(100)       NULL,
+    Specifications  NVARCHAR(MAX)       NULL,
+    Description     NVARCHAR(300)       NULL,
+    IsSystem        BIT                 NOT NULL DEFAULT 0,
+    IsActive        BIT                 NOT NULL DEFAULT 1,
+    SortOrder       INT                 NOT NULL DEFAULT 0,
+    CreatedAt       DATETIME2           NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT PK_DeviceModels PRIMARY KEY (Id),
+    CONSTRAINT FK_DeviceModels_Manufacturers
+        FOREIGN KEY (ManufacturerId) REFERENCES DeviceManufacturers(Id)
+);
+```
+
+### 4.12 MaintenanceTypes Lookup Table
+
+```sql
+CREATE TABLE MaintenanceTypes (
+    Id          UNIQUEIDENTIFIER    NOT NULL DEFAULT NEWSEQUENTIALID(),
+    TemplateId  UNIQUEIDENTIFIER    NULL,
+    TenantId    UNIQUEIDENTIFIER    NULL,
+    Name        NVARCHAR(100)       NOT NULL,
+    Code        NVARCHAR(50)        NOT NULL,
+    Color       NVARCHAR(20)        NULL,
+    Description NVARCHAR(300)       NULL,
+    IsSystem    BIT                 NOT NULL DEFAULT 0,
+    IsActive    BIT                 NOT NULL DEFAULT 1,
+    SortOrder   INT                 NOT NULL DEFAULT 0,
+    CreatedAt   DATETIME2           NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT PK_MaintenanceTypes PRIMARY KEY (Id)
+);
+-- Seed: Scheduled, Corrective, Preventive, Predictive
+```
+
+### 4.13 LocationTypes Lookup Table
+
+```sql
+CREATE TABLE LocationTypes (
+    Id          UNIQUEIDENTIFIER    NOT NULL DEFAULT NEWSEQUENTIALID(),
+    TemplateId  UNIQUEIDENTIFIER    NULL,
+    TenantId    UNIQUEIDENTIFIER    NULL,
+    Name        NVARCHAR(100)       NOT NULL,
+    Code        NVARCHAR(50)        NOT NULL,
+    Description NVARCHAR(300)       NULL,
+    IsSystem    BIT                 NOT NULL DEFAULT 0,
+    IsActive    BIT                 NOT NULL DEFAULT 1,
+    SortOrder   INT                 NOT NULL DEFAULT 0,
+    CreatedAt   DATETIME2           NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT PK_LocationTypes PRIMARY KEY (Id)
+);
+-- Pulp & Paper seed: Building, Floor, Production Line, Section
+-- Manufacturing seed: Cell, Zone, Station, Assembly Line
+-- Generic seed: Area, Zone, Section
+```
+
+### 4.14 Configuration Principle
+
+```
+EDGEPULSE CONFIGURATION PRINCIPLE:
+
+Every field presenting multiple choices to the user
+must be backed by a configurable lookup table.
+No dropdown in the UI has hardcoded options.
+Every dropdown reads from the database.
+Every lookup table has a corresponding admin screen.
+
+EXCEPTIONS (fixed product concerns, use enums):
+  UserRole       -> product architecture roles
+  DeploymentMode -> infrastructure concern
+  RoleScope      -> architecture concern
+```
+
+### 4.15 All Admin Configuration Screens
+
+```
+SUPERADMIN:
+  Industry Templates, Device Types, Device Statuses,
+  Alert Severities, Alert Statuses, Metric Types,
+  Units, Manufacturers, Maintenance Types, Location Types
+
+CUSTOMER ADMIN:
+  Device Types, Device Statuses, Alert Severities,
+  Alert Statuses, Metric Types, Units, Manufacturers,
+  Device Models, Maintenance Types, Location Types,
+  Notification Rules, User Management
+
+MILL MANAGER:
+  Device Thresholds (override per device), Area Management
+```
+
+### 4.16 TenantLookupOverrides Table
+
+```sql
+-- Tracks which template values a tenant has
+-- customised or deactivated.
+
+CREATE TABLE TenantLookupOverrides (
+    Id          UNIQUEIDENTIFIER    NOT NULL
+                DEFAULT NEWSEQUENTIALID(),
+    TenantId    UNIQUEIDENTIFIER    NOT NULL,
+    LookupType  NVARCHAR(50)        NOT NULL,
+    -- "DeviceType", "DeviceStatus",
+    -- "AlertSeverity", "AlertStatus", "MetricType"
+    LookupId    UNIQUEIDENTIFIER    NOT NULL,
+    -- ID of the template value being overridden
+    DisplayName NVARCHAR(100)       NULL,
+    -- Custom display name (null = use template name)
+    -- NordPulp renames "Digester" -> "Kamyr Digester"
+    IsActive    BIT                 NOT NULL DEFAULT 1,
+    -- false = tenant has deactivated this template value
+    UpdatedAt   DATETIME2           NOT NULL
+                DEFAULT GETUTCDATE(),
+    UpdatedBy   NVARCHAR(200)       NOT NULL,
+
+    CONSTRAINT PK_TenantLookupOverrides PRIMARY KEY (Id),
+    CONSTRAINT FK_TenantLookupOverrides_Tenants
+        FOREIGN KEY (TenantId) REFERENCES Tenants(Id),
+    CONSTRAINT UQ_TenantLookupOverrides
+        UNIQUE (TenantId, LookupType, LookupId)
+);
+```
+
+### 4.17 Well-Known GUIDs Strategy
+
+All system template values use fixed, predictable GUIDs.
+These are referenced in application code by name -- never
+by string, never by integer. Full compile-time safety.
+
+```
+GUID PREFIX CONVENTION:
+  00000010-xxxx = Industry Template IDs
+  00000011-xxxx = Pulp & Paper DeviceType IDs
+  00000012-xxxx = Pulp & Paper DeviceStatus IDs
+  00000013-xxxx = Pulp & Paper AlertSeverity IDs
+  00000014-xxxx = Pulp & Paper AlertStatus IDs
+  00000020-xxxx = Manufacturing Template IDs
+  00000021-xxxx = Manufacturing DeviceType IDs
+  00000030-xxxx = Generic Template IDs
+  00000031-xxxx = Generic DeviceType IDs
+  00000032-xxxx = Generic DeviceStatus IDs
+  00000033-xxxx = Generic AlertSeverity IDs
+  00000034-xxxx = Generic AlertStatus IDs
+```
+
+### 4.18 How Lookups Are Fetched Per Tenant
+
+```
+When NordPulp requests device types:
+
+1. Find NordPulp tenant template -> Pulp & Paper
+2. Fetch all DeviceTypes from Pulp & Paper template
+3. Apply TenantLookupOverrides:
+     - Deactivated items removed
+     - Renamed items use override DisplayName
+4. Append NordPulp custom DeviceTypes (TenantId set)
+5. Return merged, ordered list
+
+Result:
+  Pump, Motor, Valve,
+  Kamyr Digester (renamed),   <- template value, renamed
+  Chip Feeder, Refiner,       <- template values
+  Black Liquor Evaporator     <- NordPulp custom
+  -- Pulper excluded          <- deactivated by NordPulp
+```
+
+### 4.19 Admin UI Capabilities
+
+```
+SUPERADMIN:
+  -> Manage Industry Templates
+  -> Add/edit/delete template lookup values
+  -> Assign templates to tenants
+
+CUSTOMER ADMIN (Settings page):
+  -> View all lookup values from their template
+  -> Rename any template value
+  -> Deactivate/reactivate template values
+  -> Add custom values (tenant-specific)
+  -> Edit/delete their own custom values
+  -> Cannot delete system template values
+
+MILL MANAGER:
+  -> View lookups (read only)
+  -> Uses them when registering devices
+```
+
+---
+
+## 4b. Multimedia & File Attachments
+
+### Design Philosophy
+
+Files are not stored as columns on entities.
+A single generic Attachments table links to any entity.
+This allows unlimited files per entity and consistent
+handling across the entire platform.
+
+```
+SUPPORTED ENTITIES FOR ATTACHMENTS:
+  Device              -> Photo, Manual, Schematic, Datasheet
+  DeviceModel         -> Model image, Datasheet
+  DeviceManufacturer  -> Company logo
+  Mill                -> Site photo, Floor plan
+  Area                -> Layout diagram, Floor plan
+  Alert               -> Fault photo, Video
+  MaintenanceRecord   -> Before/after photos, Report
+  UserProfile         -> Profile photo
+  Tenant              -> Company logo
+  IndustryTemplate    -> Template thumbnail
+```
+
+### Storage Architecture
+
+```
+CLOUD MODE:
+  Azure Blob Storage
+  Path: /{tenantId}/{entityType}/{entityId}/{storedFileName}
+  Access: SAS tokens (temporary signed URLs, never direct)
+  CDN: optional for frequently accessed files
+
+ON-PREMISE MODE:
+  MinIO (open source S3-compatible object storage)
+  Runs in Docker container
+  Same API as Azure Blob Storage
+  Path structure identical to cloud mode
+
+ABSTRACTION:
+  IFileStorageService interface
+    -> AzureBlobStorageService  (cloud)
+    -> MinioStorageService      (on-premise)
+  DEPLOYMENT_MODE switches automatically
+```
+
+### Attachments Table
+
+```sql
+CREATE TABLE Attachments (
+    Id              UNIQUEIDENTIFIER    NOT NULL
+                    DEFAULT NEWSEQUENTIALID(),
+    TenantId        UNIQUEIDENTIFIER    NOT NULL,
+    EntityType      NVARCHAR(100)       NOT NULL,
+    -- "Device", "Alert", "Mill", "Area",
+    -- "DeviceModel", "MaintenanceRecord" etc.
+    EntityId        UNIQUEIDENTIFIER    NOT NULL,
+    FileName        NVARCHAR(300)       NOT NULL,
+    -- original filename uploaded by user
+    StoredFileName  NVARCHAR(300)       NOT NULL,
+    -- actual filename in storage (UUID based, prevents collisions)
+    FileSize        BIGINT              NOT NULL,
+    -- file size in bytes
+    ContentType     NVARCHAR(100)       NOT NULL,
+    -- MIME type: "image/jpeg", "application/pdf", "video/mp4"
+    FileCategory    NVARCHAR(50)        NOT NULL,
+    -- "Photo", "Manual", "Schematic", "Report",
+    -- "Video", "FloorPlan", "Logo", "Other"
+    StoragePath     NVARCHAR(500)       NOT NULL,
+    -- full path in blob/MinIO storage
+    IsPublic        BIT                 NOT NULL DEFAULT 0,
+    -- false = requires auth + SAS token to access
+    DisplayOrder    INT                 NOT NULL DEFAULT 0,
+    -- for ordering multiple images on same entity
+    UploadedBy      NVARCHAR(200)       NOT NULL,
+    -- Keycloak userId
+    UploadedAt      DATETIME2           NOT NULL
+                    DEFAULT GETUTCDATE(),
+    IsDeleted       BIT                 NOT NULL DEFAULT 0,
+    DeletedAt       DATETIME2           NULL,
+
+    CONSTRAINT PK_Attachments PRIMARY KEY (Id),
+    CONSTRAINT FK_Attachments_Tenants
+        FOREIGN KEY (TenantId) REFERENCES Tenants(Id)
+);
+
+CREATE INDEX IX_Attachments_Entity
+    ON Attachments(TenantId, EntityType, EntityId)
+    WHERE IsDeleted = 0;
+```
+
+### AttachmentSettings Table
+
+```sql
+-- Configurable per tenant per entity type.
+-- CustomerAdmin sets limits in Settings screen.
+
+CREATE TABLE AttachmentSettings (
+    Id              UNIQUEIDENTIFIER    NOT NULL
+                    DEFAULT NEWSEQUENTIALID(),
+    TenantId        UNIQUEIDENTIFIER    NOT NULL,
+    EntityType      NVARCHAR(100)       NOT NULL,
+    MaxFileSizeMb   INT                 NOT NULL DEFAULT 10,
+    MaxFileCount    INT                 NOT NULL DEFAULT 10,
+    AllowedTypes    NVARCHAR(500)       NOT NULL
+                    DEFAULT 'jpg,jpeg,png,pdf',
+    UpdatedAt       DATETIME2           NOT NULL
+                    DEFAULT GETUTCDATE(),
+
+    CONSTRAINT PK_AttachmentSettings PRIMARY KEY (Id),
+    CONSTRAINT UQ_AttachmentSettings
+        UNIQUE (TenantId, EntityType)
+);
+```
+
+### File Size Limits
+
+```
+CONFIGURABLE PER TENANT:
+  Max file size per upload    default: 10MB
+  Allowed file types          default: jpg, png, pdf, mp4
+  Max files per entity        default: 10
+
+HARD SYSTEM LIMITS:
+  Max file size: 100MB (enforced at API level)
+  Max files per entity: 50
+```
+
+### Admin Configuration Screen
+
+```
+CustomerAdmin -> Settings -> Attachment Settings
+
++================================================+
+|  Attachment Settings                           |
++================================================+
+|  Entity Type    | Max Size | Max Files | Types |
+|-----------------|----------|-----------|-------|
+|  Device         | 10MB     | 10        | Edit  |
+|  Alert          | 50MB     | 20        | Edit  |
+|  Mill           | 10MB     | 5         | Edit  |
+|  Area           | 10MB     | 5         | Edit  |
++================================================+
+```
+
+---
+
+## 5. Entity Relationship Diagram
+
+```
++-------------------+       +------------------+
+| IndustryTemplates |1-----*| TenantTemplates  |
++-------------------+       +--------+---------+
+         |1                          |*
+         |                    +------+------+
+         |*                   |   Tenants   |
++---------------------+       +------+------+
+| DeviceTypes         |              |1
+| DeviceStatuses      |       +------+------+       +----------+
+| AlertSeverities     |       |    Mills    |1-----*|  Areas   |
+| AlertStatuses       |       +------+------+       +-----+----+
+| MetricTypes         |              |1                   |1
++---------------------+       +------+------+       +-----+------+
+         |                    |  Devices    |       |AlertThresh |
+         |*                   +------+------+       |olds        |
++---------------------+              |1             +------------+
+| TenantLookupOverrides              |
++---------------------+    +---------+----------+
+                            |                   |
+                        +---+---+   +-----------+--+
+                        |Alerts |   | DeviceApiKeys|
+                        +---+---+   +--------------+
+                            |1
+                        +---+----------+
+                        |AlertAssign   |
+                        |ments         |
+                        +--------------+
+
++-------------+       +--------------+
+| UserProfiles|1-----*|  UserRoles   |*-----1 Roles 1-----* RolePermissions
++------+------+       +--------------+
+       |1
+       |*
++------+-------------------+
+| OperatorAreaAssignments  |
++--------------------------+
+
++------------------+   (no FK -- immutable)
 |   AuditLogs      |
 +------------------+
 
@@ -596,7 +1254,7 @@ CREATE TABLE AuditLogs (
 
 ---
 
-## 5. Cosmos DB -- Telemetry Design
+## 6. Cosmos DB -- Telemetry Design
 
 ### 6.1 Container Configuration
 
@@ -728,7 +1386,7 @@ AND r.timestamp >= '2026-05-13T00:00:00Z'
 
 ---
 
-## 6. PostgreSQL -- Keycloak Schema
+## 7. PostgreSQL -- Keycloak Schema
 
 PostgreSQL is used exclusively by Keycloak.
 EdgePulse application code never connects to it directly.
@@ -750,7 +1408,7 @@ Use Keycloak Admin Console or Admin REST API only.
 
 ---
 
-## 7. On-Premise Database Design
+## 8. On-Premise Database Design
 
 When deployed on-premise (no internet), Azure SQL and Cosmos DB
 are replaced with open source equivalents.
@@ -789,7 +1447,7 @@ Sharding (for scale):
 
 ---
 
-## 8. Tenant Isolation Strategy
+## 9. Tenant Isolation Strategy
 
 Every table in Azure SQL has a TenantId column.
 Isolation is enforced at the EF Core level using
@@ -869,7 +1527,7 @@ public class SuperAdminDbContext : DbContext
 
 ---
 
-## 9. Soft Delete Strategy
+## 10. Soft Delete Strategy
 
 No entity is ever permanently deleted in EdgePulse.
 Deletion sets IsDeleted = true and records DeletedAt timestamp.
@@ -928,7 +1586,7 @@ Referential integrity:
 
 ---
 
-## 10. Audit Log Design
+## 11. Audit Log Design
 
 Every significant action in EdgePulse is recorded
 in the AuditLogs table. It is append-only and immutable.
@@ -1006,7 +1664,7 @@ the evolution path without needing a rewrite.
 
 ---
 
-## 11. Read Replica Strategy
+## 12. Read Replica Strategy
 
 Azure SQL supports read replicas for separating
 read-heavy report queries from write operations.
@@ -1063,7 +1721,7 @@ For real-time data (device status, live telemetry):
 
 ---
 
-## 12. Telemetry Retention Strategy
+## 13. Telemetry Retention Strategy
 
 ### 13.1 Phase 1 -- TTL Auto-Expire (Implemented)
 
@@ -1116,7 +1774,7 @@ Retrieval:
 
 ---
 
-## 13. Data Flow Diagrams
+## 14. Data Flow Diagrams
 
 ### 14.1 Device Registration Flow
 
@@ -1232,7 +1890,7 @@ Alert status updated on all connected dashboards
 
 ---
 
-## 14. Indexing Strategy
+## 15. Indexing Strategy
 
 ### 15.1 Azure SQL Indexes
 
@@ -1296,7 +1954,7 @@ Composite index:
 
 ---
 
-## 15. Scalability Decisions
+## 16. Scalability Decisions
 
 ### 16.1 Azure SQL Scalability
 
