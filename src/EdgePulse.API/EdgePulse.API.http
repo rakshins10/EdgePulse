@@ -1,0 +1,6 @@
+@EdgePulse.API_HostAddress = http://localhost:5104
+
+GET {{EdgePulse.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
