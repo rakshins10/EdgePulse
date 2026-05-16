@@ -343,35 +343,191 @@ dotnet run
 
 ### EF Core Migration Commands
 
-```bash
-# Run from solution root (src folder)
-cd /c/Studies/EdgePulse-Application/src
+All migration commands run from the `src` folder.
+Always specify `--project` and `--startup-project`.
 
-# Create a new migration
-dotnet ef migrations add <MigrationName> \
+```
+--project         = where DbContext lives (Infrastructure)
+--startup-project = where Program.cs lives (API)
+                    needed to read appsettings.json for connection string
+```
+
+#### Install EF Core CLI Tool (one time only)
+
+```bash
+# Install globally
+dotnet tool install --global dotnet-ef
+
+# Update if already installed
+dotnet tool update --global dotnet-ef
+
+# Verify installation
+dotnet ef --version
+```
+
+#### Create A Migration
+
+```bash
+# Creates a new migration file in Infrastructure/Persistence/Migrations/
+# Migration name should describe what changed
+# EF Core compares current entity state with last migration and generates SQL
+
+dotnet ef migrations add InitialCreate \
   --project EdgePulse.Infrastructure \
   --startup-project EdgePulse.API
 
-# Apply migrations to database
+dotnet ef migrations add AddAlertThresholdsTable \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API
+```
+
+#### Apply Migrations To Database
+
+```bash
+# Applies all pending migrations to the database
+# Creates database if it does not exist
+# Also runs HasData() seed data
+
 dotnet ef database update \
   --project EdgePulse.Infrastructure \
   --startup-project EdgePulse.API
 
-# Rollback last migration
+# Apply up to a specific migration (partial update)
+dotnet ef database update InitialCreate \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API
+```
+
+#### Remove Last Migration
+
+```bash
+# Removes the most recently created migration FILE
+# Only works if that migration has NOT been applied to database yet
+# If already applied -- rollback first, then remove
+
 dotnet ef migrations remove \
   --project EdgePulse.Infrastructure \
   --startup-project EdgePulse.API
+```
 
-# List all migrations
-dotnet ef migrations list \
+#### Rollback A Migration
+
+```bash
+# Rolls back database to a previous migration
+# Does NOT delete migration files -- only undoes the SQL
+
+# Roll back to a specific migration
+dotnet ef database update PreviousMigrationName \
   --project EdgePulse.Infrastructure \
   --startup-project EdgePulse.API
 
-# Generate SQL script for migration
+# Roll back ALL migrations (empty database)
+dotnet ef database update 0 \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API
+```
+
+#### List All Migrations
+
+```bash
+# Shows all migrations and whether applied or pending
+dotnet ef migrations list \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API
+```
+
+#### Generate SQL Script
+
+```bash
+# Generates SQL file instead of applying directly
+# Useful for reviewing, DBA approval, CI/CD pipelines
+
 dotnet ef migrations script \
   --project EdgePulse.Infrastructure \
   --startup-project EdgePulse.API \
   --output infrastructure/sql/migration.sql
+
+# Idempotent script (safe to run multiple times)
+dotnet ef migrations script --idempotent \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API \
+  --output infrastructure/sql/migration-idempotent.sql
+```
+
+#### Drop The Database
+
+```bash
+# Completely drops the database -- all data lost
+# Development use only
+
+dotnet ef database drop \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API
+```
+
+#### Full Reset (development only)
+
+```bash
+# Step 1: Drop database
+dotnet ef database drop \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API
+
+# Step 2: Delete all migration files manually
+rm src/EdgePulse.Infrastructure/Persistence/Migrations/*.cs
+
+# Step 3: Create fresh migration
+dotnet ef migrations add InitialCreate \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API
+
+# Step 4: Apply
+dotnet ef database update \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API
+```
+
+#### Adding A New Entity -- Standard Workflow
+
+```bash
+# 1. Create entity in EdgePulse.Domain/Entities/
+# 2. Add IQueryable<T> to IApplicationDbContext interface
+# 3. Add DbSet<T> to EdgePulseDbContext
+# 4. Create configuration in Infrastructure/Persistence/Configurations/
+# 5. Create migration
+dotnet ef migrations add Add<EntityName>Table \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API
+# 6. Review generated migration file -- make sure SQL looks correct
+# 7. Apply migration
+dotnet ef database update \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API
+```
+
+#### Common Errors & Fixes
+
+```bash
+# Error: "Build failed"
+# Fix: Run dotnet build first and fix all errors
+dotnet build
+
+# Error: "CASCADE DELETE cycle"
+# Fix: Add OnDelete(DeleteBehavior.NoAction) in entity configuration
+#      on the FK causing the cycle, remove migration and recreate
+
+# Error: "Unable to connect to database"
+# Fix: Check Docker containers are running
+docker compose -f infrastructure/docker-compose.onpremise.yml ps
+
+# Error: "Migration already applied, cannot remove"
+# Fix: Rollback first, then remove
+dotnet ef database update PreviousMigrationName \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API
+dotnet ef migrations remove \
+  --project EdgePulse.Infrastructure \
+  --startup-project EdgePulse.API
 ```
 
 ---
