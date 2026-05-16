@@ -67,7 +67,7 @@ By the time a problem is identified, significant damage, unplanned downtime, or 
 ┌─────────────────────────────────────────────────────────────────┐
 │                         EdgePulse Platform                      │
 │                                                                 │
-│  ┌─────────────────┐        ┌──────────────────────────────┐    │
+│  ┌──────────────────┐        ┌──────────────────────────────┐   │
 │  │  React Dashboard │        │   Keycloak Identity Provider │   │
 │  │  (TypeScript)    │◄──────►│   + PostgreSQL               │   │
 │  │  Azure Static    │        │   Azure AD SSO (OIDC)        │   │

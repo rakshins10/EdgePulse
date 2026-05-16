@@ -35,26 +35,26 @@
 EdgePulse uses three databases, each chosen for a specific workload:
 
 ```
-+===========================================================+
-|                  DATA ARCHITECTURE                        |
-|                                                           |
++==========================================================+
+|                  DATA ARCHITECTURE                       |
+|                                                          |
 |  +------------------+  Purpose: Structured relational    |
 |  |   Azure SQL      |  data -- devices, users, alerts,   |
 |  |   (Primary DB)   |  audit logs, config                |
 |  +------------------+  Engine: SQL Server 2022           |
-|                        ORM: EF Core 9                     |
-|                                                           |
+|                        ORM: EF Core 9                    |
+|                                                          |
 |  +------------------+  Purpose: High-volume time-series  |
 |  |   Cosmos DB      |  telemetry readings from devices   |
 |  |   (Telemetry)    |  Partition: deviceId               |
 |  +------------------+  TTL: 12 months auto-expire        |
-|                                                           |
+|                                                          |
 |  +------------------+  Purpose: Keycloak identity data   |
 |  |   PostgreSQL     |  Users, sessions, realms, clients  |
 |  |   (Identity)     |  Managed entirely by Keycloak      |
 |  +------------------+  Never accessed by app directly    |
-|                                                           |
-+===========================================================+
+|                                                          |
++==========================================================+
 ```
 
 ### Design Decisions Summary
