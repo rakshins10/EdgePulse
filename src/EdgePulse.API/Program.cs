@@ -32,6 +32,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseMiddleware<EdgePulse.API.Middleware.ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

@@ -6,15 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EdgePulse.Application.Features.Devices.Commands;
 
-public record DeleteDeviceTypeCommand(Guid Id) : IRequest;
+public record DeleteDeviceStatusCommand(Guid Id) : IRequest;
 
-public class DeleteDeviceTypeCommandHandler
-    : IRequestHandler<DeleteDeviceTypeCommand>
+public class DeleteDeviceStatusCommandHandler
+    : IRequestHandler<DeleteDeviceStatusCommand>
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUser;
 
-    public DeleteDeviceTypeCommandHandler(
+    public DeleteDeviceStatusCommandHandler(
         IApplicationDbContext context,
         ICurrentUserService currentUser)
     {
@@ -23,42 +23,43 @@ public class DeleteDeviceTypeCommandHandler
     }
 
     public async Task Handle(
-        DeleteDeviceTypeCommand request,
+        DeleteDeviceStatusCommand request,
         CancellationToken cancellationToken)
     {
         if (_currentUser.IsOperator || _currentUser.IsExecutive)
             throw new ForbiddenAccessException();
 
-        // Check exists at all (system or tenant)
-        var deviceType = await _context.DeviceTypes
+        // First check if it exists at all (system or tenant)
+        var status = await _context.DeviceStatuses
             .FirstOrDefaultAsync(x =>
                 x.Id == request.Id &&
                 !x.IsDeleted,
                 cancellationToken)
             ?? throw new NotFoundException(
-                nameof(DeviceType), request.Id);
+                nameof(DeviceStatus), request.Id);
 
-        // System values cannot be deleted
-        if (deviceType.IsSystem)
+        // System values cannot be deleted by anyone
+        // Tenant must use TenantLookupOverride to disable them
+        if (status.IsSystem)
             throw new ForbiddenAccessException();
 
-        // Must belong to current tenant
-        if (deviceType.TenantId != _currentUser.TenantId)
+        // Tenant-owned type -- check it belongs to current tenant
+        if (status.TenantId != _currentUser.TenantId)
             throw new ForbiddenAccessException();
 
-        // Check if any devices are using this type
+        // Check if any devices are using this status
         var inUse = await _context.Devices
             .AnyAsync(x =>
-                x.TypeId == request.Id &&
+                x.StatusId == request.Id &&
                 !x.IsDeleted,
                 cancellationToken);
 
         if (inUse)
             throw new ConflictException(
-                "Cannot delete device type assigned to active devices.");
+                "Cannot delete device status assigned to active devices.");
 
-        deviceType.Deactivate();
-        _context.Update(deviceType);
+        status.Deactivate();
+        _context.Update(status);
         await _context.SaveChangesAsync(cancellationToken);
     }
 }
