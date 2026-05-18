@@ -21,10 +21,6 @@ public class ConfigurationController : ControllerBase
     // DEVICE TYPES
     // =============================================
 
-    /// <summary>
-    /// Get all device types for current tenant.
-    /// Returns system defaults + tenant custom types.
-    /// </summary>
     [HttpGet("device-types")]
     [ProducesResponseType(typeof(List<DeviceTypeDto>), 200)]
     public async Task<IActionResult> GetDeviceTypes(
@@ -35,30 +31,22 @@ public class ConfigurationController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
-    /// Create a custom device type for current tenant.
-    /// CustomerAdmin and above only.
-    /// System device types cannot be created via this endpoint.
-    /// </summary>
     [HttpPost("device-types")]
     [ProducesResponseType(typeof(Guid), 201)]
     [ProducesResponseType(400)]
     [ProducesResponseType(403)]
     [ProducesResponseType(409)]
-    public async Task<IActionResult> CreateDeviceType(
-        [FromBody] CreateDeviceTypeCommand command,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateDeviceType([FromBody] CreateDeviceTypeRequest request, CancellationToken cancellationToken)
     {
-        var id = await _mediator.Send(command, cancellationToken);
-        return CreatedAtAction(
-            nameof(GetDeviceTypes), new { }, id);
+        var id = await _mediator.Send(
+            new CreateDeviceTypeCommand(
+                request.Name, request.Code,
+                request.Description, request.Icon,
+                request.SortOrder),
+            cancellationToken);
+        return CreatedAtAction(nameof(GetDeviceTypes), new { }, id);
     }
 
-    /// <summary>
-    /// Update a custom device type.
-    /// Only tenant-owned types can be updated.
-    /// System types use TenantLookupOverride for renaming.
-    /// </summary>
     [HttpPut("device-types/{id:guid}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
@@ -71,21 +59,12 @@ public class ConfigurationController : ControllerBase
     {
         await _mediator.Send(
             new UpdateDeviceTypeCommand(
-                id,
-                request.Name,
-                request.Description,
-                request.Icon,
-                request.SortOrder),
+                id, request.Name, request.Description,
+                request.Icon, request.SortOrder),
             cancellationToken);
         return NoContent();
     }
 
-    /// <summary>
-    /// Deactivate a custom device type.
-    /// Only tenant-owned types can be deleted.
-    /// System types use TenantLookupOverride to disable.
-    /// Cannot delete if devices are actively using this type.
-    /// </summary>
     [HttpDelete("device-types/{id:guid}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(403)]
@@ -104,9 +83,6 @@ public class ConfigurationController : ControllerBase
     // DEVICE STATUSES
     // =============================================
 
-    /// <summary>
-    /// Get all device statuses for current tenant.
-    /// </summary>
     [HttpGet("device-statuses")]
     [ProducesResponseType(typeof(List<DeviceStatusDto>), 200)]
     public async Task<IActionResult> GetDeviceStatuses(
@@ -117,13 +93,60 @@ public class ConfigurationController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("device-statuses")]
+    [ProducesResponseType(typeof(Guid), 201)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> CreateDeviceStatus(
+    [FromBody] CreateDeviceStatusRequest request,
+    CancellationToken cancellationToken)
+    {
+        var id = await _mediator.Send(
+            new CreateDeviceStatusCommand(
+                request.Name, request.Code,
+                request.Description, request.Color,
+                request.SortOrder),
+            cancellationToken);
+        return CreatedAtAction(nameof(GetDeviceStatuses), new { }, id);
+    }
+
+    [HttpPut("device-statuses/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> UpdateDeviceStatus(
+        Guid id,
+        [FromBody] UpdateDeviceStatusRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new UpdateDeviceStatusCommand(
+                id, request.Name, request.Description,
+                request.Color, request.SortOrder),
+            cancellationToken);
+        return NoContent();
+    }
+
+    [HttpDelete("device-statuses/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> DeleteDeviceStatus(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new DeleteDeviceStatusCommand(id), cancellationToken);
+        return NoContent();
+    }
+
     // =============================================
     // METRIC TYPES
     // =============================================
 
-    /// <summary>
-    /// Get all metric types for current tenant.
-    /// </summary>
     [HttpGet("metric-types")]
     [ProducesResponseType(typeof(List<MetricTypeDto>), 200)]
     public async Task<IActionResult> GetMetricTypes(
@@ -138,10 +161,6 @@ public class ConfigurationController : ControllerBase
     // ALERT SEVERITIES
     // =============================================
 
-    /// <summary>
-    /// Get all alert severities for current tenant.
-    /// Ordered by priority (Critical first).
-    /// </summary>
     [HttpGet("alert-severities")]
     [ProducesResponseType(typeof(List<AlertSeverityDto>), 200)]
     public async Task<IActionResult> GetAlertSeverities(
@@ -156,9 +175,6 @@ public class ConfigurationController : ControllerBase
     // ALERT STATUSES
     // =============================================
 
-    /// <summary>
-    /// Get all alert statuses for current tenant.
-    /// </summary>
     [HttpGet("alert-statuses")]
     [ProducesResponseType(typeof(List<AlertStatusDto>), 200)]
     public async Task<IActionResult> GetAlertStatuses(
@@ -173,10 +189,6 @@ public class ConfigurationController : ControllerBase
     // INDUSTRY TEMPLATES (SuperAdmin only)
     // =============================================
 
-    /// <summary>
-    /// Get all industry templates.
-    /// SuperAdmin only.
-    /// </summary>
     [HttpGet("industry-templates")]
     [ProducesResponseType(typeof(List<IndustryTemplateDto>), 200)]
     [ProducesResponseType(403)]
@@ -189,10 +201,31 @@ public class ConfigurationController : ControllerBase
     }
 }
 
-// Request model for PUT (separate from command to allow route id)
 public record UpdateDeviceTypeRequest(
     string Name,
     string? Description,
     string? Icon,
     int SortOrder
+);
+
+public record UpdateDeviceStatusRequest(
+    string Name,
+    string? Description,
+    string? Color,
+    int SortOrder
+);
+public record CreateDeviceTypeRequest(
+    string Name,
+    string Code,
+    string? Description,
+    string? Icon,
+    int SortOrder = 0
+);
+
+public record CreateDeviceStatusRequest(
+    string Name,
+    string Code,
+    string? Description,
+    string? Color,
+    int SortOrder = 0
 );
