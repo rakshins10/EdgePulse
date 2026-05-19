@@ -1,5 +1,6 @@
 using EdgePulse.Application.Features.Alerts.Queries;
 using EdgePulse.Application.Features.Devices.Commands;
+using EdgePulse.Application.Features.Alerts.Commands;
 using EdgePulse.Application.Features.Devices.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -171,6 +172,54 @@ public class ConfigurationController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("alert-severities")]
+    [ProducesResponseType(typeof(Guid), 201)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> CreateAlertSeverity(
+        [FromBody] CreateAlertSeverityRequest request,
+        CancellationToken cancellationToken)
+    {
+        var id = await _mediator.Send(
+            new CreateAlertSeverityCommand(
+                request.Name, request.Code, request.Description,
+                request.Color, request.Priority, request.SortOrder),
+            cancellationToken);
+        return CreatedAtAction(nameof(GetAlertSeverities), new { }, id);
+    }
+
+    [HttpPut("alert-severities/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> UpdateAlertSeverity(
+        Guid id,
+        [FromBody] UpdateAlertSeverityRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new UpdateAlertSeverityCommand(
+                id, request.Name, request.Description,
+                request.Color, request.Priority, request.SortOrder),
+            cancellationToken);
+        return NoContent();
+    }
+
+    [HttpDelete("alert-severities/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> DeleteAlertSeverity(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new DeleteAlertSeverityCommand(id), cancellationToken);
+        return NoContent();
+    }
+
     // =============================================
     // ALERT STATUSES
     // =============================================
@@ -228,4 +277,21 @@ public record CreateDeviceStatusRequest(
     string? Description,
     string? Color,
     int SortOrder = 0
+);
+
+public record CreateAlertSeverityRequest(
+    string Name,
+    string Code,
+    string? Description,
+    string? Color,
+    int Priority,
+    int SortOrder = 0
+);
+
+public record UpdateAlertSeverityRequest(
+    string Name,
+    string? Description,
+    string? Color,
+    int Priority,
+    int SortOrder
 );
