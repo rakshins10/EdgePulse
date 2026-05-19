@@ -159,6 +159,169 @@ public class ConfigurationController : ControllerBase
     }
 
     // =============================================
+    // MANUFACTURERS
+    // =============================================
+
+    /// <summary>
+    /// Get all device manufacturers for current tenant.
+    /// </summary>
+    [HttpGet("manufacturers")]
+    [ProducesResponseType(typeof(List<DeviceManufacturerDto>), 200)]
+    public async Task<IActionResult> GetManufacturers(
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new GetDeviceManufacturersQuery(), cancellationToken);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Create a custom device manufacturer.
+    /// </summary>
+    [HttpPost("manufacturers")]
+    [ProducesResponseType(typeof(Guid), 201)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> CreateManufacturer(
+        [FromBody] CreateManufacturerRequest request,
+        CancellationToken cancellationToken)
+    {
+        var id = await _mediator.Send(
+            new CreateDeviceManufacturerCommand(
+                request.Name, request.Code,
+                request.Website, request.Country,
+                request.SortOrder),
+            cancellationToken);
+        return CreatedAtAction(nameof(GetManufacturers), new { }, id);
+    }
+
+    // =============================================
+    // DEVICE MODELS
+    // =============================================
+
+    /// <summary>
+    /// Create a custom device model under a manufacturer.
+    /// </summary>
+    [HttpPost("device-models")]
+    [ProducesResponseType(typeof(Guid), 201)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> CreateDeviceModel(
+        [FromBody] CreateDeviceModelRequest request,
+        CancellationToken cancellationToken)
+    {
+        var id = await _mediator.Send(
+            new CreateDeviceModelCommand(
+                request.ManufacturerId, request.Name, request.Code,
+                request.ModelNumber, request.Specifications,
+                request.SortOrder),
+            cancellationToken);
+        return CreatedAtAction(nameof(GetManufacturers), new { }, id);
+    }
+
+    // =============================================
+    // MAINTENANCE TYPES
+    // =============================================
+
+    /// <summary>
+    /// Get all maintenance types for current tenant.
+    /// </summary>
+    [HttpGet("maintenance-types")]
+    [ProducesResponseType(typeof(List<MaintenanceTypeDto>), 200)]
+    public async Task<IActionResult> GetMaintenanceTypes(
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new GetMaintenanceTypesQuery(), cancellationToken);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Create a custom maintenance type.
+    /// </summary>
+    [HttpPost("maintenance-types")]
+    [ProducesResponseType(typeof(Guid), 201)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> CreateMaintenanceType(
+        [FromBody] CreateMaintenanceTypeRequest request,
+        CancellationToken cancellationToken)
+    {
+        var id = await _mediator.Send(
+            new CreateMaintenanceTypeCommand(
+                request.Name, request.Code,
+                request.Description, request.Color,
+                request.SortOrder),
+            cancellationToken);
+        return CreatedAtAction(nameof(GetMaintenanceTypes), new { }, id);
+    }
+
+    // =============================================
+    // LOCATION TYPES
+    // =============================================
+
+    /// <summary>
+    /// Get all location types for current tenant.
+    /// </summary>
+    [HttpGet("location-types")]
+    [ProducesResponseType(typeof(List<LocationTypeDto>), 200)]
+    public async Task<IActionResult> GetLocationTypes(
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new GetLocationTypesQuery(), cancellationToken);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Create a custom location type.
+    /// </summary>
+    [HttpPost("location-types")]
+    [ProducesResponseType(typeof(Guid), 201)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> CreateLocationType(
+        [FromBody] CreateLocationTypeRequest request,
+        CancellationToken cancellationToken)
+    {
+        var id = await _mediator.Send(
+            new CreateLocationTypeCommand(
+                request.Name, request.Code,
+                request.Description, request.SortOrder),
+            cancellationToken);
+        return CreatedAtAction(nameof(GetLocationTypes), new { }, id);
+    }
+
+    // =============================================
+    // METRIC TYPES -- POST
+    // =============================================
+
+    /// <summary>
+    /// Create a custom metric type.
+    /// </summary>
+    [HttpPost("metric-types")]
+    [ProducesResponseType(typeof(Guid), 201)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> CreateMetricType(
+        [FromBody] CreateMetricTypeRequest request,
+        CancellationToken cancellationToken)
+    {
+        var id = await _mediator.Send(
+            new CreateMetricTypeCommand(
+                request.Name, request.Code,
+                request.DefaultUnit, request.Description,
+                request.SortOrder),
+            cancellationToken);
+        return CreatedAtAction(nameof(GetMetricTypes), new { }, id);
+    }
+
+    // =============================================
     // ALERT SEVERITIES
     // =============================================
 
@@ -294,4 +457,44 @@ public record UpdateAlertSeverityRequest(
     string? Color,
     int Priority,
     int SortOrder
+);
+
+public record CreateManufacturerRequest(
+    string Name,
+    string Code,
+    string? Website,
+    string? Country,
+    int SortOrder = 0
+);
+
+public record CreateDeviceModelRequest(
+    Guid ManufacturerId,
+    string Name,
+    string Code,
+    string? ModelNumber,
+    string? Specifications,
+    int SortOrder = 0
+);
+
+public record CreateMaintenanceTypeRequest(
+    string Name,
+    string Code,
+    string? Description,
+    string? Color,
+    int SortOrder = 0
+);
+
+public record CreateLocationTypeRequest(
+    string Name,
+    string Code,
+    string? Description,
+    int SortOrder = 0
+);
+
+public record CreateMetricTypeRequest(
+    string Name,
+    string Code,
+    string DefaultUnit,
+    string? Description,
+    int SortOrder = 0
 );
