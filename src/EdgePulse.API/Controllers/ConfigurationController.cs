@@ -411,6 +411,68 @@ public class ConfigurationController : ControllerBase
             new GetIndustryTemplatesQuery(), cancellationToken);
         return Ok(result);
     }
+
+    // =============================================
+    // TENANT LOOKUP OVERRIDES
+    // =============================================
+
+    /// <summary>
+    /// Get all tenant lookup overrides.
+    /// Shows which template values have been renamed or disabled.
+    /// Optionally filter by lookup type (e.g. DeviceType, DeviceStatus).
+    /// </summary>
+    [HttpGet("lookup-overrides")]
+    [ProducesResponseType(typeof(List<TenantLookupOverrideDto>), 200)]
+    public async Task<IActionResult> GetLookupOverrides(
+        [FromQuery] string? lookupType,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new GetTenantLookupOverridesQuery(lookupType),
+            cancellationToken);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Create or update a tenant lookup override.
+    /// Use this to rename or disable a template lookup value.
+    /// If override already exists it will be updated.
+    /// </summary>
+    [HttpPut("lookup-overrides")]
+    [ProducesResponseType(typeof(Guid), 200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    public async Task<IActionResult> UpsertLookupOverride(
+        [FromBody] UpsertLookupOverrideRequest request,
+        CancellationToken cancellationToken)
+    {
+        var id = await _mediator.Send(
+            new UpsertTenantLookupOverrideCommand(
+                request.LookupType,
+                request.LookupId,
+                request.DisplayName,
+                request.IsActive),
+            cancellationToken);
+        return Ok(id);
+    }
+
+    /// <summary>
+    /// Delete a tenant lookup override.
+    /// Restores the template default name and active state.
+    /// </summary>
+    [HttpDelete("lookup-overrides/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> DeleteLookupOverride(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new DeleteTenantLookupOverrideCommand(id),
+            cancellationToken);
+        return NoContent();
+    }
 }
 
 public record UpdateDeviceTypeRequest(
@@ -497,4 +559,11 @@ public record CreateMetricTypeRequest(
     string DefaultUnit,
     string? Description,
     int SortOrder = 0
+);
+
+public record UpsertLookupOverrideRequest(
+    string LookupType,
+    Guid LookupId,
+    string? DisplayName,
+    bool IsActive = true
 );
