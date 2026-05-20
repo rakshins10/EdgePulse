@@ -36,7 +36,7 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     public DbSet<Area> Areas => Set<Area>();
     public DbSet<Device> Devices => Set<Device>();
     public DbSet<Attachment> Attachments => Set<Attachment>();
-
+    public DbSet<DeviceApiKey> DeviceApiKeys => Set<DeviceApiKey>();
     // IApplicationDbContext explicit implementations
     IQueryable<IndustryTemplate> IApplicationDbContext.IndustryTemplates => Set<IndustryTemplate>();
     IQueryable<TenantTemplate> IApplicationDbContext.TenantTemplates => Set<TenantTemplate>();
@@ -56,6 +56,7 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     IQueryable<Area> IApplicationDbContext.Areas => Set<Area>();
     IQueryable<Device> IApplicationDbContext.Devices => Set<Device>();
     IQueryable<Attachment> IApplicationDbContext.Attachments => Set<Attachment>();
+    IQueryable<DeviceApiKey> IApplicationDbContext.DeviceApiKeys => Set<DeviceApiKey>();
 
     // Use 'new' keyword -- these hide DbContext methods intentionally
     public new void Add<TEntity>(TEntity entity) where TEntity : class
