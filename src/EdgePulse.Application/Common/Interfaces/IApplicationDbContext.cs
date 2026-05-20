@@ -18,6 +18,7 @@ public interface IApplicationDbContext
     IQueryable<MaintenanceType> MaintenanceTypes { get; }
     IQueryable<LocationType> LocationTypes { get; }
     IQueryable<TenantLookupOverride> TenantLookupOverrides { get; }
+    IQueryable<DeviceApiKey> DeviceApiKeys { get; }
 
     // Core Entities
     IQueryable<Tenant> Tenants { get; }
