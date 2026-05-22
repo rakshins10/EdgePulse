@@ -312,21 +312,44 @@ configurable retention period (to be decided).
 
 ---
 
-## What's Next: Sprint 4 — Identity & Authentication
+## Sprint 4 — Identity & Authentication (In Progress)
 
-Sprint 4 is the most important sprint in the roadmap. Everything built so far uses a
-placeholder `CurrentUserService` that returns hardcoded SuperAdmin credentials.
+**Dates:** May 23, 2026
+**Milestone:** Sprint 4 -- Identity & Auth
+**Epic:** #4 (open)
+**Stories:** #49 closed, #50-#52 in progress
 
-Sprint 4 will:
-1. Set up Keycloak 24 (already running in Docker, but not integrated)
-2. Build JWT middleware that reads `tenantId`, `role`, `millId`, `areaIds` from the token
-3. Replace `CurrentUserService` with a real implementation reading from `IHttpContextAccessor`
-4. Add `[Authorize]` attributes to controllers with role requirements
-5. Set up Azure AD SSO as an identity provider in Keycloak (cloud deployment)
-6. Test end-to-end: log in → get token → call API → role enforcement works
+### US-020: Configure Keycloak Realm (#49 — DONE)
 
-Until Sprint 4, the API is effectively open (no real authentication).
-This is acceptable for local development but must be resolved before any deployment.
+Keycloak 24 was configured with the `edgepulse` realm from scratch.
+Full details in `docs/keycloak-setup.md`.
+
+**What was set up:**
+- Realm `edgepulse`, client `edgepulse-api` (confidential, direct access grants)
+- 5 realm roles: SuperAdmin, CustomerAdmin, MillManager, Operator, Executive
+- 4 User Attribute protocol mappers: `tenantId`, `role`, `millId`, `areaIds`
+- 5 test users (one per role) with correct attributes and passwords
+
+**Keycloak 24 gotchas discovered:**
+1. `VERIFY_PROFILE` fires at login when `firstName`/`lastName` missing → blocks token
+   Fix: disable VERIFY_PROFILE on the realm
+2. `unmanagedAttributePolicy` defaults to disabled → custom attributes silently dropped
+   Fix: set `unmanagedAttributePolicy: ENABLED` on realm user profile
+3. "User Realm Role" mapper with Multivalued:OFF picks wrong role (`default-roles-edgepulse`)
+   Fix: use "User Attribute" mapper for `role` and set it explicitly on each user
+4. sed-based UUID extraction from Keycloak JSON is unreliable (greedy `.*` picks last id)
+   Fix: use `grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4` with `?fields=id,clientId`
+
+**Verified JWT claims per user type:**
+```
+superadmin:    { role: "SuperAdmin",    tenantId: "00000099-..." }
+millmanager:   { role: "MillManager",   tenantId: "00000099-...", millId: "7de9e5a5-..." }
+operator:      { role: "Operator",      tenantId: "00000099-...", areaIds: ["42ccc0bb-..."] }
+```
+
+Scripts created: `infrastructure/keycloak-setup.sh`, `keycloak-fix-claims.sh`, `keycloak-full-setup.sh`
+
+### Next: US-021 — JWT Bearer Middleware (#50)
 
 ---
 

@@ -373,14 +373,13 @@ Always include issue reference: "feat: description #XX"
 |--------|------|---------|
 | Sprint 1 | Config Module (#1 closed) | #11-#22 all closed |
 | Sprint 2 | Organisation Module (#2 closed) | #23-#26 all closed |
-| Sprint 3 (partial) | Device Management (#3 open) | #27 closed |
+| Sprint 3 | Device Management (#3 closed) | #27, #29 closed; #28 skipped |
 
 ### IN PROGRESS
 
 ```
-Sprint 3: Device Management
-  #28 Upload attachments     SKIPPED (needs file storage service)
-  #29 Decommission device    NEXT → branch: feature/US-029-decommission-device
+Sprint 4: Keycloak JWT Authentication
+  NEXT → Replace placeholder CurrentUserService with real JWT auth
 ```
 
 ### NEXT SPRINTS
@@ -462,9 +461,50 @@ POST   devices                       Register device, returns API key ONCE
 
 ---
 
+## Keycloak Configuration (Sprint 4 — US-020 complete)
+
+Full details in `docs/keycloak-setup.md`. Summary:
+
+```
+Realm:         edgepulse
+Client ID:     edgepulse-api
+Client Secret: lnBQYXdQnQTku1jT64LbEMyaRFRws3HS  (dev only — rotate before deploy)
+Authority:     http://localhost:8080/realms/edgepulse
+Audience:      account
+```
+
+**JWT custom claims** (User Attribute mappers on the client):
+
+```
+tenantId  -> user attribute  -> string
+role      -> user attribute  -> string  (SuperAdmin / CustomerAdmin / MillManager / Operator / Executive)
+millId    -> user attribute  -> string  (MillManager only)
+areaIds   -> user attribute  -> string[] (Operator only)
+```
+
+**Test users:**
+
+| Username       | Password    | Role           |
+|----------------|-------------|----------------|
+| superadmin     | Test@1234   | SuperAdmin     |
+| customeradmin  | Test@1234   | CustomerAdmin  |
+| millmanager    | Test@1234   | MillManager    |
+| operator       | Test@1234   | Operator       |
+| executive      | Test@1234   | Executive      |
+
+**Keycloak 24 gotchas to remember:**
+- `VERIFY_PROFILE` must be disabled or it blocks login when firstName/lastName missing
+- `unmanagedAttributePolicy` must be `ENABLED` or custom attributes are silently dropped
+- Use "User Attribute" mapper for `role`, NOT "User Realm Role" (picks wrong default role)
+- Client UUID ≠ Client ID — use `?fields=id,clientId` when extracting via API
+
+**Re-setup:** Import `infrastructure/keycloak/edgepulse-realm.json` via Keycloak admin console → Create Realm → Browse. Then create the 5 test users manually. Full guide: `docs/keycloak-setup.md`.
+
+---
+
 ## Placeholder — CurrentUserService
 
-Until Keycloak JWT is implemented (Sprint 4), `CurrentUserService` returns hardcoded values:
+Until US-022 is implemented, `CurrentUserService` still returns hardcoded values:
 
 ```csharp
 UserId   = "dev-user-001"
@@ -474,7 +514,7 @@ IsSuperAdmin = true
 ```
 
 The dev tenant `00000099-0000-0000-0000-000000000001` is manually seeded in SQL Server.
-**Replace entirely when Keycloak is implemented.**
+**Replace entirely in US-022.**
 
 ---
 
