@@ -65,6 +65,27 @@ public class DevicesController : ControllerBase
             cancellationToken);
         return CreatedAtAction(nameof(GetDevices), new { }, result);
     }
+
+    /// <summary>
+    /// Decommission a device.
+    /// Sets device status to Decommissioned and revokes all active API keys.
+    /// Historical telemetry data is preserved (soft delete only).
+    /// MillManager can only decommission devices in their assigned mill.
+    /// Operators and Executives cannot decommission devices.
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> DecommissionDevice(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new DecommissionDeviceCommand(id),
+            cancellationToken);
+        return NoContent();
+    }
 }
 
 public record RegisterDeviceRequest(
