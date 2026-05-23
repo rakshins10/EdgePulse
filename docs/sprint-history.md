@@ -312,12 +312,13 @@ configurable retention period (to be decided).
 
 ---
 
-## Sprint 4 — Identity & Authentication (In Progress)
+## Sprint 4 — Identity & Authentication (Complete)
 
 **Dates:** May 23, 2026
 **Milestone:** Sprint 4 -- Identity & Auth
-**Epic:** #4 (open)
-**Stories:** #49 closed, #50-#52 in progress
+**Epic:** #4 (closed)
+**Stories:** #49, #50, #51, #52 (all closed)
+**PR:** #53 merged
 
 ### US-020: Configure Keycloak Realm (#49 — DONE)
 
@@ -337,8 +338,6 @@ Full details in `docs/keycloak-setup.md`.
    Fix: set `unmanagedAttributePolicy: ENABLED` on realm user profile
 3. "User Realm Role" mapper with Multivalued:OFF picks wrong role (`default-roles-edgepulse`)
    Fix: use "User Attribute" mapper for `role` and set it explicitly on each user
-4. sed-based UUID extraction from Keycloak JSON is unreliable (greedy `.*` picks last id)
-   Fix: use `grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4` with `?fields=id,clientId`
 
 **Verified JWT claims per user type:**
 ```
@@ -347,9 +346,67 @@ millmanager:   { role: "MillManager",   tenantId: "00000099-...", millId: "7de9e
 operator:      { role: "Operator",      tenantId: "00000099-...", areaIds: ["42ccc0bb-..."] }
 ```
 
-Scripts created: `infrastructure/keycloak-setup.sh`, `keycloak-fix-claims.sh`, `keycloak-full-setup.sh`
+---
 
-### Next: US-021 — JWT Bearer Middleware (#50)
+### US-021/022/023: JWT Auth Middleware + CurrentUserService + [Authorize] (#50/#51/#52 — DONE)
+
+**PR:** #53 merged
+
+#### US-021 — JWT Bearer Middleware
+
+- Keycloak section added to `appsettings.json`:
+  ```json
+  "Keycloak": {
+    "Authority": "http://localhost:8080/realms/edgepulse",
+    "Audience": "account",
+    "ClientId": "edgepulse-api",
+    "ClientSecret": "lnBQYXdQnQTku1jT64LbEMyaRFRws3HS"
+  }
+  ```
+- `AddAuthentication().AddJwtBearer()` in `Program.cs`
+- `MapInboundClaims = false` — preserves JWT claim names exactly as Keycloak sends them
+- `RoleClaimType = "role"`, `NameClaimType = "sub"` in `TokenValidationParameters`
+- Swagger gets an "Authorize" button via `AddSecurityDefinition("Bearer", ...)`
+- `UseAuthentication()` wired before `UseAuthorization()` in pipeline
+
+#### US-022 — Real CurrentUserService
+
+Replaced hardcoded dev placeholder with real JWT claim reading:
+
+```csharp
+public string UserId  => Claim("sub") ?? string.Empty;
+public string Email   => Claim("email") ?? string.Empty;
+public Guid TenantId  => Guid.Parse(Claim("tenantId") ?? "");
+public UserRole Role  => Enum.Parse<UserRole>(Claim("role") ?? "Operator");
+public Guid? MillId   => Guid.TryParse(Claim("millId"), out var id) ? id : null;
+public IReadOnlyList<Guid> AreaIds => User.FindAll("areaIds").Select(c => Guid.Parse(c.Value));
+```
+
+**Key gotcha:** `MapInboundClaims = true` (default) would rename `role` → `ClaimTypes.Role`
+(a long WS-* URI), making `Claim("role")` return null. Setting `MapInboundClaims = false`
+preserves all JWT claim names exactly as they arrive from Keycloak.
+
+#### US-023 — [Authorize] on all controllers
+
+All three controllers (`ConfigurationController`, `OrganisationController`, `DevicesController`)
+have `[Authorize]` at the class level.
+
+**Verified test results:**
+
+| Test | Expected | Actual |
+|------|----------|--------|
+| No token → any endpoint | 401 | ✅ 401 |
+| SuperAdmin token → GET /configuration/device-types | 200 | ✅ 200 |
+| SuperAdmin token → GET /organisation/tenants | 200 | ✅ 200 |
+| Operator token → GET /organisation/tenants | 403 | ✅ 403 |
+| Operator token → GET /devices | 200 | ✅ 200 |
+
+MediatR logs confirm the real Keycloak `sub` and `tenantId` in every request:
+```
+EdgePulse Request: GetTenantsQuery UserId: 1fff3368-8676-4c1c-b151-afdb5f912294 TenantId: 00000099-0000-0000-0000-000000000001
+```
+
+Sprint 4 is now **complete**. All four stories delivered and verified end-to-end.
 
 ---
 
@@ -360,7 +417,7 @@ Scripts created: `infrastructure/keycloak-setup.sh`, `keycloak-fix-claims.sh`, `
 | Sprint 1 -- Configuration Module | 1 | Complete |
 | Sprint 2 -- Organisation Module | 2 | Complete |
 | Sprint 3 -- Device Management | 3 | In Progress |
-| Sprint 4 -- Identity & Auth | 4 | Not started |
+| Sprint 4 -- Identity & Auth | 4 | Complete |
 | Sprint 5 -- Telemetry Pipeline | 5 | Not started |
 | Sprint 6 -- Alerts & Notifications | 6 | Not started |
 | Sprint 7 -- Dashboard & Reports | 7 | Not started |
