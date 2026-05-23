@@ -3,11 +3,13 @@ using EdgePulse.Application.Features.Devices.Commands;
 using EdgePulse.Application.Features.Alerts.Commands;
 using EdgePulse.Application.Features.Devices.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EdgePulse.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class ConfigurationController : ControllerBase
 {
