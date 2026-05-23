@@ -5,11 +5,13 @@ using EdgePulse.Application.Features.Mills.Queries;
 using EdgePulse.Application.Features.Tenants.Commands;
 using EdgePulse.Application.Features.Tenants.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EdgePulse.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class OrganisationController : ControllerBase
 {

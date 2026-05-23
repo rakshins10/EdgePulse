@@ -1,27 +1,99 @@
-using EdgePulse.Application;
+﻿using EdgePulse.Application;
 using EdgePulse.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ----------------------------------------------------------------
+// Authentication — Keycloak JWT Bearer
+// ----------------------------------------------------------------
+var keycloakAuthority = builder.Configuration["Keycloak:Authority"]!;
+var keycloakAudience  = builder.Configuration["Keycloak:Audience"]!;
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = keycloakAuthority;
+        options.Audience  = keycloakAudience;
+
+        // Allow HTTP in development (Keycloak runs on http://localhost:8080)
+        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+
+        // Keep JWT claim names as-is from Keycloak (don't map "role" → ClaimTypes.Role URI).
+        // With MapInboundClaims = true (the default), the JWT middleware renames claim types
+        // to their long WS-* URIs, which breaks Claim("role") lookups in CurrentUserService.
+        options.MapInboundClaims = false;
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer           = true,
+            ValidateAudience         = true,
+            ValidateLifetime         = true,
+            ValidateIssuerSigningKey = true,
+            // Keycloak puts the role claim under "role" (our custom User Attribute mapper)
+            RoleClaimType = "role",
+            // Keycloak uses "sub" as the name identifier
+            NameClaimType = "sub"
+        };
+    });
+
+// ----------------------------------------------------------------
 // Add services
+// ----------------------------------------------------------------
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// ----------------------------------------------------------------
+// Swagger — with Bearer token "Authorize" button
+// ----------------------------------------------------------------
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new()
     {
-        Title = "EdgePulse API",
-        Version = "v1",
+        Title       = "EdgePulse API",
+        Version     = "v1",
         Description = "Industrial IoT Device Management Platform"
+    });
+
+    // Define the Bearer security scheme
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name         = "Authorization",
+        Type         = SecuritySchemeType.Http,
+        Scheme       = "bearer",
+        BearerFormat = "JWT",
+        In           = ParameterLocation.Header,
+        Description  = "Paste your Keycloak access token here.\n\nGet one with:\ncurl -s -X POST http://localhost:8080/realms/edgepulse/protocol/openid-connect/token -d 'grant_type=password&client_id=edgepulse-api&client_secret=lnBQYXdQnQTku1jT64LbEMyaRFRws3HS&username=superadmin&password=Test@1234' | jq -r .access_token"
+    });
+
+    // Apply the Bearer scheme globally to all operations
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id   = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
     });
 });
 
 var app = builder.Build();
 
-// Configure pipeline
+// ----------------------------------------------------------------
+// Middleware pipeline
+// ----------------------------------------------------------------
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -34,7 +106,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<EdgePulse.API.Middleware.ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
+
+// Order matters: Authentication must come before Authorization
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
