@@ -1,0 +1,273 @@
+{
+  "name": "nordpulp-opcua-agent",
+  "publishIntervalMs": 5000,
+
+  "opcua": {
+    "serverUrl": "opc.tcp://opcua-simulator:4840",
+    "reconnectDelayMs": 5000,
+    "samplingIntervalMs": 1000
+  },
+
+  "rabbitmq": {
+    "url": "amqp://edgepulse:EdgePulse@2026@rabbitmq:5672/edgepulse",
+    "queue": "telemetry.readings",
+    "durable": true,
+    "reconnectDelayMs": 5000
+  },
+
+  "devices": [
+
+    {
+      "label": "LW Feed Water Pump",
+      "deviceId": "40000001-0000-0000-0000-000000000001",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000001",
+      "areaId":   "30000001-0000-0000-0000-000000000001",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.LW_FeedWaterPump.bearing_temp", "key": "bearing_temp", "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.LW_FeedWaterPump.vibration",    "key": "vibration",    "unit": "mm/s" },
+        { "nodeId": "ns=1;s=NordPulp.LW_FeedWaterPump.flow_rate",    "key": "flow_rate",    "unit": "m³/h" }
+      ]
+    },
+
+    {
+      "label": "LW White Liquor Pump",
+      "deviceId": "40000001-0000-0000-0000-000000000002",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000001",
+      "areaId":   "30000001-0000-0000-0000-000000000001",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.LW_WhiteLiquorPump.bearing_temp",        "key": "bearing_temp",        "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.LW_WhiteLiquorPump.flow_rate",           "key": "flow_rate",           "unit": "m³/h" },
+        { "nodeId": "ns=1;s=NordPulp.LW_WhiteLiquorPump.discharge_pressure",  "key": "discharge_pressure",  "unit": "bar" }
+      ]
+    },
+
+    {
+      "label": "LW Chip Feeder Motor",
+      "deviceId": "40000001-0000-0000-0000-000000000003",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000001",
+      "areaId":   "30000001-0000-0000-0000-000000000001",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.LW_ChipFeederMotor.winding_temp",  "key": "winding_temp",  "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.LW_ChipFeederMotor.vibration",     "key": "vibration",     "unit": "mm/s" },
+        { "nodeId": "ns=1;s=NordPulp.LW_ChipFeederMotor.motor_current", "key": "motor_current", "unit": "A" }
+      ]
+    },
+
+    {
+      "label": "LW Continuous Digester",
+      "deviceId": "40000001-0000-0000-0000-000000000004",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000001",
+      "areaId":   "30000001-0000-0000-0000-000000000001",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.LW_ContinuousDigester.pressure",    "key": "pressure",    "unit": "bar" },
+        { "nodeId": "ns=1;s=NordPulp.LW_ContinuousDigester.temperature", "key": "temperature", "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.LW_ContinuousDigester.kappa_number","key": "kappa_number","unit": "" }
+      ]
+    },
+
+    {
+      "label": "LW Bleach Pump",
+      "deviceId": "40000001-0000-0000-0000-000000000005",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000001",
+      "areaId":   "30000001-0000-0000-0000-000000000002",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.LW_BleachPump.flow_rate",    "key": "flow_rate",    "unit": "m³/h" },
+        { "nodeId": "ns=1;s=NordPulp.LW_BleachPump.bearing_temp", "key": "bearing_temp", "unit": "°C" }
+      ]
+    },
+
+    {
+      "label": "LW Primary Refiner",
+      "deviceId": "40000001-0000-0000-0000-000000000006",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000001",
+      "areaId":   "30000001-0000-0000-0000-000000000002",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.LW_PrimaryRefiner.plate_gap",          "key": "plate_gap",          "unit": "mm" },
+        { "nodeId": "ns=1;s=NordPulp.LW_PrimaryRefiner.motor_temp",         "key": "motor_temp",         "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.LW_PrimaryRefiner.power_consumption",  "key": "power_consumption",  "unit": "kW" }
+      ]
+    },
+
+    {
+      "label": "LW PM1 Head Box Pump",
+      "deviceId": "40000001-0000-0000-0000-000000000007",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000001",
+      "areaId":   "30000001-0000-0000-0000-000000000003",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.LW_PM1HeadBoxPump.flow_rate",           "key": "flow_rate",           "unit": "m³/h" },
+        { "nodeId": "ns=1;s=NordPulp.LW_PM1HeadBoxPump.discharge_pressure",  "key": "discharge_pressure",  "unit": "bar" },
+        { "nodeId": "ns=1;s=NordPulp.LW_PM1HeadBoxPump.bearing_temp",        "key": "bearing_temp",        "unit": "°C" }
+      ]
+    },
+
+    {
+      "label": "LW PM1 Drive Motor",
+      "deviceId": "40000001-0000-0000-0000-000000000008",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000001",
+      "areaId":   "30000001-0000-0000-0000-000000000003",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.LW_PM1DriveMotor.winding_temp", "key": "winding_temp", "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.LW_PM1DriveMotor.vibration",    "key": "vibration",    "unit": "mm/s" },
+        { "nodeId": "ns=1;s=NordPulp.LW_PM1DriveMotor.speed_rpm",    "key": "speed_rpm",    "unit": "rpm" }
+      ]
+    },
+
+    {
+      "label": "LW Recovery Boiler Feed Pump",
+      "deviceId": "40000001-0000-0000-0000-000000000009",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000001",
+      "areaId":   "30000001-0000-0000-0000-000000000004",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.LW_RecoveryBoilerFeedPump.flow_rate",           "key": "flow_rate",           "unit": "m³/h" },
+        { "nodeId": "ns=1;s=NordPulp.LW_RecoveryBoilerFeedPump.bearing_temp",        "key": "bearing_temp",        "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.LW_RecoveryBoilerFeedPump.discharge_pressure",  "key": "discharge_pressure",  "unit": "bar" }
+      ]
+    },
+
+    {
+      "label": "LW Recovery Boiler Fan Motor",
+      "deviceId": "40000001-0000-0000-0000-000000000010",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000001",
+      "areaId":   "30000001-0000-0000-0000-000000000004",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.LW_RecoveryBoilerFanMotor.winding_temp", "key": "winding_temp", "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.LW_RecoveryBoilerFanMotor.vibration",    "key": "vibration",    "unit": "mm/s" },
+        { "nodeId": "ns=1;s=NordPulp.LW_RecoveryBoilerFanMotor.airflow",      "key": "airflow",      "unit": "m³/s" }
+      ]
+    },
+
+    {
+      "label": "RV Feed Water Pump",
+      "deviceId": "40000002-0000-0000-0000-000000000001",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000002",
+      "areaId":   "30000002-0000-0000-0000-000000000001",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.RV_FeedWaterPump.bearing_temp", "key": "bearing_temp", "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.RV_FeedWaterPump.vibration",    "key": "vibration",    "unit": "mm/s" },
+        { "nodeId": "ns=1;s=NordPulp.RV_FeedWaterPump.flow_rate",    "key": "flow_rate",    "unit": "m³/h" }
+      ]
+    },
+
+    {
+      "label": "RV Chip Feeder Motor",
+      "deviceId": "40000002-0000-0000-0000-000000000002",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000002",
+      "areaId":   "30000002-0000-0000-0000-000000000001",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.RV_ChipFeederMotor.winding_temp", "key": "winding_temp", "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.RV_ChipFeederMotor.vibration",    "key": "vibration",    "unit": "mm/s" }
+      ]
+    },
+
+    {
+      "label": "RV Batch Digester",
+      "deviceId": "40000002-0000-0000-0000-000000000003",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000002",
+      "areaId":   "30000002-0000-0000-0000-000000000001",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.RV_BatchDigester.pressure",    "key": "pressure",    "unit": "bar" },
+        { "nodeId": "ns=1;s=NordPulp.RV_BatchDigester.temperature", "key": "temperature", "unit": "°C" }
+      ]
+    },
+
+    {
+      "label": "RV Black Liquor Pump",
+      "deviceId": "40000002-0000-0000-0000-000000000004",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000002",
+      "areaId":   "30000002-0000-0000-0000-000000000002",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.RV_BlackLiquorPump.pump_temp",  "key": "pump_temp",  "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.RV_BlackLiquorPump.flow_rate",  "key": "flow_rate",  "unit": "m³/h" }
+      ]
+    },
+
+    {
+      "label": "RV Green Liquor Pump",
+      "deviceId": "40000002-0000-0000-0000-000000000005",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000002",
+      "areaId":   "30000002-0000-0000-0000-000000000002",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.RV_GreenLiquorPump.flow_rate",    "key": "flow_rate",    "unit": "m³/h" },
+        { "nodeId": "ns=1;s=NordPulp.RV_GreenLiquorPump.bearing_temp", "key": "bearing_temp", "unit": "°C" }
+      ]
+    },
+
+    {
+      "label": "RV Recovery Fan Motor",
+      "deviceId": "40000002-0000-0000-0000-000000000006",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000002",
+      "areaId":   "30000002-0000-0000-0000-000000000002",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.RV_RecoveryFanMotor.winding_temp", "key": "winding_temp", "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.RV_RecoveryFanMotor.vibration",    "key": "vibration",    "unit": "mm/s" }
+      ]
+    },
+
+    {
+      "label": "RV Primary Refiner",
+      "deviceId": "40000002-0000-0000-0000-000000000007",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000002",
+      "areaId":   "30000002-0000-0000-0000-000000000003",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.RV_PrimaryRefiner.motor_temp",        "key": "motor_temp",        "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.RV_PrimaryRefiner.plate_gap",         "key": "plate_gap",         "unit": "mm" },
+        { "nodeId": "ns=1;s=NordPulp.RV_PrimaryRefiner.power_consumption", "key": "power_consumption", "unit": "kW" }
+      ]
+    },
+
+    {
+      "label": "RV PM1 White Water Pump",
+      "deviceId": "40000002-0000-0000-0000-000000000008",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000002",
+      "areaId":   "30000002-0000-0000-0000-000000000003",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.RV_PM1WhiteWaterPump.flow_rate",    "key": "flow_rate",    "unit": "m³/h" },
+        { "nodeId": "ns=1;s=NordPulp.RV_PM1WhiteWaterPump.bearing_temp", "key": "bearing_temp", "unit": "°C" }
+      ]
+    },
+
+    {
+      "label": "RV Cooling Water Pump",
+      "deviceId": "40000002-0000-0000-0000-000000000009",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000002",
+      "areaId":   "30000002-0000-0000-0000-000000000004",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.RV_CoolingWaterPump.flow_rate",   "key": "flow_rate",   "unit": "m³/h" },
+        { "nodeId": "ns=1;s=NordPulp.RV_CoolingWaterPump.outlet_temp", "key": "outlet_temp", "unit": "°C" }
+      ]
+    },
+
+    {
+      "label": "RV Main Drive Motor",
+      "deviceId": "40000002-0000-0000-0000-000000000010",
+      "tenantId": "10000001-0000-0000-0000-000000000001",
+      "millId":   "20000001-0000-0000-0000-000000000002",
+      "areaId":   "30000002-0000-0000-0000-000000000004",
+      "metrics": [
+        { "nodeId": "ns=1;s=NordPulp.RV_MainDriveMotor.winding_temp", "key": "winding_temp", "unit": "°C" },
+        { "nodeId": "ns=1;s=NordPulp.RV_MainDriveMotor.vibration",    "key": "vibration",    "unit": "mm/s" },
+        { "nodeId": "ns=1;s=NordPulp.RV_MainDriveMotor.speed_rpm",    "key": "speed_rpm",    "unit": "rpm" }
+      ]
+    }
+
+  ]
+}
