@@ -8,18 +8,19 @@
 }
 
 .select {
-  background: #0f1117;
-  border: 1px solid #1e2230;
-  color: #e2e8f0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
   padding: 7px 12px;
   border-radius: 6px;
   font-size: 0.8rem;
   cursor: pointer;
+  transition: border-color 0.15s;
 }
 
 .select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--color-accent);
 }
 
 /* ── Summary badges ──────────────────────────────────────────────────────────── */
@@ -31,8 +32,8 @@
 }
 
 .summaryCard {
-  background: #0f1117;
-  border: 1px solid #1e2230;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 12px 18px;
   min-width: 120px;
@@ -41,24 +42,24 @@
 .summaryCount {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--color-text);
   line-height: 1.2;
 }
 
 .summaryLabel {
   font-size: 0.72rem;
-  color: #64748b;
+  color: var(--color-text-muted);
   margin-top: 2px;
 }
 
-.summaryCardCritical .summaryCount { color: #ef4444; }
-.summaryCardHigh     .summaryCount { color: #f97316; }
-.summaryCardMedium   .summaryCount { color: #f59e0b; }
+.summaryCardCritical .summaryCount { color: var(--color-critical); }
+.summaryCardHigh     .summaryCount { color: var(--color-high); }
+.summaryCardMedium   .summaryCount { color: var(--color-medium); }
 
 /* ── Table ───────────────────────────────────────────────────────────────────── */
 .tableWrap {
   overflow-x: auto;
-  border: 1px solid #1e2230;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
 }
 
@@ -70,12 +71,12 @@
 }
 
 .table th {
-  background: #0a0d14;
-  color: #64748b;
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
   font-weight: 600;
   text-align: left;
   padding: 10px 14px;
-  border-bottom: 1px solid #1e2230;
+  border-bottom: 1px solid var(--color-border);
   white-space: nowrap;
   user-select: none;
 }
@@ -85,13 +86,13 @@
 }
 
 .table th.sortable:hover {
-  color: #94a3b8;
+  color: var(--color-text-secondary);
 }
 
 .table td {
   padding: 11px 14px;
-  border-bottom: 1px solid #111827;
-  color: #cbd5e1;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
   vertical-align: middle;
 }
 
@@ -100,7 +101,7 @@
 }
 
 .table tr:hover td {
-  background: #0d1117;
+  background: var(--color-row-hover);
 }
 
 /* ── Severity pill ───────────────────────────────────────────────────────────── */
@@ -172,7 +173,7 @@
   justify-content: space-between;
   margin-top: 16px;
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--color-text-muted);
   flex-wrap: wrap;
   gap: 10px;
 }
@@ -186,33 +187,37 @@
 .btnPage {
   padding: 5px 12px;
   border-radius: 5px;
-  border: 1px solid #1e2230;
-  background: #0f1117;
-  color: #94a3b8;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
   font-size: 0.8rem;
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, color 0.15s;
 }
 
-.btnPage:hover:not(:disabled) { border-color: #3b82f6; color: #e2e8f0; }
+.btnPage:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
 .btnPage:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .pageInfo {
-  color: #94a3b8;
+  color: var(--color-text-secondary);
 }
 
 /* ── Empty / loading states ──────────────────────────────────────────────────── */
 .empty {
   text-align: center;
   padding: 48px 24px;
-  color: #475569;
+  color: var(--color-text-faint);
   font-size: 0.875rem;
 }
 
 .loading {
   text-align: center;
   padding: 32px;
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
 }
 
@@ -224,6 +229,23 @@
 
 .thresholdNote {
   font-size: 0.72rem;
-  color: #64748b;
+  color: var(--color-text-muted);
   margin-top: 1px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .summary {
+    gap: 8px;
+  }
+
+  .summaryCard {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 0;
+  }
+
+  .pagination {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
