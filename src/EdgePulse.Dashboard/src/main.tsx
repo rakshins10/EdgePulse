@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider as ReduxProvider } from 'react-redux';
 import { store } from './store/index';
 import keycloak from './keycloak';
+import { ThemeProvider } from './context/ThemeContext';
 import App from './App';
 import './index.css';
 
@@ -36,11 +37,13 @@ async function bootstrap() {
 
   createRoot(root).render(
     <StrictMode>
-      <ReduxProvider store={store}>
-        <QueryClientProvider client={queryClient}>
-          <App />
-        </QueryClientProvider>
-      </ReduxProvider>
+      <ThemeProvider>
+        <ReduxProvider store={store}>
+          <QueryClientProvider client={queryClient}>
+            <App />
+          </QueryClientProvider>
+        </ReduxProvider>
+      </ThemeProvider>
     </StrictMode>
   );
 }
