@@ -27,6 +27,10 @@ public interface IApplicationDbContext
     IQueryable<Device> Devices { get; }
     IQueryable<Attachment> Attachments { get; }
 
+    // Alert Engine
+    IQueryable<AlertThreshold> AlertThresholds { get; }
+    IQueryable<Alert> Alerts { get; }
+
     // Write operations
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     void Add<TEntity>(TEntity entity) where TEntity : class;
