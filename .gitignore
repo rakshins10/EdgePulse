@@ -482,3 +482,11 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Frontend build output
+src/EdgePulse.Dashboard/dist/
+src/EdgePulse.Dashboard/playwright-report/
+
+# Node.js build output
+src/EdgePulse.Ingestion/dist/
+src/EdgePulse.OpcUaAgent/dist/
