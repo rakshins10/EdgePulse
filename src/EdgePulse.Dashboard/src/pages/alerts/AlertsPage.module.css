@@ -1,0 +1,229 @@
+/* ── Filters bar ─────────────────────────────────────────────────────────────── */
+.filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.select {
+  background: #0f1117;
+  border: 1px solid #1e2230;
+  color: #e2e8f0;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+/* ── Summary badges ──────────────────────────────────────────────────────────── */
+.summary {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.summaryCard {
+  background: #0f1117;
+  border: 1px solid #1e2230;
+  border-radius: 8px;
+  padding: 12px 18px;
+  min-width: 120px;
+}
+
+.summaryCount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  line-height: 1.2;
+}
+
+.summaryLabel {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.summaryCardCritical .summaryCount { color: #ef4444; }
+.summaryCardHigh     .summaryCount { color: #f97316; }
+.summaryCardMedium   .summaryCount { color: #f59e0b; }
+
+/* ── Table ───────────────────────────────────────────────────────────────────── */
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid #1e2230;
+  border-radius: 8px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  min-width: 860px;
+}
+
+.table th {
+  background: #0a0d14;
+  color: #64748b;
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid #1e2230;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.table th.sortable {
+  cursor: pointer;
+}
+
+.table th.sortable:hover {
+  color: #94a3b8;
+}
+
+.table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid #111827;
+  color: #cbd5e1;
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: #0d1117;
+}
+
+/* ── Severity pill ───────────────────────────────────────────────────────────── */
+.severity {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.severityCritical { background: rgba(239,68,68,0.15);  color: #ef4444; }
+.severityHigh     { background: rgba(249,115,22,0.15); color: #f97316; }
+.severityMedium   { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.severityLow      { background: rgba(34,197,94,0.15);  color: #22c55e; }
+
+/* ── Status pill ─────────────────────────────────────────────────────────────── */
+.status {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.statusOpen         { background: rgba(239,68,68,0.12);  color: #f87171; }
+.statusAcknowledged { background: rgba(249,115,22,0.12); color: #fb923c; }
+.statusResolved     { background: rgba(34,197,94,0.12);  color: #4ade80; }
+.statusClosed       { background: rgba(100,116,139,0.12);color: #94a3b8; }
+
+/* ── Action buttons ──────────────────────────────────────────────────────────── */
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btnAction {
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+
+.btnAck {
+  background: rgba(249,115,22,0.1);
+  border-color: rgba(249,115,22,0.3);
+  color: #f97316;
+}
+.btnAck:hover { background: rgba(249,115,22,0.2); }
+
+.btnResolve {
+  background: rgba(34,197,94,0.1);
+  border-color: rgba(34,197,94,0.3);
+  color: #22c55e;
+}
+.btnResolve:hover { background: rgba(34,197,94,0.2); }
+
+/* ── Pagination ──────────────────────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: #64748b;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pageControls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btnPage {
+  padding: 5px 12px;
+  border-radius: 5px;
+  border: 1px solid #1e2230;
+  background: #0f1117;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.btnPage:hover:not(:disabled) { border-color: #3b82f6; color: #e2e8f0; }
+.btnPage:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.pageInfo {
+  color: #94a3b8;
+}
+
+/* ── Empty / loading states ──────────────────────────────────────────────────── */
+.empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: #475569;
+  font-size: 0.875rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 32px;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+/* ── Metric cell ─────────────────────────────────────────────────────────────── */
+.metricValue {
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+.thresholdNote {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 1px;
+}
