@@ -1,0 +1,130 @@
+/* ── Sidebar shell ─────────────────────────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: #0f1117;
+  border-right: 1px solid #1e2230;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+/* ── Logo ──────────────────────────────────────────────────────────────────── */
+.logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid #1e2230;
+}
+
+.logoText {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  letter-spacing: 0.03em;
+}
+
+.logoSub {
+  font-size: 0.7rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* ── Nav ───────────────────────────────────────────────────────────────────── */
+.nav {
+  flex: 1;
+  padding: 12px 0;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  position: relative;
+  border-left: 3px solid transparent;
+}
+
+.navItem:hover {
+  background: #1e2230;
+  color: #e2e8f0;
+}
+
+.navItemActive {
+  background: #1e2230;
+  color: #e2e8f0;
+  border-left-color: #3b82f6;
+}
+
+.navIcon {
+  font-size: 1rem;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ── Alert badge ───────────────────────────────────────────────────────────── */
+.badgeWrapper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.badgeCritical {
+  background: #ef4444;
+  color: #fff;
+}
+
+.badgeOpen {
+  background: #f97316;
+  color: #fff;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────────── */
+.footer {
+  padding: 16px 20px;
+  border-top: 1px solid #1e2230;
+  font-size: 0.75rem;
+  color: #475569;
+}
+
+.userEmail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logoutBtn {
+  margin-top: 8px;
+  background: none;
+  border: 1px solid #334155;
+  color: #64748b;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.logoutBtn:hover {
+  border-color: #64748b;
+  color: #94a3b8;
+}

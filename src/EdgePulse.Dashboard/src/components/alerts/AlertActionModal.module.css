@@ -1,0 +1,143 @@
+/* ── Overlay ────────────────────────────────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+/* ── Dialog ─────────────────────────────────────────────────────────────────── */
+.dialog {
+  background: #0f1117;
+  border: 1px solid #1e2230;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 480px;
+  padding: 24px;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0 0 20px;
+}
+
+/* ── Alert info summary ─────────────────────────────────────────────────────── */
+.alertInfo {
+  background: #0a0d14;
+  border: 1px solid #1e2230;
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 16px;
+}
+
+.infoRow {
+  font-size: 0.8rem;
+}
+
+.infoLabel {
+  color: #475569;
+}
+
+.infoValue {
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+/* ── Notes textarea ─────────────────────────────────────────────────────────── */
+.label {
+  display: block;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.textarea {
+  width: 100%;
+  background: #0a0d14;
+  border: 1px solid #1e2230;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  padding: 10px 12px;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+/* ── Actions ────────────────────────────────────────────────────────────────── */
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btnCancel {
+  padding: 8px 18px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btnCancel:hover {
+  border-color: #64748b;
+  color: #e2e8f0;
+}
+
+.btnConfirm {
+  padding: 8px 18px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btnConfirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnAcknowledge {
+  background: #f97316;
+  color: #fff;
+}
+
+.btnAcknowledge:hover:not(:disabled) {
+  background: #ea6d10;
+}
+
+.btnResolve {
+  background: #22c55e;
+  color: #fff;
+}
+
+.btnResolve:hover:not(:disabled) {
+  background: #16a34a;
+}
