@@ -1,3 +1,75 @@
+/* ── Theme variables — dark (default) ──────────────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --color-bg:             #080b12;
+  --color-surface:        #0f1117;
+  --color-surface-2:      #0a0d14;
+
+  /* Borders */
+  --color-border:         #1e2230;
+  --color-border-hover:   #334155;
+
+  /* Text */
+  --color-text:           #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted:     #64748b;
+  --color-text-faint:     #475569;
+
+  /* Accent */
+  --color-accent:         #3b82f6;
+  --color-accent-hover:   #2563eb;
+
+  /* Semantic (unchanged across themes) */
+  --color-critical:       #ef4444;
+  --color-high:           #f97316;
+  --color-medium:         #f59e0b;
+  --color-low:            #22c55e;
+
+  /* Row hover */
+  --color-row-hover:      #0d1117;
+
+  /* Overlay */
+  --color-overlay:        rgba(0, 0, 0, 0.65);
+
+  /* Scrollbar */
+  --color-scroll-track:       #0a0d14;
+  --color-scroll-thumb:       #1e2230;
+  --color-scroll-thumb-hover: #334155;
+
+  /* Sidebar active left-border */
+  --color-nav-active-bg:     #1e2230;
+  --color-nav-active-border: #3b82f6;
+}
+
+/* ── Theme variables — light ────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --color-bg:             #f8fafc;
+  --color-surface:        #ffffff;
+  --color-surface-2:      #f1f5f9;
+
+  --color-border:         #e2e8f0;
+  --color-border-hover:   #94a3b8;
+
+  --color-text:           #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted:     #64748b;
+  --color-text-faint:     #94a3b8;
+
+  --color-accent:         #2563eb;
+  --color-accent-hover:   #1d4ed8;
+
+  --color-row-hover:      #f1f5f9;
+
+  --color-overlay:        rgba(15, 23, 42, 0.50);
+
+  --color-scroll-track:       #e2e8f0;
+  --color-scroll-thumb:       #cbd5e1;
+  --color-scroll-thumb-hover: #94a3b8;
+
+  --color-nav-active-bg:     #eff6ff;
+  --color-nav-active-border: #2563eb;
+}
+
 /* ── Reset & base ──────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -10,13 +82,14 @@ html, body {
 }
 
 body {
-  background: #080b12;
-  color: #e2e8f0;
+  background: var(--color-bg);
+  color: var(--color-text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 #root {
@@ -30,27 +103,27 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0d14;
+  background: var(--color-scroll-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e2230;
+  background: var(--color-scroll-thumb);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: var(--color-scroll-thumb-hover);
 }
 
 /* ── Focus ring ────────────────────────────────────────────────────────────── */
 :focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
 /* ── Links ─────────────────────────────────────────────────────────────────── */
 a {
-  color: #3b82f6;
+  color: var(--color-accent);
   text-decoration: none;
 }
 
@@ -59,10 +132,9 @@ a:hover {
 }
 
 /* ── Utility ───────────────────────────────────────────────────────────────── */
-button {
-  font-family: inherit;
-}
-
-input, select, textarea {
+button,
+input,
+select,
+textarea {
   font-family: inherit;
 }
