@@ -3,14 +3,16 @@
 # Stop with: docker compose -f infrastructure/docker-compose.onpremise.yml down
 #
 # Services started:
-#   HAProxy       -> http://localhost:80       (load balancer)
-#   HAProxy Stats -> http://localhost:8404     (stats dashboard)
-#   Keycloak      -> http://localhost:8080     (identity provider)
-#   PostgreSQL    -> localhost:5432            (Keycloak DB)
-#   SQL Server    -> localhost:1433            (devices, alerts)
-#   MongoDB       -> localhost:27017           (telemetry)
-#   RabbitMQ      -> http://localhost:15672    (message queue UI)
-#   RabbitMQ AMQP -> localhost:5672            (message queue)
+#   HAProxy          -> http://localhost:80       (load balancer)
+#   HAProxy Stats    -> http://localhost:8404     (stats dashboard)
+#   Keycloak         -> http://localhost:8080     (identity provider)
+#   PostgreSQL       -> localhost:5432            (Keycloak DB)
+#   SQL Server       -> localhost:1433            (devices, alerts)
+#   MongoDB          -> localhost:27017           (telemetry)
+#   RabbitMQ         -> http://localhost:15672    (message queue UI)
+#   RabbitMQ AMQP   -> localhost:5672            (message queue)
+#   OPC-UA Simulator -> opc.tcp://localhost:4840  (NordPulp demo data)
+#   OPC-UA Agent     -> (internal)               (simulator → RabbitMQ bridge)
 
 name: edgepulse-onpremise
 
@@ -177,6 +179,61 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # ============================================================
+  # OPC-UA Simulator (NordPulp demo only)
+  # Generates synthetic Pulp & Paper sensor data for all 20 demo devices.
+  # Exposes OPC-UA endpoint: opc.tcp://opcua-simulator:4840 (internal)
+  #                          opc.tcp://localhost:4840       (host access)
+  #
+  # Start standalone:
+  #   docker compose ... up -d opcua-simulator
+  # ============================================================
+  opcua-simulator:
+    build:
+      context: ../src/EdgePulse.OpcUaAgent
+      dockerfile: Dockerfile
+    container_name: edgepulse-opcua-simulator
+    command: ["node", "dist/index.js", "--simulate"]
+    environment:
+      OPCUA_PORT: 4840
+      SIMULATOR_UPDATE_MS: 2000
+    ports:
+      - "4840:4840"
+    networks:
+      - edgepulse-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('net').connect(4840,'localhost',function(){process.exit(0)}).on('error',function(){process.exit(1)})\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ============================================================
+  # OPC-UA Agent
+  # Reads from opcua-simulator, publishes TelemetryReading JSON
+  # to RabbitMQ 'telemetry.readings' queue every 5 seconds.
+  # The TelemetryProcessor picks up the messages and stores them
+  # in MongoDB and evaluates alert thresholds.
+  #
+  # CONFIG_PATH: override to use a custom config file.
+  # ============================================================
+  opcua-agent:
+    build:
+      context: ../src/EdgePulse.OpcUaAgent
+      dockerfile: Dockerfile
+    container_name: edgepulse-opcua-agent
+    environment:
+      CONFIG_PATH: /app/config/config.nordpulp.json
+    networks:
+      - edgepulse-network
+    restart: unless-stopped
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      opcua-simulator:
+        condition: service_healthy
 
 # ============================================================
 # Networks
