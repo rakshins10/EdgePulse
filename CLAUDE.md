@@ -2,7 +2,7 @@
 
 > This file is read automatically by Claude Code on every session.
 > Keep it updated. It is the single source of truth for project context.
-> Last updated: May 2026 | Sprint 3 in progress
+> Last updated: May 2026 | Sprint 11 complete — Sprint 12 next
 
 ---
 
@@ -28,18 +28,17 @@ targeting mid-market manufacturers (50-500 employees) that ABB/Siemens/Honeywell
 ```
 Backend API:      .NET 9, ASP.NET Core, Clean Architecture
                   CQRS + MediatR 12, EF Core 9.0.5 (PINNED), FluentValidation
-Telemetry:        Node.js 20, NestJS, TypeScript  [Sprint 5 - NOT YET BUILT]
-Processor:        .NET 9 Worker Service            [Sprint 5 - NOT YET BUILT]
-Identity:         Keycloak 24 + PostgreSQL 16      [Sprint 4 - NOT YET BUILT]
+Ingestion:        Node.js 20, NestJS, TypeScript    [Sprint 5 - BUILT]
+Processor:        .NET 9 Worker Service             [Sprint 6 - BUILT]
+OPC-UA Agent:     Node.js 20, TypeScript, node-opcua [Sprint 11 - BUILT]
+Identity:         Keycloak 24 + PostgreSQL 16        [Sprint 4 - BUILT]
 Message Queue:    Azure Service Bus (cloud) / RabbitMQ (on-premise)
-Telemetry DB:     Azure Cosmos DB (cloud) / MongoDB (on-premise)
+Telemetry DB:     Azure Cosmos DB (cloud) / MongoDB 7 (on-premise)
 Primary DB:       Azure SQL (cloud) / SQL Server 2022 (on-premise, Docker)
 Load Balancer:    HAProxy (on-premise) / Azure Container Apps (cloud)
 AI:               Azure OpenAI GPT-4o-mini (cloud) / Ollama llama3.2 (on-premise)
-ML:               Azure ML (cloud) / ONNX runtime (on-premise)
-Mobile:           React Native (iOS + Android)     [Sprint 11 - NOT YET BUILT]
-Frontend:         React 18, TypeScript, Tailwind   [Sprint 7 - NOT YET BUILT]
-CI/CD:            GitHub Actions + self-hosted runner [Sprint 8 - NOT YET BUILT]
+Frontend:         React 18 + TypeScript + Vite + CSS Modules [Sprint 7 - BUILT]
+CI/CD:            GitHub Actions + self-hosted runner [NOT YET BUILT]
 ```
 
 **CRITICAL PACKAGE PINS — DO NOT UPGRADE:**
@@ -47,70 +46,86 @@ CI/CD:            GitHub Actions + self-hosted runner [Sprint 8 - NOT YET BUILT]
 - Swashbuckle: `6.9.0` (7.x breaks .NET 9 Swagger)
 - JWT Bearer: `9.0.5`
 
+**FRONTEND RULE — NO CSS LIBRARIES:**
+Plain CSS Modules only. No Tailwind, no Bootstrap, no Radix UI, no component libraries.
+Theme: CSS custom properties in `index.css` (`:root` dark, `[data-theme="light"]` light).
+
 ---
 
 ## Solution Structure
 
 ```
-src/EdgePulse.sln
-├── EdgePulse.Domain/                    # No dependencies. Pure C#.
+src/
+├── EdgePulse.sln
+├── EdgePulse.Domain/           # No dependencies. Pure C#.
 │   ├── Common/
-│   │   ├── BaseEntity.cs               # Id, CreatedAt, UpdatedAt, IsDeleted, DeletedAt
-│   │   ├── TenantBaseEntity.cs         # + TenantId
-│   │   └── LookupBaseEntity.cs         # + Code, IsSystem, IsActive, SortOrder, TemplateId
-│   ├── Entities/                       # All domain entities
-│   ├── Enums/                          # UserRole, DeploymentMode, RoleScope
+│   │   ├── BaseEntity.cs       # Id, CreatedAt, UpdatedAt, IsDeleted, DeletedAt
+│   │   ├── TenantBaseEntity.cs # + TenantId
+│   │   └── LookupBaseEntity.cs # + Code, IsSystem, IsActive, SortOrder, TemplateId
+│   ├── Entities/               # Tenant, Mill, Area, Device, Alert, AlertThreshold, ...
+│   ├── Enums/                  # UserRole, DeploymentMode, RoleScope
 │   └── Constants/
-│       ├── WellKnownIds.cs             # System GUIDs (00000010-..., 00000011-..., etc.)
-│       ├── LookupTypes.cs              # "DeviceType", "DeviceStatus", etc.
+│       ├── WellKnownIds.cs     # System GUIDs (00000010-..., 00000011-..., etc.)
+│       ├── DemoIds.cs          # Fixed NordPulp demo GUIDs (10000001-..., 40000001-...)
+│       ├── LookupTypes.cs      # "DeviceType", "DeviceStatus", etc.
 │       ├── EntityTypes.cs
 │       └── FileCategories.cs
 │
-├── EdgePulse.Application/               # Depends on Domain only.
-│   ├── Common/
-│   │   ├── Interfaces/
-│   │   │   ├── IApplicationDbContext.cs # IQueryable<T> for each entity
-│   │   │   ├── ICurrentUserService.cs
-│   │   │   └── IFileStorageService.cs
-│   │   ├── Exceptions/
-│   │   │   ├── ValidationException.cs   # -> 400
-│   │   │   ├── NotFoundException.cs     # -> 404
-│   │   │   ├── ForbiddenAccessException.cs # -> 403
-│   │   │   └── ConflictException.cs     # -> 409
-│   │   └── Behaviours/
-│   │       ├── ValidationBehaviour.cs   # MediatR pipeline: FluentValidation
-│   │       └── LoggingBehaviour.cs      # MediatR pipeline: request/response logging
+├── EdgePulse.Application/      # Depends on Domain only.
+│   ├── Common/Interfaces/
+│   │   ├── IApplicationDbContext.cs
+│   │   ├── ICurrentUserService.cs
+│   │   └── IFileStorageService.cs
+│   ├── Common/Exceptions/      # ValidationException(400), NotFoundException(404),
+│   │                           # ForbiddenAccessException(403), ConflictException(409)
+│   ├── Common/Behaviours/      # ValidationBehaviour, LoggingBehaviour (MediatR pipeline)
 │   └── Features/
-│       ├── Devices/
-│       │   ├── Commands/               # Write operations
-│       │   └── Queries/                # Read operations (never mutate state)
-│       ├── Alerts/
-│       │   ├── Commands/
-│       │   └── Queries/
+│       ├── Configuration/      # Device types, statuses, metric types, alert severities,
+│       │                       # manufacturers, location types, maintenance types,
+│       │                       # industry templates, lookup overrides
 │       ├── Tenants/
-│       │   ├── Commands/
-│       │   └── Queries/
 │       ├── Mills/
-│       │   ├── Commands/
-│       │   └── Queries/
-│       └── Areas/
-│           ├── Commands/
-│           └── Queries/
+│       ├── Areas/
+│       ├── Devices/
+│       └── Alerts/             # AlertThreshold CRUD + Alert state machine (CQRS)
 │
-├── EdgePulse.Infrastructure/            # Depends on Application + Domain.
+├── EdgePulse.Infrastructure/   # Depends on Application + Domain.
 │   └── Persistence/
-│       ├── EdgePulseDbContext.cs        # EF Core DbContext
-│       ├── Configurations/             # IEntityTypeConfiguration<T> per entity
-│       └── Migrations/                 # EF Core migrations
+│       ├── EdgePulseDbContext.cs
+│       ├── Configurations/     # IEntityTypeConfiguration<T> per entity
+│       ├── Migrations/         # EF Core migrations
+│       └── Seeding/
+│           └── DemoSeedService.cs  # NordPulp demo seed (idempotent, fixed GUIDs)
 │
-└── EdgePulse.API/                       # Depends on Application + Infrastructure.
-    ├── Controllers/
-    │   ├── ConfigurationController.cs
-    │   ├── OrganisationController.cs
-    │   └── DevicesController.cs
-    ├── Middleware/
-    │   └── ExceptionHandlingMiddleware.cs
-    └── Program.cs
+├── EdgePulse.API/              # Depends on Application + Infrastructure.
+│   ├── Controllers/
+│   ├── Middleware/ExceptionHandlingMiddleware.cs
+│   └── Program.cs              # --seed flag runs DemoSeedService then exits
+│
+├── EdgePulse.TelemetryProcessor/  # .NET 9 Worker Service
+│   ├── Worker.cs               # RabbitMQ consumer → MongoDB + AlertEngine
+│   ├── Services/
+│   │   ├── AlertEngineService.cs   # Threshold eval, consecutive-breach tracking
+│   │   └── ThresholdCacheService.cs # 60s ADO.NET cache of AlertThresholds
+│   └── Models/TelemetryReading.cs
+│
+├── EdgePulse.Ingestion/        # Node.js 20 + NestJS — HTTP → RabbitMQ gateway
+│
+├── EdgePulse.OpcUaAgent/       # Node.js 20 + TypeScript
+│   ├── src/
+│   │   ├── opcua/OpcUaSubscriber.ts    # node-opcua client, subscription-based
+│   │   ├── publisher/RabbitMqPublisher.ts
+│   │   ├── simulator/OpcUaSimulator.ts # Demo OPC-UA server (--simulate flag)
+│   │   └── simulator/profiles.ts       # 20 devices, spike profiles per threshold
+│   └── config/config.nordpulp.json     # All 20 NordPulp devices pre-wired
+│
+└── EdgePulse.Dashboard/        # React 18 + TypeScript + Vite
+    └── src/
+        ├── context/ThemeContext.tsx    # dark/light theme, localStorage persist
+        ├── components/layout/          # AppLayout, Sidebar (mobile drawer), ThemeToggle
+        ├── pages/alerts/AlertsPage.tsx # Paginated alerts, acknowledge/resolve modal
+        ├── store/                      # Redux: alert count for sidebar badge
+        └── api/                        # Axios + Keycloak bearer token interceptor
 ```
 
 ---
@@ -122,9 +137,11 @@ src/EdgePulse.sln
 ```
 EdgePulse Platform (SuperAdmin)
   └── Tenant (e.g. NordPulp Industries)
-        └── Mill (e.g. Lakewood Mill, Tampere)
-              └── Area (e.g. Paper Machine 1)
+        └── Mill (e.g. Lakewood Mill)
+              └── Area (e.g. Fiberline)
                     └── Device (e.g. PUMP-LW-001)
+                          └── AlertThreshold  (threshold rule per metric)
+                          └── Alert           (fired when threshold breached N times)
 ```
 
 ### Roles (5 total)
@@ -133,7 +150,7 @@ EdgePulse Platform (SuperAdmin)
 |------|-------|--------|
 | SuperAdmin | Platform | All tenants, all mills, create tenants |
 | CustomerAdmin | Tenant | All mills within tenant |
-| MillManager | Single Mill | One mill, create areas and devices |
+| MillManager | Single Mill | One mill, create areas/devices/thresholds |
 | Operator | Assigned Areas | Read + acknowledge alerts |
 | Executive | Tenant (read-only) | Dashboard and reports only |
 
@@ -145,6 +162,9 @@ Mill             -> TenantId, Name, Code, Location, Timezone, HasInternet, Deplo
 Area             -> TenantId, MillId, Name, Code, LocationTypeId, Description
 Device           -> TenantId, MillId, AreaId, TypeId, StatusId, Name, Code, SerialNumber
 DeviceApiKey     -> TenantId, DeviceId, KeyHash (SHA-256), KeyPrefix, IsActive
+AlertThreshold   -> DeviceId, MetricKey, MinValue?, MaxValue?, SeverityCode, ConsecutiveCount
+Alert            -> DeviceId, AlertThresholdId, MetricKey, TriggerValue, StatusCode
+                    States: OPEN → ACKNOWLEDGED → RESOLVED → CLOSED
 ```
 
 ### Lookup Architecture (CRITICAL PATTERN)
@@ -164,7 +184,14 @@ Well-known GUID prefixes:
 - `00000033-*` = Generic Alert Severities
 - `00000034-*` = Generic Alert Statuses
 - `00000035-*` = Generic Metric Types
-- `00000099-*` = Dev/test tenant (placeholder until Keycloak)
+- `00000099-*` = Dev/test tenant (placeholder)
+
+Demo GUIDs (DemoIds.cs):
+- `10000001-*` = NordPulp Tenant
+- `20000001-*` = NordPulp Mills
+- `30000001-*` = Lakewood Areas / `30000002-*` = Riverside Areas
+- `40000001-*` = Lakewood Devices / `40000002-*` = Riverside Devices
+- `50000001-*` = Lakewood Thresholds / `50000002-*` = Riverside Thresholds
 
 ---
 
@@ -177,7 +204,6 @@ if (status == "ONLINE") { ... }
 
 // CORRECT
 if (status == GenericDeviceStatusIds.Online.ToString()) { ... }
-// or use the constant directly in queries
 ```
 
 ### 2. Clean Architecture — Dependency Rules
@@ -191,81 +217,58 @@ Never reference Infrastructure from Application. Never reference API from anywhe
 
 ### 3. CQRS with MediatR
 ```csharp
-// Command = write operation (INSERT, UPDATE, DELETE)
-public record CreateDeviceTypeCommand(...) : IRequest<Guid>;
-
-// Query = read operation (SELECT only, never mutates state)
-public record GetDeviceTypesQuery() : IRequest<List<DeviceTypeDto>>;
+public record CreateDeviceTypeCommand(...) : IRequest<Guid>;  // write
+public record GetDeviceTypesQuery()        : IRequest<List<DeviceTypeDto>>;  // read
 ```
 
 ### 4. IApplicationDbContext — IQueryable Pattern
 ```csharp
-// Interface uses IQueryable, not DbSet
-IQueryable<DeviceType> DeviceTypes { get; }
-
-// Never expose EF-specific types in Application layer
-// Global Query Filters handle TenantId + IsDeleted automatically
+IQueryable<DeviceType> DeviceTypes { get; }  // interface
+// Global Query Filters auto-apply TenantId + IsDeleted — never write manual WHERE
 ```
 
-### 5. Global Query Filters (auto-applied in EF Core)
+### 5. Soft Delete Only
 ```csharp
-// DeviceType has TenantId filter + IsDeleted filter applied globally
-// You never need to write: .Where(x => !x.IsDeleted && x.TenantId == ...)
-// The filters are in EdgePulseDbContext.OnModelCreating()
-```
-
-### 6. Soft Delete Only
-```csharp
-// NEVER: _context.Remove(entity)
-// ALWAYS:
-entity.Deactivate(); // sets IsDeleted = true, DeletedAt = UtcNow
+entity.Deactivate(); // IsDeleted = true, DeletedAt = UtcNow
 _context.Update(entity);
-await _context.SaveChangesAsync(cancellationToken);
+await _context.SaveChangesAsync(ct);
 ```
 
-### 7. Request Models for POST/PUT (not Commands directly)
+### 6. Request Models for POST/PUT (not Commands directly in controller)
 ```csharp
-// WRONG — causes Swagger 400 errors
-public async Task<IActionResult> CreateDeviceType(
-    [FromBody] CreateDeviceTypeCommand command, ...)
-
-// CORRECT — separate request model
-public async Task<IActionResult> CreateDeviceType(
-    [FromBody] CreateDeviceTypeRequest request, ...)
-{
-    var id = await _mediator.Send(new CreateDeviceTypeCommand(
-        request.Name, request.Code, ...), cancellationToken);
-}
+// CORRECT — separate request record, map to command in controller
+public async Task<IActionResult> Create([FromBody] CreateXRequest request, ...)
+    => Ok(await _mediator.Send(new CreateXCommand(request.Name, ...)));
 ```
 
-### 8. All Timestamps UTC
+### 7. All Timestamps UTC
 ```csharp
 CreatedAt = DateTime.UtcNow  // always, never DateTime.Now
 ```
 
-### 9. Exception Pattern
+### 8. Exception Pattern
 ```csharp
-// Domain exceptions map to HTTP via ExceptionHandlingMiddleware
-throw new NotFoundException(nameof(DeviceType), request.Id);    // -> 404
-throw new ForbiddenAccessException();                            // -> 403
-throw new ConflictException("Code already exists.");             // -> 409
-// ValidationException is thrown automatically by ValidationBehaviour -> 400
+throw new NotFoundException(nameof(Device), id);   // -> 404
+throw new ForbiddenAccessException();               // -> 403
+throw new ConflictException("Code exists.");        // -> 409
+// ValidationException thrown by ValidationBehaviour -> 400
 ```
 
-### 10. Delete Pattern (check existence before IsSystem)
+### 9. Alert SeverityCode / StatusCode — stored as plain strings
 ```csharp
-// CORRECT order:
-var entity = await _context.X
-    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, ct)
-    ?? throw new NotFoundException(...);     // 1. Check exists
+// Stored as nvarchar, NOT FK to lookup tables
+// Reason: TelemetryProcessor writes alerts without loading EF / joining lookups
+// Valid values: CRITICAL / HIGH / MEDIUM / LOW  (severity)
+//               OPEN / ACKNOWLEDGED / RESOLVED / CLOSED  (status)
+```
 
-if (entity.IsSystem)
-    throw new ForbiddenAccessException();    // 2. Check system
-
-if (entity.TenantId != _currentUser.TenantId)
-    throw new ForbiddenAccessException();    // 3. Check ownership
-
-// 4. Check in-use (where applicable)
+### 10. CSS — NO libraries, CSS Modules only
+```css
+/* All theme colours via CSS custom properties — index.css */
+background: var(--color-surface);
+color: var(--color-text);
+border: 1px solid var(--color-border);
+/* No Tailwind, no Bootstrap, no Radix UI */
 ```
 
 ---
@@ -273,19 +276,16 @@ if (entity.TenantId != _currentUser.TenantId)
 ## Local Infrastructure
 
 ```bash
-# Start all services
+# Start all services (including OPC-UA simulator + agent)
 cd /c/Studies/EdgePulse-Application/EdgePulse
 docker compose -f infrastructure/docker-compose.onpremise.yml up -d
 
 # Stop
 docker compose -f infrastructure/docker-compose.onpremise.yml down
-
-# Status
-docker compose -f infrastructure/docker-compose.onpremise.yml ps
 ```
 
-| Service | URL | Credentials |
-|---------|-----|-------------|
+| Service | URL / Host | Credentials |
+|---------|-----------|-------------|
 | Swagger | http://localhost:5104/swagger | n/a |
 | HAProxy Stats | http://localhost:8404/stats | admin/edgepulse123 |
 | Keycloak | http://localhost:8080 | admin/admin |
@@ -293,6 +293,19 @@ docker compose -f infrastructure/docker-compose.onpremise.yml ps
 | SQL Server | localhost:1433 | sa/EdgePulse@2026 |
 | MongoDB | localhost:27017 | edgepulse/EdgePulse@2026 |
 | PostgreSQL | localhost:5432 | keycloak/keycloak |
+| OPC-UA Simulator | opc.tcp://localhost:4840 | anonymous |
+
+---
+
+## Demo Data Seed
+
+```bash
+# Run once after applying migrations — fully idempotent, safe to re-run
+dotnet run --project src/EdgePulse.API --seed
+```
+
+Seeds: NordPulp tenant, 2 mills, 8 areas, 20 devices, 21 alert thresholds.
+Full reference: `docs/domain/02-demo-data-setup.md`
 
 ---
 
@@ -301,18 +314,11 @@ docker compose -f infrastructure/docker-compose.onpremise.yml ps
 ```bash
 cd /c/Studies/EdgePulse-Application/EdgePulse/src
 
-# Add migration
-dotnet ef migrations add <MigrationName> \
+dotnet ef migrations add <Name> \
   --project EdgePulse.Infrastructure \
   --startup-project EdgePulse.API
 
-# Apply to database
 dotnet ef database update \
-  --project EdgePulse.Infrastructure \
-  --startup-project EdgePulse.API
-
-# Remove last migration (if not applied)
-dotnet ef migrations remove \
   --project EdgePulse.Infrastructure \
   --startup-project EdgePulse.API
 ```
@@ -325,73 +331,53 @@ manually remove the `InsertData` block from the migration file before running up
 ## GitHub Workflow
 
 ```bash
-# Fix gh CLI PATH (run once per terminal session, or add to ~/.bashrc)
 export PATH=$PATH:"/c/Program Files/GitHub CLI"
-
-# Permanent fix (already done)
-echo 'export PATH=$PATH:"/c/Program Files/GitHub CLI"' >> ~/.bashrc
 ```
 
-### Per-Story Workflow
-
+### Per-Sprint Workflow
 ```
-1. Pick story from Backlog on GitHub Project board
-2. Move to "In Progress"
-3. git checkout -b feature/US-XXX-short-description
-4. Code + commit: git commit -m "feat: description #XX"
-5. Test in Swagger
-6. Move to "In Review" on board
-7. git push origin feature/US-XXX-...
-8. gh pr create --title "..." --body "... Closes #XX ..."
-9. Merge PR on GitHub
-10. Issue auto-closes, board moves to Done
-11. git checkout main && git pull && git branch -d feature/US-XXX-...
+1. git checkout -b feature/sprint-N-name
+2. Code + commit with issue reference: "feat: description #XX"
+3. git push origin feature/sprint-N-name
+4. gh pr create --title "..." --body "Closes #XX"
+5. Merge PR → issue auto-closes
+6. git checkout main && git pull
+7. Create docs/sprints/sprint-N-name.md summary
 ```
 
 ### Commit Message Format
-
 ```
-feat:     new feature
-fix:      bug fix
-docs:     documentation only
-infra:    infrastructure / docker / config
-test:     tests
-chore:    maintenance
-refactor: restructure
-
+feat / fix / docs / infra / chore / refactor
 Always include issue reference: "feat: description #XX"
-"Closes #XX" in PR body auto-closes the issue.
 ```
 
 ---
 
 ## Current Sprint Status
 
-### DONE
+| Sprint | Topic | Status | Issue |
+|--------|-------|--------|-------|
+| 1 | Config Module (lookup tables) | ✅ Done | #1 |
+| 2 | Organisation Module (tenant/mill/area) | ✅ Done | #2 |
+| 3 | Device Management | ✅ Done | #3 |
+| 4 | Keycloak JWT Auth | ✅ Done | — |
+| 5 | Telemetry Ingestion (NestJS + RabbitMQ) | ✅ Done | — |
+| 6 | TelemetryProcessor Worker | ✅ Done | — |
+| 7 | React Dashboard (initial) | ✅ Done | — |
+| 8 | Alerts Engine (thresholds, state machine, API) | ✅ Done | #64 |
+| 9 | Demo Data Seed (NordPulp fixed GUIDs) | ✅ Done | #65 |
+| 10 | Dark Mode + Responsive Layout | ✅ Done | #66 |
+| 11 | OPC-UA Edge Agent + Simulator | ✅ Done | #67 |
+| **12** | **Executive Dashboard** | **🔜 Next** | #68 |
 
-| Sprint | Epic | Stories |
-|--------|------|---------|
-| Sprint 1 | Config Module (#1 closed) | #11-#22 all closed |
-| Sprint 2 | Organisation Module (#2 closed) | #23-#26 all closed |
-| Sprint 3 | Device Management (#3 closed) | #27, #29 closed; #28 skipped |
-
-### IN PROGRESS
+### Next Sprints
 
 ```
-Sprint 4: Keycloak JWT Authentication
-  NEXT → Replace placeholder CurrentUserService with real JWT auth
-```
-
-### NEXT SPRINTS
-
-```
-Sprint 4:  Keycloak JWT authentication (most important — secures everything)
-Sprint 5:  Telemetry pipeline (NestJS ingestion + Processor worker)
-Sprint 6:  Alerts & notifications
-Sprint 7:  React dashboard
-Sprint 8:  CI/CD pipeline
-Sprint 9:  AI features
-Sprint 10: Polish + demo environment
+Sprint 12: Executive Dashboard — KPI tiles, 7-day alert chart (plain SVG), top devices
+Sprint 13: CI/CD Pipeline — GitHub Actions, Docker build + push, auto-deploy
+Sprint 14: AI Features — GPT-4o-mini alert summaries (Azure OpenAI + Ollama fallback)
+Sprint 15: User Management UI — role assignment, AD group mapping
+           + Documentation Sprints (#72-#78)
 ```
 
 ---
@@ -399,133 +385,81 @@ Sprint 10: Polish + demo environment
 ## Completed API Endpoints
 
 ### ConfigurationController (`/api/configuration/`)
-
 ```
-GET    device-types                  Returns system + tenant custom types
-POST   device-types                  Create custom type
-PUT    device-types/{id}             Update custom type (not system)
-DELETE device-types/{id}             Deactivate custom type
-
-GET    device-statuses               Returns system + custom statuses
-POST   device-statuses               Create custom status
-PUT    device-statuses/{id}          Update custom status
-DELETE device-statuses/{id}          Deactivate custom status
-
-GET    metric-types                  Returns system + custom metrics
-POST   metric-types                  Create custom metric type
-
-GET    alert-severities              Returns severities ordered by priority
-POST   alert-severities              Create custom severity
-PUT    alert-severities/{id}         Update custom severity
-DELETE alert-severities/{id}         Deactivate custom severity
-
-GET    alert-statuses                Returns statuses with IsTerminal flag
-
-GET    industry-templates            SuperAdmin only
-
-GET    manufacturers                 Returns system + custom manufacturers
-POST   manufacturers                 Create custom manufacturer
-
-POST   device-models                 Create device model under manufacturer
-
-GET    maintenance-types             Returns system + custom maintenance types
-POST   maintenance-types             Create custom maintenance type
-
-GET    location-types                Returns system + custom location types
-POST   location-types                Create custom location type
-
-GET    lookup-overrides              Tenant overrides (filter by ?lookupType=)
-PUT    lookup-overrides              Upsert override (rename or disable)
-DELETE lookup-overrides/{id}         Remove override (restore default)
+GET/POST/PUT/DELETE  device-types
+GET/POST/PUT/DELETE  device-statuses
+GET/POST             metric-types
+GET/POST/PUT/DELETE  alert-severities
+GET                  alert-statuses
+GET                  industry-templates  (SuperAdmin only)
+GET/POST             manufacturers
+POST                 device-models
+GET/POST             maintenance-types
+GET/POST             location-types
+GET/PUT/DELETE       lookup-overrides
 ```
 
 ### OrganisationController (`/api/organisation/`)
-
 ```
-GET    tenants                       SuperAdmin only
-POST   tenants                       Create tenant (SuperAdmin only)
-
-GET    mills                         Role-scoped
-POST   mills                         Create mill (CustomerAdmin+)
-
-GET    areas                         Role-scoped, ?millId= filter
-POST   areas                         Create area (MillManager restricted to their mill)
+GET/POST    tenants   (SuperAdmin)
+GET/POST    mills
+GET/POST    areas
 ```
 
 ### DevicesController (`/api/devices/`)
-
 ```
-GET    devices                       Role-scoped, ?millId= ?areaId=
-POST   devices                       Register device, returns API key ONCE
+GET/POST    devices   (POST returns API key once)
+```
+
+### AlertsController (`/api/alerts/`)
+```
+GET/POST/PUT/DELETE   thresholds
+GET                   (paginated list, ?millId= ?deviceId= ?severityCode= ?statusCode=)
+GET                   count  (returns openCount + criticalOpenCount for sidebar badge)
+POST                  {id}/acknowledge
+POST                  {id}/resolve
 ```
 
 ---
 
-## Keycloak Configuration (Sprint 4 — US-020 complete)
-
-Full details in `docs/keycloak-setup.md`. Summary:
+## Keycloak Configuration
 
 ```
 Realm:         edgepulse
 Client ID:     edgepulse-api
-Client Secret: lnBQYXdQnQTku1jT64LbEMyaRFRws3HS  (dev only — rotate before deploy)
+Client Secret: lnBQYXdQnQTku1jT64LbEMyaRFRws3HS  (dev — rotate before prod)
 Authority:     http://localhost:8080/realms/edgepulse
 Audience:      account
 ```
 
-**JWT custom claims** (User Attribute mappers on the client):
-
+**JWT custom claims:**
 ```
-tenantId  -> user attribute  -> string
-role      -> user attribute  -> string  (SuperAdmin / CustomerAdmin / MillManager / Operator / Executive)
-millId    -> user attribute  -> string  (MillManager only)
-areaIds   -> user attribute  -> string[] (Operator only)
+tenantId  -> user attribute -> string
+role      -> user attribute -> string  (SuperAdmin/CustomerAdmin/MillManager/Operator/Executive)
+millId    -> user attribute -> string  (MillManager only)
+areaIds   -> user attribute -> string[] (Operator only)
 ```
 
-**Test users:**
+**Test users (password: Test@1234):**
+superadmin | customeradmin | millmanager | operator | executive
 
-| Username       | Password    | Role           |
-|----------------|-------------|----------------|
-| superadmin     | Test@1234   | SuperAdmin     |
-| customeradmin  | Test@1234   | CustomerAdmin  |
-| millmanager    | Test@1234   | MillManager    |
-| operator       | Test@1234   | Operator       |
-| executive      | Test@1234   | Executive      |
-
-**Keycloak 24 gotchas to remember:**
-- `VERIFY_PROFILE` must be disabled or it blocks login when firstName/lastName missing
+**Gotchas:**
+- Disable `VERIFY_PROFILE` or login is blocked when firstName/lastName missing
 - `unmanagedAttributePolicy` must be `ENABLED` or custom attributes are silently dropped
-- Use "User Attribute" mapper for `role`, NOT "User Realm Role" (picks wrong default role)
-- Client UUID ≠ Client ID — use `?fields=id,clientId` when extracting via API
-
-**Re-setup:** Import `infrastructure/keycloak/edgepulse-realm.json` via Keycloak admin console → Create Realm → Browse. Then create the 5 test users manually. Full guide: `docs/keycloak-setup.md`.
+- Use "User Attribute" mapper for `role`, NOT "User Realm Role"
+- Re-setup: import `infrastructure/keycloak/edgepulse-realm.json`, then create 5 users manually
 
 ---
 
-## Placeholder — CurrentUserService
-
-Until US-022 is implemented, `CurrentUserService` still returns hardcoded values:
-
-```csharp
-UserId   = "dev-user-001"
-TenantId = Guid.Parse("00000099-0000-0000-0000-000000000001")
-Role     = UserRole.SuperAdmin
-IsSuperAdmin = true
-```
-
-The dev tenant `00000099-0000-0000-0000-000000000001` is manually seeded in SQL Server.
-**Replace entirely in US-022.**
-
----
-
-## Known Issues / Tech Debt
+## Known Tech Debt
 
 ```
-1. Duplicate using in UpsertTenantLookupOverrideCommand.cs (CS0105 warning) — harmless
-2. CurrentUserService is a placeholder — no real auth until Sprint 4
-3. #28 (file attachments) skipped — needs IFileStorageService + Azure Blob/MinIO
-4. DeploymentMode enum stored as string in DB (by design for readability)
-5. Dev tenant seeded manually — will be handled by migration after Sprint 4
+1. #28 (file attachments) skipped — needs IFileStorageService + Azure Blob/MinIO
+2. DeploymentMode stored as string in DB (by design for readability)
+3. AlertSeverityCode/StatusCode stored as strings (by design — processor independence)
+4. CurrentUserService reads JWT claims directly — no claims caching
+5. OpcUaAgent: no TLS/certificate auth (acceptable for on-premise LAN deployment)
+6. Dashboard: no e2e tests yet (playwright-report/ exists from scaffolding, unused)
 ```
 
 ---
@@ -538,9 +472,7 @@ CLAUDE-SETUP.md        All setup commands
 DOCKER-COMMANDS.md     All Docker commands
 PRODUCT-ROADMAP.md     Full 22-sprint product vision
 ARCHITECTURE.md        Solution architecture guide
-docs/01-requirements.md
-docs/02-architecture.md
-docs/03-data-design.md
-docs/sprint-history.md
-docs/implementation-patterns.md
+docs/domain/           Domain reference docs (02-demo-data-setup.md)
+docs/sprints/          Sprint summary docs (sprint-1 through sprint-11)
+docs/keycloak-setup.md Keycloak realm + user setup guide
 ```
