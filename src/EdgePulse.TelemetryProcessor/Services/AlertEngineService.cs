@@ -42,6 +42,52 @@ public class AlertEngineService
     }
 
     /// <summary>
+    /// Called once on TelemetryProcessor startup.
+    /// Loads all currently OPEN/ACKNOWLEDGED alerts from SQL so the in-memory
+    /// deduplication dictionary is populated even after a restart.
+    /// Without this, a processor restart would re-fire alerts that are already open.
+    /// </summary>
+    public async Task PreloadOpenAlertsAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            await using var conn = new SqlConnection(_sqlConnectionString);
+            await conn.OpenAsync(ct);
+
+            const string sql = """
+                SELECT DeviceId, MetricKey, AlertThresholdId
+                FROM   Alerts
+                WHERE  StatusCode IN ('OPEN', 'ACKNOWLEDGED')
+                """;
+
+            await using var cmd = new SqlCommand(sql, conn);
+            await using var reader = await cmd.ExecuteReaderAsync(ct);
+
+            int count = 0;
+            while (await reader.ReadAsync(ct))
+            {
+                var deviceId    = reader.GetGuid(0);
+                var metricKey   = reader.GetString(1);
+                var thresholdId = reader.GetGuid(2);
+                var key = $"{deviceId}:{metricKey.ToLowerInvariant()}:{thresholdId}";
+                _openAlertKeys[key] = true;
+                count++;
+            }
+
+            _logger.LogInformation(
+                "Preloaded {Count} open/acknowledged alert keys " +
+                "into deduplication cache.", count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to preload open alert keys. " +
+                "Alert deduplication may fire duplicate alerts " +
+                "for existing open thresholds until they are resolved.");
+        }
+    }
+
+    /// <summary>
     /// Evaluate a telemetry reading against all active thresholds.
     /// Called once per reading after MongoDB store.
     /// </summary>

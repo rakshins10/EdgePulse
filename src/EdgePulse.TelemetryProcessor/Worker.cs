@@ -47,6 +47,9 @@ public class Worker : BackgroundService
         // Pre-load threshold cache so the first messages get evaluated
         await _thresholdCache.RefreshAsync(stoppingToken);
 
+        // Pre-load open alert keys so we don't re-fire alerts after a restart
+        await _alertEngine.PreloadOpenAlertsAsync(stoppingToken);
+
         // MongoDB setup
         _mongoCollection = BuildMongoCollection();
 

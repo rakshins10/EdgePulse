@@ -1,5 +1,7 @@
 ﻿using EdgePulse.Application;
 using EdgePulse.Infrastructure;
+using EdgePulse.Infrastructure.Persistence;
+using EdgePulse.Infrastructure.Persistence.Seeding;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -90,6 +92,21 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+// ----------------------------------------------------------------
+// --seed flag: run demo data seeding then exit
+// ----------------------------------------------------------------
+if (args.Contains("--seed"))
+{
+    using var scope = app.Services.CreateScope();
+    var db     = scope.ServiceProvider.GetRequiredService<EdgePulseDbContext>();
+    var logger = scope.ServiceProvider
+        .GetRequiredService<ILogger<DemoSeedService>>();
+    var seeder = new DemoSeedService(db, logger);
+    await seeder.SeedAsync();
+    Console.WriteLine("Demo seed complete. Exiting.");
+    return;
+}
 
 // ----------------------------------------------------------------
 // Middleware pipeline
