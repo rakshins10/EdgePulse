@@ -1,0 +1,41 @@
+{
+  "_comment": "Copy this file to config.json, adjust values, then set CONFIG_PATH=./config/config.json",
+
+  "name": "my-opcua-agent",
+  "publishIntervalMs": 5000,
+
+  "opcua": {
+    "serverUrl": "opc.tcp://your-plc-or-scada:4840",
+    "reconnectDelayMs": 5000,
+    "samplingIntervalMs": 1000
+  },
+
+  "rabbitmq": {
+    "url": "amqp://edgepulse:EdgePulse@2026@localhost:5672/edgepulse",
+    "queue": "telemetry.readings",
+    "durable": true,
+    "reconnectDelayMs": 5000
+  },
+
+  "devices": [
+    {
+      "label": "Pump A",
+      "deviceId": "YOUR-DEVICE-UUID-FROM-EDGEPULSE-API",
+      "tenantId": "YOUR-TENANT-UUID",
+      "millId":   "YOUR-MILL-UUID",
+      "areaId":   "YOUR-AREA-UUID",
+      "metrics": [
+        {
+          "nodeId": "ns=2;s=PLC1.PumpA.BearingTemp",
+          "key": "bearing_temp",
+          "unit": "°C"
+        },
+        {
+          "nodeId": "ns=2;s=PLC1.PumpA.VibrationRMS",
+          "key": "vibration",
+          "unit": "mm/s"
+        }
+      ]
+    }
+  ]
+}
