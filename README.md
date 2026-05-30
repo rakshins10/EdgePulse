@@ -244,49 +244,84 @@ NordPulp Industries
 
 ### Prerequisites
 
-```bash
-# Required
-dotnet --version    # 9.0+
-node --version      # 20.x+
-docker --version    # 24.x+
-git --version       # 2.x+
-```
+| Tool | Version | Check |
+|------|---------|-------|
+| Docker Desktop | Any recent | `docker --version` |
+| .NET SDK | 9.x | `dotnet --version` |
+| Node.js | 20.x | `node --version` |
+| npm | 10.x+ | `npm --version` |
 
-### Local Development Setup
+### Service Ports (Local Dev)
 
-```bash
-# 1. Clone the repository
+| Service | URL | Where it runs |
+|---------|-----|---------------|
+| Dashboard (Vite) | http://localhost:3000 | `npm run dev` |
+| EdgePulse.API | http://localhost:5104 | `dotnet run` |
+| API Swagger | http://localhost:5104/swagger | (built into API) |
+| Keycloak Admin | http://localhost:8080 | Docker (admin / admin) |
+| RabbitMQ UI | http://localhost:15672 | Docker (edgepulse / EdgePulse@2026) |
+| SQL Server | localhost:1433 | Docker (sa / EdgePulse@2026) |
+| MongoDB | localhost:27017 | Docker (edgepulse / EdgePulse@2026) |
+| OPC-UA Server | opc.tcp://localhost:4840 | Docker (anonymous) |
+| HAProxy Stats | http://localhost:8404/stats | Docker (admin / edgepulse123) |
+
+### Quick Start (NordPulp demo — all 20 devices)
+
+```powershell
+# 1. Clone
 git clone https://github.com/rakshins10/EdgePulse.git
 cd EdgePulse
 
-# 2. Start all services with Docker Compose
-docker compose up -d
+# 2. Start infrastructure (SQL Server, MongoDB, RabbitMQ, Keycloak)
+docker compose -f infrastructure/docker-compose.onpremise.yml up -d `
+    sqlserver mongodb rabbitmq postgres keycloak
 
-# Services started:
-# Keycloak      → http://localhost:8080  (admin/admin)
-# PostgreSQL    → localhost:5432         (Keycloak DB)
-# Device API    → http://localhost:5000  (.NET 9)
-# SQL Server    → localhost:1433         (Devices DB)
-# Telemetry Svc → http://localhost:3000  (Node.js)
-# React App     → http://localhost:4000  (Dashboard)
+# 3. Apply EF migrations + seed NordPulp demo data
+dotnet run --project src/EdgePulse.API -- --seed
 
-# 3. Apply database migrations
-cd src/EdgePulse.API
-dotnet ef database update
+# 4. Start the API (new terminal — leave running)
+dotnet run --project src/EdgePulse.API
 
-# 4. Access the dashboard
-open http://localhost:4000
+# 5. Start the TelemetryProcessor (new terminal — leave running)
+dotnet run --project src/EdgePulse.TelemetryProcessor
+
+# 6. Start the OPC-UA simulator + agent (publishes telemetry to RabbitMQ)
+docker compose -f infrastructure/docker-compose.onpremise.yml up -d `
+    opcua-simulator opcua-agent
+
+# 7. Start the Dashboard (new terminal — leave running)
+cd src/EdgePulse.Dashboard
+npm install   # first time only
+npm run dev
 ```
 
-### Environment Variables
+Open **http://localhost:3000** in a browser.
 
-Copy `.env.example` to `.env` and fill in your values:
+### First-time Keycloak Setup
 
-```bash
-cp .env.example .env
+Keycloak needs a one-time configuration:
+
+1. Open http://localhost:8080 (admin / admin)
+2. Import the `edgepulse` realm (or create manually with the `edgepulse-dashboard` public client)
+3. **Create custom protocol mappers** on the `edgepulse-dashboard` client (Client scopes → dedicated scope → Add mapper → User Attribute):
+   - `tenantId` (required — without this, the dashboard shows zeros)
+   - `role`, `millId`, `areaIds`
+4. Create your user and set the `tenantId` attribute to `10000001-0000-0000-0000-000000000001` (the seeded NordPulp tenant)
+5. Assign realm role: `SuperAdmin`
+
+> Full step-by-step setup + troubleshooting: **[docs/testing/local-test-guide.md](docs/testing/local-test-guide.md)**
+
+### Stopping Everything
+
+```powershell
+# Stop local dotnet/npm processes: Ctrl+C in each terminal
+
+# Stop Docker services (data persists)
+docker compose -f infrastructure/docker-compose.onpremise.yml down
+
+# Stop and DELETE all data (full reset)
+docker compose -f infrastructure/docker-compose.onpremise.yml down -v
 ```
-
-> ⚠️ Never commit `.env` to source control. All secrets are managed via Azure Key Vault in production.
 
 ---
 

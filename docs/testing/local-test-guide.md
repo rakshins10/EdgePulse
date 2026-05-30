@@ -22,7 +22,7 @@
 Browser
   |
   v
-Vite Dev Server :5173
+Vite Dev Server :3000
   |-- /api/*  -->  EdgePulse.API :5104  -->  SQL Server :1433
   |                                     -->  Keycloak   :8080
   |
@@ -46,7 +46,7 @@ TelemetryProcessor  -->  MongoDB    :27017
 | OPC-UA Agent | Docker | — |
 | EdgePulse.API | Local (`dotnet run`) | 5104 |
 | TelemetryProcessor | Local (`dotnet run`) | — |
-| Dashboard | Local (`npm run dev`) | 5173 |
+| Dashboard | Local (`npm run dev`) | 3000 |
 
 > The **Ingestion service** (HTTP device push path) is not needed for the OPC-UA demo.
 > The OPC-UA Agent publishes telemetry directly to RabbitMQ, bypassing Ingestion.
@@ -192,35 +192,72 @@ Expected:
 ```
   VITE v6.x.x  ready in 500ms
 
-  ➜  Local:   http://localhost:5173/
+  ➜  Local:   http://localhost:3000/
   ➜  Network: use --host to expose
 ```
 
-Open http://localhost:5173 in a browser.
+Open http://localhost:3000 in a browser.
 
 ---
 
-## Step 7 — Log In
+## Step 7 — Configure Keycloak (first time only)
 
-The Keycloak realm must be configured with the `edgepulse` realm and a test user.
+### 7a. Realm
 
-**Quick check — does the realm exist?**
-1. Go to http://localhost:8080 → Admin Console (admin/admin)
+1. Go to http://localhost:8080 → Admin Console (admin / admin)
 2. Look for the `edgepulse` realm in the left dropdown.
+3. **If it doesn't exist:** Realm Settings → Import → `docs/keycloak/edgepulse-realm-export.json` (if present), or create manually.
 
-**If the realm doesn't exist:** Import it:
-1. In Keycloak Admin → Realm Settings → Import
-2. Import file: `docs/keycloak/edgepulse-realm-export.json` (if present)
+### 7b. Dashboard client (public)
 
-**Test user credentials (NordPulp CustomerAdmin):**
-- Username: `customeradmin@nordpulp.com` (or as configured in Keycloak)
-- Password: `Test@1234`
+Create a client for the React app:
+- **Client ID:** `edgepulse-dashboard`
+- **Client type:** OpenID Connect
+- **Client authentication:** OFF (public client)
+- **Standard flow:** ON
+- **Valid redirect URIs:** `http://localhost:3000/*` AND `http://localhost:3000/`
+- **Web origins:** `http://localhost:3000`
+
+### 7c. Protocol mappers (CRITICAL)
+
+The dashboard client must emit custom claims the API reads from the JWT. Without these, the dashboard renders but every API call returns empty (because `TenantId` defaults to `Guid.Empty`).
+
+Clients → `edgepulse-dashboard` → **Client scopes** tab → click `edgepulse-dashboard-dedicated` → **Add mapper → By configuration → User Attribute**, repeat for each:
+
+| Name | User Attribute | Token Claim Name | JSON Type | Multivalued | Add to access token |
+|------|---------------|------------------|-----------|-------------|---------------------|
+| `tenantId` | `tenantId` | `tenantId` | String | OFF | ON |
+| `role` | `role` | `role` | String | OFF | ON |
+| `millId` | `millId` | `millId` | String | OFF | ON |
+| `areaIds` | `areaIds` | `areaIds` | String | **ON** | ON |
+
+Also add an `email` mapper of type **User Property** (Property = `email`, Claim Name = `email`).
+
+### 7d. Test user
+
+Users → Add User:
+- Username: `superadmin`
+- Email: any valid email; Email verified: ON
+
+**Credentials** tab → Set password (e.g. `Test@1234`), Temporary: OFF.
+
+**Attributes** tab → add row:
+- Key: `tenantId`
+- Value: `10000001-0000-0000-0000-000000000001`   ← seeded NordPulp tenant ID
+
+**Role mapping** tab → Assign realm role: `SuperAdmin`.
+
+### 7e. Verify the JWT
+
+Log in to http://localhost:3000. Open DevTools → Network → any `/api/*` request → copy the `Authorization: Bearer ...` token → paste into https://jwt.io.
+
+The decoded **payload** must contain `tenantId`, `role`, `email`. If any are missing, revisit step 7c.
 
 ---
 
 ## Step 8 — Verify the Dashboard
 
-After logging in, you should reach `http://localhost:5173/dashboard`.
+After logging in, you should reach `http://localhost:3000/dashboard`.
 
 ### KPI Tiles
 
@@ -289,7 +326,7 @@ Navigate to `/alerts`:
 ### Dashboard redirects to Keycloak login in a loop
 - Realm name or client ID mismatch
 - Check `src/EdgePulse.Dashboard/src/keycloak.ts`: realm should be `edgepulse`, clientId `edgepulse-dashboard`
-- Verify Keycloak client has `http://localhost:5173/*` in Valid Redirect URIs
+- Verify Keycloak client has `http://localhost:3000/*` in Valid Redirect URIs
 
 ### No telemetry arriving (TelemetryProcessor idle)
 - RabbitMQ queue `telemetry.readings` is empty → check Agent is running
@@ -308,6 +345,20 @@ Navigate to `/alerts`:
 - Caused by a stale queue with different arguments in RabbitMQ
 - Fix: delete the `telemetry.readings` queue via RabbitMQ UI → Queues tab → Purge / Delete
 - Restart TelemetryProcessor
+
+### Dashboard renders but all KPI tiles show zero
+- The JWT is missing the `tenantId` claim → `CurrentUserService.TenantId` returns `Guid.Empty` → all queries scope to a non-existent tenant
+- Verify by pasting the JWT at https://jwt.io — the payload MUST contain `tenantId`, `role`, and `email`
+- Fix: see **Step 7c** — add the protocol mappers to the `edgepulse-dashboard` client
+- After adding mappers, do a full **logout + login** (a refresh reuses the cached token)
+
+### MongoDB telemetry collection stays empty despite TelemetryProcessor running
+- Symptom: RabbitMQ shows messages being delivered (`deliver` count rising) but `ack` count stays at 0 and MongoDB has no documents
+- Cause: MongoDB.Driver 3.x default `GuidRepresentation` is `Unspecified` → inserting a POCO with `Guid` fields throws `BsonSerializationException` → message is silently nacked
+- Fix: `Program.cs` of TelemetryProcessor must register the serializer at startup:
+  ```csharp
+  BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
+  ```
 
 ---
 
@@ -329,7 +380,7 @@ docker compose -f infrastructure/docker-compose.onpremise.yml down -v
 
 | Service | URL | Credentials |
 |---------|-----|-------------|
-| Dashboard | http://localhost:5173 | Keycloak user |
+| Dashboard | http://localhost:3000 | Keycloak user |
 | API Swagger | http://localhost:5104/swagger | Bearer token |
 | API Health | http://localhost:5104/health | None |
 | Keycloak Admin | http://localhost:8080 | admin / admin |
