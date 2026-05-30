@@ -1,0 +1,99 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table thead tr {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table th {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  text-align: left;
+}
+
+.thRank  { width: 2rem;  }
+.thBar   { width: 10rem; }
+.thCount { width: 4rem; text-align: right; }
+
+.row {
+  border-bottom: 1px solid var(--color-border);
+  transition: background 0.1s ease;
+}
+
+.row:last-child { border-bottom: none; }
+
+.row:hover { background: var(--color-row-hover); }
+
+.table td {
+  padding: 0.625rem 0.75rem;
+  vertical-align: middle;
+}
+
+.tdRank {
+  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.tdDevice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.deviceCode {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  font-family: monospace;
+}
+
+.deviceName {
+  font-size: 0.8rem;
+  color: var(--color-text);
+}
+
+.tdMill {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.tdBar { padding-right: 0.5rem; }
+
+.barTrack {
+  height: 0.625rem;
+  background: var(--color-surface-2);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 0.5rem;
+  opacity: 0.75;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+.tdCount {
+  text-align: right;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}

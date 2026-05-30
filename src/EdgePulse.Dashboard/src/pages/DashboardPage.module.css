@@ -1,0 +1,94 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── KPI Tiles ────────────────────────────────────────────────────────────── */
+
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .kpiRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .kpiRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Chart Row ────────────────────────────────────────────────────────────── */
+
+.chartsRow {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .chartsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  min-width: 0;
+}
+
+.cardTitle {
+  margin: 0 0 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Loading / error states ───────────────────────────────────────────────── */
+
+.state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 4rem 2rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.state.error {
+  color: var(--color-critical);
+}
+
+/* Simple CSS spinner */
+.spinner {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
