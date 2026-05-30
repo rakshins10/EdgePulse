@@ -4,7 +4,7 @@ import {
   Variant,
   type AddressSpace,
   type UAObject,
-  type UANamespace,
+  type Namespace,
 } from "node-opcua";
 import { DEVICE_PROFILES, type MetricProfile } from "./profiles";
 import type { SimulatorConfig } from "../types";
@@ -50,7 +50,7 @@ export class OpcUaSimulator {
     await this.server.initialize();
 
     const addressSpace = this.server.engine.addressSpace as AddressSpace;
-    const namespace = addressSpace.getOwnNamespace() as UANamespace;
+    const namespace = addressSpace.getOwnNamespace() as Namespace;
 
     // Root folder for all NordPulp devices
     const nordPulpFolder = namespace.addObject({

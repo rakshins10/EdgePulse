@@ -11,7 +11,6 @@ import type { TelemetryReading, RabbitMqConfig } from "../types";
  */
 export class RabbitMqPublisher {
   private readonly cfg: RabbitMqConfig;
-  private conn: amqplib.ChannelWrapper | null = null;
   private connecting = false;
   private stopped = false;
 
