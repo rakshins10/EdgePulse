@@ -1,5 +1,12 @@
 using EdgePulse.TelemetryProcessor;
 using EdgePulse.TelemetryProcessor.Services;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+
+// MongoDB.Driver 3.x breaking change: GuidRepresentation is Unspecified by default.
+// Register globally so POCO Guid properties serialize as BSON strings.
+BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((ctx, services) =>
