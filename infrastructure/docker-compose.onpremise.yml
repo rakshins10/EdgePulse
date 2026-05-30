@@ -181,6 +181,38 @@ services:
       retries: 5
 
   # ============================================================
+  # Telemetry Ingestion Service (NestJS)
+  # Accepts HTTP POST /ingest from IoT devices (X-Device-Key header).
+  # Validates the device key via EdgePulse.API then publishes to RabbitMQ.
+  # Not needed for the OPC-UA demo path (that publishes directly to RabbitMQ).
+  # HTTP: http://localhost:3000/ingest
+  # ============================================================
+  ingestion:
+    build:
+      context: ../src/EdgePulse.Ingestion
+      dockerfile: Dockerfile
+    container_name: edgepulse-ingestion
+    environment:
+      PORT: 3000
+      EDGEPULSE_API_URL: http://host.docker.internal:5104
+      SERVICE_KEY: ingestion-service-dev-key-change-before-deploy
+      RABBITMQ_URL: amqp://edgepulse:EdgePulse%402026@rabbitmq:5672/edgepulse
+    ports:
+      - "3000:3000"
+    networks:
+      - edgepulse-network
+    restart: unless-stopped
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ============================================================
   # OPC-UA Simulator (NordPulp demo only)
   # Generates synthetic Pulp & Paper sensor data for all 20 demo devices.
   # Exposes OPC-UA endpoint: opc.tcp://opcua-simulator:4840 (internal)

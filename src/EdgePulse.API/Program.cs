@@ -121,6 +121,12 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// ── Health endpoint (unauthenticated) ────────────────────────────────────────
+// Used by HAProxy to determine whether this instance is healthy.
+// Returns 200 {"status":"healthy"} — no JWT required.
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }))
+   .AllowAnonymous();
+
 app.UseMiddleware<EdgePulse.API.Middleware.ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 
