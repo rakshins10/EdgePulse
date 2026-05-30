@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
 import AlertsPage from './pages/alerts/AlertsPage';
+import DashboardPage from './pages/DashboardPage';
 import PlaceholderPage from './pages/placeholder/PlaceholderPage';
 
 const router = createBrowserRouter([
@@ -8,10 +9,10 @@ const router = createBrowserRouter([
     path: '/',
     element: <AppLayout />,
     children: [
-      { index: true, element: <Navigate to="/alerts" replace /> },
+      { index: true, element: <Navigate to="/dashboard" replace /> },
       {
         path: 'dashboard',
-        element: <PlaceholderPage title="Dashboard" />,
+        element: <DashboardPage />,
         handle: { title: 'Dashboard' },
       },
       {
