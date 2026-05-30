@@ -1,0 +1,41 @@
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  border-left: 4px solid var(--color-border);
+  min-width: 0;
+}
+
+/* Accent variants */
+.tile.critical { border-left-color: var(--color-critical); }
+.tile.warning  { border-left-color: var(--color-high); }
+.tile.ok       { border-left-color: var(--color-low); }
+.tile.default  { border-left-color: var(--color-accent); }
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.tile.critical .value { color: var(--color-critical); }
+.tile.warning  .value { color: var(--color-high); }
+.tile.ok       .value { color: var(--color-low); }
+
+.sub {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}

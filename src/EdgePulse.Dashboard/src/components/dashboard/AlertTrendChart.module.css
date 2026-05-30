@@ -1,0 +1,64 @@
+.wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.gridLine {
+  stroke: var(--color-border);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.bar {
+  fill: var(--color-accent);
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.bar:hover {
+  opacity: 1;
+}
+
+.barEmpty {
+  fill: var(--color-border);
+  opacity: 0.6;
+}
+
+.barLabel {
+  font-size: 10px;
+  text-anchor: middle;
+  fill: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.xLabel {
+  font-size: 10px;
+  text-anchor: middle;
+  fill: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.xSubLabel {
+  font-size: 9px;
+  text-anchor: middle;
+  fill: var(--color-text-muted);
+}
+
+.yLabel {
+  font-size: 10px;
+  text-anchor: end;
+  fill: var(--color-text-muted);
+}
+
+.empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}

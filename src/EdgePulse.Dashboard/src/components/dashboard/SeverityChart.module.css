@@ -1,0 +1,57 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 5rem 1fr 2.5rem;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.severityLabel {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-align: right;
+}
+
+.barTrack {
+  height: 0.875rem;
+  background: var(--color-surface-2);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 0.5rem;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+/* Severity fill colours */
+.barFill.critical { background: var(--color-critical); }
+.barFill.high     { background: var(--color-high); }
+.barFill.medium   { background: var(--color-medium); }
+.barFill.low      { background: var(--color-low); }
+
+.count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: right;
+}
+
+.empty {
+  padding: 1.5rem 0;
+  text-align: center;
+  color: var(--color-low);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
