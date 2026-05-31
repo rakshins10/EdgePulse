@@ -92,6 +92,12 @@
   color: var(--color-text-secondary);
 }
 
+.locationSub {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
 .empty {
   padding: 48px 24px;
   text-align: center;

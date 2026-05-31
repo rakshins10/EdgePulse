@@ -47,6 +47,97 @@
   font-variant-numeric: tabular-nums;
 }
 
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.registerBtn {
+  padding: 8px 16px;
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.registerBtn:hover {
+  background: var(--color-accent-hover);
+}
+
+/* Actions column */
+.actionsCol {
+  width: 140px;
+  text-align: right;
+}
+
+.decommBtn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.decommBtn:hover {
+  border-color: var(--color-critical);
+  color: var(--color-critical);
+  background: rgba(239, 68, 68, 0.06);
+}
+
+/* Registration success */
+.successBox {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.successTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-low);
+}
+
+.successNote {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.apiKeyBox {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.apiKeyLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.apiKey {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  color: var(--color-accent);
+  word-break: break-all;
+}
+
 /* Table */
 .tableWrapper {
   background: var(--color-surface);
@@ -107,6 +198,12 @@
 
 .location {
   color: var(--color-text-secondary);
+}
+
+.locationSub {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
 }
 
 .empty {

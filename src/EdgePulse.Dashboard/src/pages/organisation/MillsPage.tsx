@@ -1,72 +1,282 @@
-import { useQuery } from '@tanstack/react-query';
-import { getMills, getAreas } from '../../api/organisation';
+import { useState, type FormEvent } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getMills, getAreas, createMill, createArea } from '../../api/organisation';
+import { getLocationTypes } from '../../api/configuration';
+import type { MillDto, DeploymentMode } from '../../types/api';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
 import Badge from '../../components/common/Badge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import Modal from '../../components/common/Modal';
 import styles from './MillsPage.module.css';
+import f from '../../components/common/FormField.module.css';
+
+const TIMEZONES = [
+  'UTC',
+  'Europe/London', 'Europe/Helsinki', 'Europe/Berlin', 'Europe/Paris',
+  'Europe/Stockholm', 'Europe/Oslo',
+  'Asia/Kolkata', 'Asia/Tokyo', 'Asia/Shanghai', 'Asia/Singapore',
+  'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+  'Australia/Sydney',
+];
+
+function canManageMills(role?: string) {
+  return role === 'SuperAdmin' || role === 'CustomerAdmin';
+}
+
+function canManageAreas(role?: string) {
+  return role === 'SuperAdmin' || role === 'CustomerAdmin' || role === 'MillManager';
+}
 
 export default function MillsPage() {
-  const { data: mills = [], isLoading: millsLoading } = useQuery({
-    queryKey: ['mills'],
-    queryFn: getMills,
-  });
+  const user = useCurrentUser();
+  const qc = useQueryClient();
 
-  const { data: areas = [], isLoading: areasLoading } = useQuery({
-    queryKey: ['areas'],
-    queryFn: () => getAreas(),
-  });
+  const { data: mills = [], isLoading: millsLoading } = useQuery({ queryKey: ['mills'], queryFn: getMills });
+  const { data: areas = [], isLoading: areasLoading } = useQuery({ queryKey: ['areas'], queryFn: () => getAreas() });
+  const { data: locationTypes = [] } = useQuery({ queryKey: ['location-types'], queryFn: getLocationTypes });
+
+  // ── Add Mill modal ────────────────────────────────────────────────────────
+  const [millModalOpen, setMillModalOpen] = useState(false);
+  const [millSaving,    setMillSaving]    = useState(false);
+  const [millError,     setMillError]     = useState<string | null>(null);
+  const [millName,      setMillName]      = useState('');
+  const [millCode,      setMillCode]      = useState('');
+  const [millLocation,  setMillLocation]  = useState('');
+  const [millTimezone,  setMillTimezone]  = useState('UTC');
+  const [millInternet,  setMillInternet]  = useState(true);
+  const [millMode,      setMillMode]      = useState<DeploymentMode>('Cloud');
+
+  function openAddMill() {
+    setMillName(''); setMillCode(''); setMillLocation('');
+    setMillTimezone('UTC'); setMillInternet(true); setMillMode('Cloud');
+    setMillError(null); setMillModalOpen(true);
+  }
+
+  async function handleAddMill(e: FormEvent) {
+    e.preventDefault(); setMillSaving(true); setMillError(null);
+    try {
+      await createMill({
+        name: millName, code: millCode, location: millLocation,
+        timezone: millTimezone, hasInternet: millInternet, deploymentMode: millMode,
+      });
+      await qc.invalidateQueries({ queryKey: ['mills'] });
+      setMillModalOpen(false);
+    } catch { setMillError('Failed to create mill. Please try again.'); }
+    finally { setMillSaving(false); }
+  }
+
+  // ── Add Area modal ────────────────────────────────────────────────────────
+  const [areaModalOpen,  setAreaModalOpen]  = useState(false);
+  const [areaTargetMill, setAreaTargetMill] = useState<MillDto | null>(null);
+  const [areaSaving,     setAreaSaving]     = useState(false);
+  const [areaError,      setAreaError]      = useState<string | null>(null);
+  const [areaName,       setAreaName]       = useState('');
+  const [areaCode,       setAreaCode]       = useState('');
+  const [areaDesc,       setAreaDesc]       = useState('');
+  const [areaLocType,    setAreaLocType]    = useState('');
+
+  function openAddArea(mill: MillDto) {
+    setAreaName(''); setAreaCode(''); setAreaDesc(''); setAreaLocType('');
+    setAreaError(null); setAreaTargetMill(mill); setAreaModalOpen(true);
+  }
+
+  async function handleAddArea(e: FormEvent) {
+    e.preventDefault();
+    if (!areaTargetMill) return;
+    setAreaSaving(true); setAreaError(null);
+    try {
+      await createArea({
+        millId: areaTargetMill.id,
+        name: areaName,
+        code: areaCode,
+        description: areaDesc || undefined,
+        locationTypeId: areaLocType || undefined,
+      });
+      await qc.invalidateQueries({ queryKey: ['areas'] });
+      setAreaModalOpen(false);
+    } catch { setAreaError('Failed to create area. Please try again.'); }
+    finally { setAreaSaving(false); }
+  }
 
   if (millsLoading || areasLoading) return <LoadingSpinner message="Loading mills…" />;
 
-  if (mills.length === 0) {
-    return (
-      <div className={styles.empty}>
-        No mills configured for your tenant.
-      </div>
-    );
-  }
-
   return (
-    <div className={styles.grid}>
-      {mills.map(mill => {
-        const millAreas = areas.filter(a => a.millId === mill.id);
+    <>
+      <div className={styles.topBar}>
+        <p className={styles.summary}>
+          {mills.length} {mills.length === 1 ? 'mill' : 'mills'} · {areas.length} {areas.length === 1 ? 'area' : 'areas'}
+        </p>
+        {canManageMills(user?.role) && (
+          <button className={styles.addBtn} onClick={openAddMill}>+ Add Mill</button>
+        )}
+      </div>
 
-        return (
-          <div key={mill.id} className={styles.card}>
-            <div className={styles.cardHeader}>
-              <div>
-                <div className={styles.millName}>{mill.name}</div>
-                <div className={styles.millMeta}>
-                  {mill.location} · {mill.timezone}
+      {mills.length === 0 ? (
+        <div className={styles.empty}>
+          <p>No mills configured yet.</p>
+          {canManageMills(user?.role) && (
+            <button className={styles.addBtn} onClick={openAddMill}>+ Add your first mill</button>
+          )}
+        </div>
+      ) : (
+        <div className={styles.grid}>
+          {mills.map(mill => {
+            const millAreas = areas.filter(a => a.millId === mill.id);
+            return (
+              <div key={mill.id} className={styles.card}>
+                <div className={styles.cardHeader}>
+                  <div>
+                    <div className={styles.millName}>{mill.name}</div>
+                    <div className={styles.millMeta}>{mill.location} · {mill.timezone}</div>
+                  </div>
+                  <div className={styles.headerRight}>
+                    <div className={styles.badges}>
+                      <Badge label={mill.deploymentMode} variant="deployment" />
+                      {!mill.hasInternet && <Badge label="No Internet" color="#ef4444" variant="status" />}
+                    </div>
+                    {canManageAreas(user?.role) && (
+                      <button className={styles.areaAddBtn} onClick={() => openAddArea(mill)}>
+                        + Add Area
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.cardBody}>
+                  <div className={styles.areaHeader}>Areas ({millAreas.length})</div>
+                  {millAreas.length === 0 ? (
+                    <p className={styles.noAreas}>
+                      No areas{canManageAreas(user?.role) ? ' — click "+ Add Area" to create one' : ''}
+                    </p>
+                  ) : (
+                    <ul className={styles.areaList}>
+                      {millAreas.map(area => (
+                        <li key={area.id} className={styles.areaItem}>
+                          <div className={styles.areaLeft}>
+                            <span className={styles.areaName}>{area.name}</span>
+                            {area.locationTypeName && (
+                              <span className={styles.areaType}>{area.locationTypeName}</span>
+                            )}
+                          </div>
+                          <span className={styles.areaCode}>{area.code}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
-              <div className={styles.badges}>
-                <Badge label={mill.deploymentMode} variant="deployment" />
-                {!mill.hasInternet && (
-                  <Badge label="Offline" color="#ef4444" variant="status" />
-                )}
-              </div>
-            </div>
+            );
+          })}
+        </div>
+      )}
 
-            <div className={styles.cardBody}>
-              <div className={styles.areaHeader}>
-                Areas ({millAreas.length})
-              </div>
-              {millAreas.length === 0 ? (
-                <p className={styles.noAreas}>No areas configured</p>
-              ) : (
-                <ul className={styles.areaList}>
-                  {millAreas.map(area => (
-                    <li key={area.id} className={styles.areaItem}>
-                      <span className={styles.areaName}>{area.name}</span>
-                      <span className={styles.areaCode}>{area.code}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+      {/* Add Mill modal */}
+      <Modal
+        open={millModalOpen}
+        title="Add Mill"
+        onClose={() => setMillModalOpen(false)}
+        footer={
+          <>
+            <button className={f.btnSecondary} onClick={() => setMillModalOpen(false)}>Cancel</button>
+            <button className={f.btnPrimary} form="mill-form" disabled={millSaving}>
+              {millSaving ? 'Creating…' : 'Create Mill'}
+            </button>
+          </>
+        }
+      >
+        <form id="mill-form" className={f.formGrid} onSubmit={handleAddMill}>
+          {millError && <p className={f.errorText}>{millError}</p>}
+          <div className={f.formRow}>
+            <div className={f.field}>
+              <label className={`${f.label} ${f.required}`}>Mill Name</label>
+              <input className={f.input} required value={millName}
+                onChange={e => setMillName(e.target.value)} placeholder="e.g. Lakewood Mill" />
+            </div>
+            <div className={f.field}>
+              <label className={`${f.label} ${f.required}`}>Code</label>
+              <input className={f.input} required value={millCode}
+                onChange={e => setMillCode(e.target.value.toUpperCase())} placeholder="e.g. LKW" />
             </div>
           </div>
-        );
-      })}
-    </div>
+          <div className={f.field}>
+            <label className={`${f.label} ${f.required}`}>Location</label>
+            <input className={f.input} required value={millLocation}
+              onChange={e => setMillLocation(e.target.value)} placeholder="e.g. Tampere, Finland" />
+          </div>
+          <div className={f.formRow}>
+            <div className={f.field}>
+              <label className={`${f.label} ${f.required}`}>Timezone</label>
+              <select className={f.select} value={millTimezone}
+                onChange={e => setMillTimezone(e.target.value)}>
+                {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz}</option>)}
+              </select>
+            </div>
+            <div className={f.field}>
+              <label className={`${f.label} ${f.required}`}>Deployment Mode</label>
+              <select className={f.select} value={millMode}
+                onChange={e => setMillMode(e.target.value as DeploymentMode)}>
+                <option value="Cloud">Cloud</option>
+                <option value="OnPremise">On-Premise</option>
+              </select>
+            </div>
+          </div>
+          <div className={f.field}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={millInternet}
+                onChange={e => setMillInternet(e.target.checked)}
+              />
+              Has internet connectivity
+            </label>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Add Area modal */}
+      <Modal
+        open={areaModalOpen}
+        title={`Add Area — ${areaTargetMill?.name ?? ''}`}
+        onClose={() => setAreaModalOpen(false)}
+        footer={
+          <>
+            <button className={f.btnSecondary} onClick={() => setAreaModalOpen(false)}>Cancel</button>
+            <button className={f.btnPrimary} form="area-form" disabled={areaSaving}>
+              {areaSaving ? 'Creating…' : 'Create Area'}
+            </button>
+          </>
+        }
+      >
+        <form id="area-form" className={f.formGrid} onSubmit={handleAddArea}>
+          {areaError && <p className={f.errorText}>{areaError}</p>}
+          <div className={f.formRow}>
+            <div className={f.field}>
+              <label className={`${f.label} ${f.required}`}>Area Name</label>
+              <input className={f.input} required value={areaName}
+                onChange={e => setAreaName(e.target.value)} placeholder="e.g. Paper Machine 1" />
+            </div>
+            <div className={f.field}>
+              <label className={`${f.label} ${f.required}`}>Code</label>
+              <input className={f.input} required value={areaCode}
+                onChange={e => setAreaCode(e.target.value.toUpperCase())} placeholder="e.g. PM1" />
+            </div>
+          </div>
+          <div className={f.field}>
+            <label className={f.label}>Location Type</label>
+            <select className={f.select} value={areaLocType}
+              onChange={e => setAreaLocType(e.target.value)}>
+              <option value="">— None —</option>
+              {locationTypes.map(lt => <option key={lt.id} value={lt.id}>{lt.name}</option>)}
+            </select>
+            <span className={f.hint}>e.g. Building, Floor, Production Line — defined in Configuration → Location Types</span>
+          </div>
+          <div className={f.field}>
+            <label className={f.label}>Description</label>
+            <textarea className={f.textarea} value={areaDesc}
+              onChange={e => setAreaDesc(e.target.value)} placeholder="Optional notes about this area" />
+          </div>
+        </form>
+      </Modal>
+    </>
   );
 }

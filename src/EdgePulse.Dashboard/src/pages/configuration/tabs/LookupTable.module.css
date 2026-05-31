@@ -1,0 +1,115 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.count {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.addBtn {
+  padding: 6px 14px;
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.addBtn:hover {
+  background: var(--color-accent-hover);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+}
+
+.table td {
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.muted {
+  color: var(--color-text-secondary);
+}
+
+.actionsCol {
+  text-align: right;
+  width: 160px;
+}
+
+.editBtn,
+.deleteBtn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: inherit;
+  margin-left: 4px;
+  color: var(--color-text-secondary);
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.editBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.deleteBtn:hover {
+  border-color: var(--color-critical);
+  color: var(--color-critical);
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.empty {
+  padding: 32px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.colorSwatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--color-border);
+  vertical-align: middle;
+  margin-right: 8px;
+}

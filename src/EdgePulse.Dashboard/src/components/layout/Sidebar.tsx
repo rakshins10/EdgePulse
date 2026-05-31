@@ -12,11 +12,12 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
-  { to: '/dashboard', icon: '⬛', label: 'Dashboard' },
-  { to: '/devices',   icon: '🔌', label: 'Devices'   },
-  { to: '/alerts',    icon: '🔔', label: 'Alerts'    },
-  { to: '/mills',     icon: '🏭', label: 'Mills'      },
-  { to: '/areas',     icon: '📍', label: 'Areas'      },
+  { to: '/dashboard',     icon: '⬛', label: 'Dashboard' },
+  { to: '/devices',       icon: '🔌', label: 'Devices'   },
+  { to: '/alerts',        icon: '🔔', label: 'Alerts'    },
+  { to: '/mills',         icon: '🏭', label: 'Mills'      },
+  { to: '/areas',         icon: '📍', label: 'Areas'      },
+  { to: '/configuration', icon: '⚙️', label: 'Configuration' },
 ];
 
 const BADGE_REFRESH_MS = 30_000;

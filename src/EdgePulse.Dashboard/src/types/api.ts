@@ -47,6 +47,57 @@ export interface DeviceListDto {
   tenantId: string;
 }
 
+export interface RegisterDeviceResult {
+  deviceId: string;
+  apiKey: string;
+}
+
+// ── Configuration / lookup tables ───────────────────────────────────────────
+
+export interface DeviceTypeDto {
+  id: string;
+  name: string;
+  code: string;
+  description: string | null;
+  icon: string | null;
+  sortOrder: number;
+}
+
+export interface DeviceStatusDto {
+  id: string;
+  name: string;
+  code: string;
+  description: string | null;
+  color: string | null;
+  sortOrder: number;
+}
+
+export interface LocationTypeDto {
+  id: string;
+  name: string;
+  code: string;
+  description: string | null;
+  sortOrder: number;
+}
+
+export interface MaintenanceTypeDto {
+  id: string;
+  name: string;
+  code: string;
+  description: string | null;
+  color: string | null;
+  sortOrder: number;
+}
+
+export interface MetricTypeDto {
+  id: string;
+  name: string;
+  code: string;
+  defaultUnit: string;
+  description: string | null;
+  sortOrder: number;
+}
+
 // ── Current user (parsed from JWT) ──────────────────────────────────────────
 
 export interface CurrentUser {

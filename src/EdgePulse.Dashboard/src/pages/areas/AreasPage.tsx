@@ -26,7 +26,11 @@ export default function AreasPage() {
             onChange={e => setMillFilter(e.target.value)}
           >
             <option value="">All mills</option>
-            {mills.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+            {mills.map(m => (
+              <option key={m.id} value={m.id}>
+                {m.name}{m.location ? ` — ${m.location}` : ''}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -52,15 +56,23 @@ export default function AreasPage() {
                 <td colSpan={5} className={styles.empty}>No areas found.</td>
               </tr>
             ) : (
-              areas.map(area => (
-                <tr key={area.id}>
-                  <td className={styles.areaName}>{area.name}</td>
-                  <td className={styles.areaCode}>{area.code}</td>
-                  <td className={styles.location}>{area.millName}</td>
-                  <td className={styles.location}>{area.locationTypeName ?? '—'}</td>
-                  <td className={styles.location}>{area.description ?? '—'}</td>
-                </tr>
-              ))
+              areas.map(area => {
+                const mill = mills.find(m => m.id === area.millId);
+                return (
+                  <tr key={area.id}>
+                    <td className={styles.areaName}>{area.name}</td>
+                    <td className={styles.areaCode}>{area.code}</td>
+                    <td className={styles.location}>
+                      <div>{area.millName}</div>
+                      {mill?.location && (
+                        <div className={styles.locationSub}>{mill.location}</div>
+                      )}
+                    </td>
+                    <td className={styles.location}>{area.locationTypeName ?? '—'}</td>
+                    <td className={styles.location}>{area.description ?? '—'}</td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

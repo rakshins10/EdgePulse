@@ -121,8 +121,11 @@ export default function TelemetryChart({ metricKey, readings, color, unit, from,
   const stroke       = color ?? COLORS[metricKey.length % COLORS.length];
 
   const periodFromMs = from.getTime();
-  const periodToMs   = to.getTime();
-  const spanMs       = periodToMs - periodFromMs;
+  // Snap visual end to the next boundary so the axis "closes" — `to` is always
+  // *.999ms before a natural boundary (next midnight / Monday / month / year),
+  // so +1ms always lands on a clean tick position.
+  const periodToMs = to.getTime() + 1;
+  const spanMs     = to.getTime() - from.getTime();
 
   const ticks   = generateTicks(periodFromMs, periodToMs, spanMs);
   const fmtTick = makeFmtTick(spanMs);
