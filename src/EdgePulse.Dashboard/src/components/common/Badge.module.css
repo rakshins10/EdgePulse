@@ -1,0 +1,26 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+/* Role badges */
+.roleSuperAdmin    { background: rgba(168, 85, 247, 0.15); color: #c084fc; border-color: rgba(168, 85, 247, 0.3); }
+.roleCustomerAdmin { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); }
+.roleMillManager   { background: rgba(6, 182, 212, 0.15);  color: #22d3ee; border-color: rgba(6, 182, 212, 0.3); }
+.roleOperator      { background: rgba(34, 197, 94, 0.15);  color: #4ade80; border-color: rgba(34, 197, 94, 0.3); }
+.roleExecutive     { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
+
+/* Deployment badges */
+.deploymentCloud     { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); }
+.deploymentOnPremise { background: rgba(100,116,139, 0.15); color: #94a3b8; border-color: rgba(100,116,139, 0.3); }
+
+/* Status (colour comes from API via inline style) */
+.status {
+  /* inline style sets background + color dynamically */
+}

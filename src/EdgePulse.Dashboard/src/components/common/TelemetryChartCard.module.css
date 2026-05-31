@@ -1,0 +1,63 @@
+.card {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--color-surface);
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+
+.overrideActive {
+  border-color: var(--color-accent);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+  gap: 8px;
+}
+
+.rangeTag {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.03em;
+}
+
+.overrideBtn {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 5px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.overrideBtn:hover {
+  background: var(--color-row-hover);
+  color: var(--color-text);
+}
+
+.overrideBtnActive {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.overrideBtnActive:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--color-accent);
+}
+
+.toolbarWrap {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}

@@ -5,6 +5,13 @@ using EdgePulse.Infrastructure.Persistence.Seeding;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+
+// MongoDB.Driver 3.x: Guids are stored as strings by TelemetryProcessor — register
+// the matching serializer here so reads deserialize correctly.
+BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
 
 var builder = WebApplication.CreateBuilder(args);
 
