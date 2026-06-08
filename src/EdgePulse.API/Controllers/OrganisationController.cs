@@ -148,6 +148,93 @@ public class OrganisationController : ControllerBase
             cancellationToken);
         return CreatedAtAction(nameof(GetAreas), new { }, id);
     }
+
+    /// <summary>
+    /// Update an area's editable details (name, description, location type).
+    /// MillManager can only edit areas in their assigned mill.
+    /// </summary>
+    [HttpPut("areas/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> UpdateArea(
+        Guid id,
+        [FromBody] UpdateAreaRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new EdgePulse.Application.Features.Areas.Commands.UpdateAreaCommand(
+                id,
+                request.Name,
+                request.Description,
+                request.LocationTypeId),
+            cancellationToken);
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Delete an area. Refuses if the area has active devices.
+    /// MillManager can only delete areas in their assigned mill.
+    /// </summary>
+    [HttpDelete("areas/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> DeleteArea(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new EdgePulse.Application.Features.Areas.Commands.DeleteAreaCommand(id),
+            cancellationToken);
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Update a mill's editable details. CustomerAdmin and above.
+    /// </summary>
+    [HttpPut("mills/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> UpdateMill(
+        Guid id,
+        [FromBody] UpdateMillRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new EdgePulse.Application.Features.Mills.Commands.UpdateMillCommand(
+                id,
+                request.Name,
+                request.Location,
+                request.Timezone,
+                request.HasInternet,
+                request.DeploymentMode),
+            cancellationToken);
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Delete a mill. Refuses if mill has active areas or devices.
+    /// CustomerAdmin and above.
+    /// </summary>
+    [HttpDelete("mills/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> DeleteMill(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new EdgePulse.Application.Features.Mills.Commands.DeleteMillCommand(id),
+            cancellationToken);
+        return NoContent();
+    }
 }
 
 // Request models
@@ -168,10 +255,24 @@ public record CreateMillRequest(
         EdgePulse.Domain.Enums.DeploymentMode.Cloud
 );
 
+public record UpdateMillRequest(
+    string Name,
+    string Location,
+    string Timezone,
+    bool HasInternet,
+    EdgePulse.Domain.Enums.DeploymentMode DeploymentMode
+);
+
 public record CreateAreaRequest(
     Guid MillId,
     string Name,
     string Code,
     Guid? LocationTypeId = null,
     string? Description = null
+);
+
+public record UpdateAreaRequest(
+    string Name,
+    string? Description = null,
+    Guid? LocationTypeId = null
 );

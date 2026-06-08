@@ -25,3 +25,17 @@ export const registerDevice = (body: RegisterDeviceBody): Promise<RegisterDevice
 
 export const decommissionDevice = (id: string): Promise<void> =>
   apiClient.delete(`/devices/${id}`).then(() => undefined);
+
+export interface UpdateDeviceBody {
+  name: string;
+  areaId: string;
+  typeId: string;
+  manufacturerId?: string;
+  modelId?: string;
+  serialNumber?: string;
+  installDate?: string;
+  description?: string;
+}
+
+export const updateDevice = (id: string, body: UpdateDeviceBody): Promise<void> =>
+  apiClient.put(`/devices/${id}`, body).then(() => undefined);

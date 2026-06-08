@@ -69,6 +69,37 @@ public class DevicesController : ControllerBase
     }
 
     /// <summary>
+    /// Update a device's editable details. Mill is not changeable here —
+    /// to move a device between mills, decommission and re-register.
+    /// Area change within the same mill is permitted.
+    /// </summary>
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> UpdateDevice(
+        Guid id,
+        [FromBody] UpdateDeviceRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new UpdateDeviceCommand(
+                id,
+                request.Name,
+                request.AreaId,
+                request.TypeId,
+                request.ManufacturerId,
+                request.ModelId,
+                request.SerialNumber,
+                request.InstallDate,
+                request.Description),
+            cancellationToken);
+        return NoContent();
+    }
+
+    /// <summary>
     /// Decommission a device.
     /// Sets device status to Decommissioned and revokes all active API keys.
     /// Historical telemetry data is preserved (soft delete only).
@@ -96,6 +127,17 @@ public record RegisterDeviceRequest(
     Guid StatusId,
     string Name,
     string Code,
+    Guid? ManufacturerId = null,
+    Guid? ModelId = null,
+    string? SerialNumber = null,
+    DateOnly? InstallDate = null,
+    string? Description = null
+);
+
+public record UpdateDeviceRequest(
+    string Name,
+    Guid AreaId,
+    Guid TypeId,
     Guid? ManufacturerId = null,
     Guid? ModelId = null,
     string? SerialNumber = null,

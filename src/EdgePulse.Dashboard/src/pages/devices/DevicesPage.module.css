@@ -73,10 +73,12 @@
 
 /* Actions column */
 .actionsCol {
-  width: 140px;
+  width: 200px;
   text-align: right;
+  white-space: nowrap;
 }
 
+.editBtn,
 .decommBtn {
   padding: 4px 10px;
   background: transparent;
@@ -86,7 +88,13 @@
   font-size: 11px;
   cursor: pointer;
   font-family: inherit;
+  margin-left: 4px;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.editBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .decommBtn:hover {
