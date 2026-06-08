@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { TimeRangeResult, Scale } from '../../hooks/useTimeRange';
 import { toInputDate } from '../../hooks/useTimeRange';
 import styles from './TimeRangeToolbar.module.css';
@@ -10,6 +11,7 @@ interface Props {
 const SCALES: Scale[] = ['day', 'week', 'month', 'year', 'custom'];
 
 export default function TimeRangeToolbar({ range, compact = false }: Props) {
+  const { t } = useTranslation();
   const {
     scale, periodLabel, canNext,
     customFromInput, customToInput,
@@ -27,7 +29,7 @@ export default function TimeRangeToolbar({ range, compact = false }: Props) {
             className={`${styles.scaleBtn} ${scale === s ? styles.scaleBtnActive : ''}`}
             onClick={() => handleScaleChange(s)}
           >
-            {s.charAt(0).toUpperCase() + s.slice(1)}
+            {t(`timeRange.${s}`)}
           </button>
         ))}
       </div>
@@ -37,7 +39,7 @@ export default function TimeRangeToolbar({ range, compact = false }: Props) {
           <button
             className={styles.navBtn}
             onClick={() => handleNav(-1)}
-            title="Previous period"
+            title={t('timeRange.previousPeriod')}
           >
             ‹
           </button>
@@ -46,7 +48,7 @@ export default function TimeRangeToolbar({ range, compact = false }: Props) {
             className={styles.navBtn}
             onClick={() => handleNav(1)}
             disabled={!canNext}
-            title="Next period"
+            title={t('timeRange.nextPeriod')}
           >
             ›
           </button>
@@ -55,7 +57,7 @@ export default function TimeRangeToolbar({ range, compact = false }: Props) {
 
       {scale === 'custom' && (
         <div className={styles.customRow}>
-          <label className={styles.dateLabel}>From</label>
+          <label className={styles.dateLabel}>{t('timeRange.from')}</label>
           <input
             type="date"
             className={styles.dateInput}
@@ -63,7 +65,7 @@ export default function TimeRangeToolbar({ range, compact = false }: Props) {
             max={customToInput}
             onChange={e => setCustomFromInput(e.target.value)}
           />
-          <label className={styles.dateLabel}>To</label>
+          <label className={styles.dateLabel}>{t('timeRange.to')}</label>
           <input
             type="date"
             className={styles.dateInput}
@@ -73,7 +75,7 @@ export default function TimeRangeToolbar({ range, compact = false }: Props) {
             onChange={e => setCustomToInput(e.target.value)}
           />
           <button className={styles.applyBtn} onClick={handleApplyCustom}>
-            Apply
+            {t('timeRange.apply')}
           </button>
           <span className={styles.periodLabel}>{periodLabel}</span>
         </div>

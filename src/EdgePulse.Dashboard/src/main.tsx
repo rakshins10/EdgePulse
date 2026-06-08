@@ -5,6 +5,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { store } from './store/index';
 import keycloak from './keycloak';
 import { ThemeProvider } from './context/ThemeContext';
+import './i18n';
 import App from './App';
 import './index.css';
 

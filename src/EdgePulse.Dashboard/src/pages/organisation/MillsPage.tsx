@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   getMills, getAreas,
   createMill, updateMill, deleteMill,
@@ -32,6 +33,7 @@ function canManageAreas(role?: string) {
 }
 
 export default function MillsPage() {
+  const { t } = useTranslation();
   const user = useCurrentUser();
   const qc = useQueryClient();
 
@@ -82,18 +84,18 @@ export default function MillsPage() {
       await qc.invalidateQueries({ queryKey: ['mills'] });
       setMillOpen(false);
     } catch {
-      setMillError(millEditing ? 'Failed to update mill.' : 'Failed to create mill. Code may already exist.');
+      setMillError(millEditing ? t('mills.modal.errorUpdate') : t('mills.modal.errorCreate'));
     } finally { setMillSaving(false); }
   }
 
   async function handleDeleteMill(mill: MillDto) {
-    if (!confirm(`Delete mill "${mill.name}"?\n\nThis will fail if it has active areas or devices.`)) return;
+    if (!confirm(t('mills.deleteConfirm', { name: mill.name }))) return;
     try {
       await deleteMill(mill.id);
       await qc.invalidateQueries({ queryKey: ['mills'] });
     } catch (err) {
       const msg = (err as { response?: { data?: { title?: string } } })?.response?.data?.title
-        ?? 'Failed to delete mill. It may have active areas or devices.';
+        ?? t('mills.deleteFallback');
       alert(msg);
     }
   }
@@ -146,40 +148,40 @@ export default function MillsPage() {
       await qc.invalidateQueries({ queryKey: ['areas'] });
       setAreaOpen(false);
     } catch {
-      setAreaError(areaEditing ? 'Failed to update area.' : 'Failed to create area. Code may already exist in this mill.');
+      setAreaError(areaEditing ? t('mills.areaModal.errorUpdate') : t('mills.areaModal.errorCreate'));
     } finally { setAreaSaving(false); }
   }
 
   async function handleDeleteArea(area: AreaDto) {
-    if (!confirm(`Delete area "${area.name}"?\n\nThis will fail if it has active devices.`)) return;
+    if (!confirm(t('mills.deleteAreaConfirm', { name: area.name }))) return;
     try {
       await deleteArea(area.id);
       await qc.invalidateQueries({ queryKey: ['areas'] });
     } catch (err) {
       const msg = (err as { response?: { data?: { title?: string } } })?.response?.data?.title
-        ?? 'Failed to delete area. It may have active devices.';
+        ?? t('mills.deleteAreaFallback');
       alert(msg);
     }
   }
 
-  if (millsLoading || areasLoading) return <LoadingSpinner message="Loading mills…" />;
+  if (millsLoading || areasLoading) return <LoadingSpinner message={t('mills.loading')} />;
 
   return (
     <>
       <div className={styles.topBar}>
         <p className={styles.summary}>
-          {mills.length} {mills.length === 1 ? 'mill' : 'mills'} · {areas.length} {areas.length === 1 ? 'area' : 'areas'}
+          {t('mills.summary', { count: mills.length })} · {t('mills.areasSummary', { count: areas.length })}
         </p>
         {canManageMills(user?.role) && (
-          <button className={styles.addBtn} onClick={openAddMill}>+ Add Mill</button>
+          <button className={styles.addBtn} onClick={openAddMill}>{t('mills.addMill')}</button>
         )}
       </div>
 
       {mills.length === 0 ? (
         <div className={styles.empty}>
-          <p>No mills configured yet.</p>
+          <p>{t('mills.emptyMessage')}</p>
           {canManageMills(user?.role) && (
-            <button className={styles.addBtn} onClick={openAddMill}>+ Add your first mill</button>
+            <button className={styles.addBtn} onClick={openAddMill}>{t('mills.addFirstMill')}</button>
           )}
         </div>
       ) : (
@@ -199,22 +201,22 @@ export default function MillsPage() {
                   </div>
                   {canManageMills(user?.role) && (
                     <div className={styles.headerActions}>
-                      <button className={styles.iconBtn} onClick={() => openEditMill(mill)} title="Edit mill">✎</button>
-                      <button className={styles.iconBtnDanger} onClick={() => handleDeleteMill(mill)} title="Delete mill">🗑</button>
+                      <button className={styles.iconBtn} onClick={() => openEditMill(mill)} title={t('mills.editTooltip')}>✎</button>
+                      <button className={styles.iconBtnDanger} onClick={() => handleDeleteMill(mill)} title={t('mills.deleteTooltip')}>🗑</button>
                     </div>
                   )}
                 </div>
 
                 <div className={styles.cardBody}>
                   <div className={styles.areaHeader}>
-                    <span>Areas ({millAreas.length})</span>
+                    <span>{t('mills.areasHeader', { count: millAreas.length })}</span>
                     {canManageAreas(user?.role) && (
-                      <button className={styles.areaAddBtn} onClick={() => openAddArea(mill)}>+ Add</button>
+                      <button className={styles.areaAddBtn} onClick={() => openAddArea(mill)}>{t('mills.addArea')}</button>
                     )}
                   </div>
                   {millAreas.length === 0 ? (
                     <p className={styles.noAreas}>
-                      No areas{canManageAreas(user?.role) ? ' — click "+ Add" to create one' : ''}
+                      {t('mills.noAreas')}{canManageAreas(user?.role) ? t('mills.noAreasHint') : ''}
                     </p>
                   ) : (
                     <ul className={styles.areaList}>
@@ -230,8 +232,8 @@ export default function MillsPage() {
                             <span className={styles.areaCode}>{area.code}</span>
                             {canManageAreas(user?.role) && (
                               <span className={styles.areaActions}>
-                                <button className={styles.areaIconBtn} onClick={() => openEditArea(area)} title="Edit area">✎</button>
-                                <button className={styles.areaIconBtnDanger} onClick={() => handleDeleteArea(area)} title="Delete area">🗑</button>
+                                <button className={styles.areaIconBtn} onClick={() => openEditArea(area)} title={t('mills.editAreaTooltip')}>✎</button>
+                                <button className={styles.areaIconBtnDanger} onClick={() => handleDeleteArea(area)} title={t('mills.deleteAreaTooltip')}>🗑</button>
                               </span>
                             )}
                           </div>
@@ -249,13 +251,13 @@ export default function MillsPage() {
       {/* Mill modal (Add + Edit) */}
       <Modal
         open={millOpen}
-        title={millEditing ? 'Edit Mill' : 'Add Mill'}
+        title={millEditing ? t('mills.modal.editTitle') : t('mills.modal.addTitle')}
         onClose={() => setMillOpen(false)}
         footer={
           <>
-            <button className={f.btnSecondary} onClick={() => setMillOpen(false)}>Cancel</button>
+            <button className={f.btnSecondary} onClick={() => setMillOpen(false)}>{t('common.cancel')}</button>
             <button className={f.btnPrimary} form="mill-form" disabled={millSaving}>
-              {millSaving ? 'Saving…' : millEditing ? 'Save Changes' : 'Create Mill'}
+              {millSaving ? t('common.saving') : millEditing ? t('mills.modal.saveBtn') : t('mills.modal.createBtn')}
             </button>
           </>
         }
@@ -264,35 +266,35 @@ export default function MillsPage() {
           {millError && <p className={f.errorText}>{millError}</p>}
           <div className={f.formRow}>
             <div className={f.field}>
-              <label className={`${f.label} ${f.required}`}>Mill Name</label>
+              <label className={`${f.label} ${f.required}`}>{t('mills.modal.name')}</label>
               <input className={f.input} required value={millName}
-                onChange={e => setMillName(e.target.value)} placeholder="e.g. Lakewood Mill" />
+                onChange={e => setMillName(e.target.value)} placeholder={t('mills.modal.namePlaceholder')} />
             </div>
             <div className={f.field}>
-              <label className={`${f.label} ${f.required}`}>Code</label>
+              <label className={`${f.label} ${f.required}`}>{t('mills.modal.code')}</label>
               <input className={f.input} required value={millCode} disabled={!!millEditing}
-                onChange={e => setMillCode(e.target.value.toUpperCase())} placeholder="e.g. LKW" />
+                onChange={e => setMillCode(e.target.value.toUpperCase())} placeholder={t('mills.modal.codePlaceholder')} />
             </div>
           </div>
           <div className={f.field}>
-            <label className={`${f.label} ${f.required}`}>Location</label>
+            <label className={`${f.label} ${f.required}`}>{t('mills.modal.location')}</label>
             <input className={f.input} required value={millLocation}
-              onChange={e => setMillLocation(e.target.value)} placeholder="e.g. Tampere, Finland" />
+              onChange={e => setMillLocation(e.target.value)} placeholder={t('mills.modal.locationPlaceholder')} />
           </div>
           <div className={f.formRow}>
             <div className={f.field}>
-              <label className={`${f.label} ${f.required}`}>Timezone</label>
+              <label className={`${f.label} ${f.required}`}>{t('mills.modal.timezone')}</label>
               <select className={f.select} value={millTimezone}
                 onChange={e => setMillTimezone(e.target.value)}>
                 {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz}</option>)}
               </select>
             </div>
             <div className={f.field}>
-              <label className={`${f.label} ${f.required}`}>Deployment Mode</label>
+              <label className={`${f.label} ${f.required}`}>{t('mills.modal.deploymentMode')}</label>
               <select className={f.select} value={millMode}
                 onChange={e => setMillMode(e.target.value as DeploymentMode)}>
-                <option value="Cloud">Cloud</option>
-                <option value="OnPremise">On-Premise</option>
+                <option value="Cloud">{t('mills.modal.deploymentCloud')}</option>
+                <option value="OnPremise">{t('mills.modal.deploymentOnPremise')}</option>
               </select>
             </div>
           </div>
@@ -300,7 +302,7 @@ export default function MillsPage() {
             <label className={styles.checkboxLabel}>
               <input type="checkbox" checked={millInternet}
                 onChange={e => setMillInternet(e.target.checked)} />
-              Has internet connectivity
+              {t('mills.modal.hasInternet')}
             </label>
           </div>
         </form>
@@ -309,13 +311,15 @@ export default function MillsPage() {
       {/* Area modal (Add + Edit) */}
       <Modal
         open={areaOpen}
-        title={areaEditing ? `Edit Area — ${areaTargetMill?.name ?? ''}` : `Add Area — ${areaTargetMill?.name ?? ''}`}
+        title={areaEditing
+          ? t('mills.areaModal.editTitle', { mill: areaTargetMill?.name ?? '' })
+          : t('mills.areaModal.addTitle', { mill: areaTargetMill?.name ?? '' })}
         onClose={() => setAreaOpen(false)}
         footer={
           <>
-            <button className={f.btnSecondary} onClick={() => setAreaOpen(false)}>Cancel</button>
+            <button className={f.btnSecondary} onClick={() => setAreaOpen(false)}>{t('common.cancel')}</button>
             <button className={f.btnPrimary} form="area-form" disabled={areaSaving}>
-              {areaSaving ? 'Saving…' : areaEditing ? 'Save Changes' : 'Create Area'}
+              {areaSaving ? t('common.saving') : areaEditing ? t('common.save') : t('mills.areaModal.createBtn')}
             </button>
           </>
         }
@@ -324,29 +328,29 @@ export default function MillsPage() {
           {areaError && <p className={f.errorText}>{areaError}</p>}
           <div className={f.formRow}>
             <div className={f.field}>
-              <label className={`${f.label} ${f.required}`}>Area Name</label>
+              <label className={`${f.label} ${f.required}`}>{t('mills.areaModal.name')}</label>
               <input className={f.input} required value={areaName}
-                onChange={e => setAreaName(e.target.value)} placeholder="e.g. Paper Machine 1" />
+                onChange={e => setAreaName(e.target.value)} placeholder={t('mills.areaModal.namePlaceholder')} />
             </div>
             <div className={f.field}>
-              <label className={`${f.label} ${f.required}`}>Code</label>
+              <label className={`${f.label} ${f.required}`}>{t('mills.areaModal.code')}</label>
               <input className={f.input} required value={areaCode} disabled={!!areaEditing}
-                onChange={e => setAreaCode(e.target.value.toUpperCase())} placeholder="e.g. PM1" />
+                onChange={e => setAreaCode(e.target.value.toUpperCase())} placeholder={t('mills.areaModal.codePlaceholder')} />
             </div>
           </div>
           <div className={f.field}>
-            <label className={f.label}>Location Type</label>
+            <label className={f.label}>{t('mills.areaModal.locationType')}</label>
             <select className={f.select} value={areaLocType}
               onChange={e => setAreaLocType(e.target.value)}>
-              <option value="">— None —</option>
+              <option value="">{t('common.none')}</option>
               {locationTypes.map(lt => <option key={lt.id} value={lt.id}>{lt.name}</option>)}
             </select>
-            <span className={f.hint}>e.g. Building, Floor, Production Line — defined in Configuration → Location Types</span>
+            <span className={f.hint}>{t('mills.areaModal.locationTypeHint')}</span>
           </div>
           <div className={f.field}>
-            <label className={f.label}>Description</label>
+            <label className={f.label}>{t('mills.areaModal.description')}</label>
             <textarea className={f.textarea} value={areaDesc}
-              onChange={e => setAreaDesc(e.target.value)} placeholder="Optional notes about this area" />
+              onChange={e => setAreaDesc(e.target.value)} placeholder={t('mills.areaModal.descriptionPlaceholder')} />
           </div>
         </form>
       </Modal>

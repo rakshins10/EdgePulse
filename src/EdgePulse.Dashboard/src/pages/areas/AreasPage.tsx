@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { getMills, getAreas } from '../../api/organisation';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import styles from './AreasPage.module.css';
 
 export default function AreasPage() {
+  const { t } = useTranslation();
   const [millFilter, setMillFilter] = useState('');
 
   const { data: mills = [] } = useQuery({ queryKey: ['mills'], queryFn: getMills });
@@ -13,19 +15,19 @@ export default function AreasPage() {
     queryFn:  () => getAreas(millFilter || undefined),
   });
 
-  if (isLoading) return <LoadingSpinner message="Loading areas…" />;
+  if (isLoading) return <LoadingSpinner message={t('areas.loading')} />;
 
   return (
     <>
       <div className={styles.toolbar}>
         <div className={styles.filters}>
-          <span className={styles.filterLabel}>Filter:</span>
+          <span className={styles.filterLabel}>{t('common.filter')}</span>
           <select
             className={styles.select}
             value={millFilter}
             onChange={e => setMillFilter(e.target.value)}
           >
-            <option value="">All mills</option>
+            <option value="">{t('areas.allMills')}</option>
             {mills.map(m => (
               <option key={m.id} value={m.id}>
                 {m.name}{m.location ? ` — ${m.location}` : ''}
@@ -35,7 +37,7 @@ export default function AreasPage() {
         </div>
 
         <div className={styles.count}>
-          {areas.length} {areas.length === 1 ? 'area' : 'areas'}
+          {t('areas.count', { count: areas.length })}
         </div>
       </div>
 
@@ -43,17 +45,17 @@ export default function AreasPage() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Area</th>
-              <th>Code</th>
-              <th>Mill</th>
-              <th>Location Type</th>
-              <th>Description</th>
+              <th>{t('areas.table.area')}</th>
+              <th>{t('areas.table.code')}</th>
+              <th>{t('areas.table.mill')}</th>
+              <th>{t('areas.table.locationType')}</th>
+              <th>{t('areas.table.description')}</th>
             </tr>
           </thead>
           <tbody>
             {areas.length === 0 ? (
               <tr>
-                <td colSpan={5} className={styles.empty}>No areas found.</td>
+                <td colSpan={5} className={styles.empty}>{t('areas.empty')}</td>
               </tr>
             ) : (
               areas.map(area => {

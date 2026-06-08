@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   getLocationTypes,
   createLocationType,
@@ -13,6 +14,7 @@ import styles from './LookupTable.module.css';
 import f from '../../../components/common/FormField.module.css';
 
 export default function LocationTypesTab() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data = [], isLoading } = useQuery({ queryKey: ['location-types'], queryFn: getLocationTypes });
 
@@ -50,41 +52,41 @@ export default function LocationTypesTab() {
       await qc.invalidateQueries({ queryKey: ['location-types'] });
       setOpen(false);
     } catch {
-      setError(editing ? 'Failed to update.' : 'Failed to create. Code may already exist.');
+      setError(editing ? t('configuration.lookup.errorUpdate') : t('configuration.lookup.errorCreate'));
     } finally {
       setSaving(false);
     }
   }
 
   async function handleDelete(row: LocationTypeDto) {
-    if (!confirm(`Delete location type "${row.name}"?\n\nAreas already using it keep their reference until reassigned.`)) return;
+    if (!confirm(t('configuration.locationTypes.deleteConfirm', { name: row.name }))) return;
     try {
       await deleteLocationType(row.id);
       await qc.invalidateQueries({ queryKey: ['location-types'] });
     } catch {
-      alert('Failed to delete. It may be in use or be a system type.');
+      alert(t('configuration.lookup.errorDelete'));
     }
   }
 
-  if (isLoading) return <LoadingSpinner message="Loading…" />;
+  if (isLoading) return <LoadingSpinner message={t('common.loading')} />;
 
   return (
     <>
       <div className={styles.toolbar}>
-        <span className={styles.count}>{data.length} location types</span>
-        <button className={styles.addBtn} onClick={openAdd}>+ Add Location Type</button>
+        <span className={styles.count}>{t('configuration.locationTypes.count', { count: data.length })}</span>
+        <button className={styles.addBtn} onClick={openAdd}>{t('configuration.locationTypes.addBtn')}</button>
       </div>
 
       {data.length === 0 ? (
-        <div className={styles.empty}>No location types defined.</div>
+        <div className={styles.empty}>{t('configuration.lookup.empty')}</div>
       ) : (
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Code</th>
-              <th>Description</th>
-              <th>Sort Order</th>
+              <th>{t('configuration.lookup.name')}</th>
+              <th>{t('configuration.lookup.code')}</th>
+              <th>{t('configuration.lookup.description')}</th>
+              <th>{t('configuration.lookup.sortOrder')}</th>
               <th className={styles.actionsCol} />
             </tr>
           </thead>
@@ -99,8 +101,8 @@ export default function LocationTypesTab() {
                   <td className={styles.muted}>{row.description ?? '—'}</td>
                   <td className={styles.muted}>{row.sortOrder}</td>
                   <td className={styles.actionsCol}>
-                    <button className={styles.editBtn} onClick={() => openEdit(row)}>Edit</button>
-                    <button className={styles.deleteBtn} onClick={() => handleDelete(row)}>Delete</button>
+                    <button className={styles.editBtn} onClick={() => openEdit(row)}>{t('common.edit')}</button>
+                    <button className={styles.deleteBtn} onClick={() => handleDelete(row)}>{t('common.delete')}</button>
                   </td>
                 </tr>
               ))}
@@ -110,13 +112,13 @@ export default function LocationTypesTab() {
 
       <Modal
         open={open}
-        title={editing ? 'Edit Location Type' : 'Add Location Type'}
+        title={editing ? t('configuration.locationTypes.editTitle') : t('configuration.locationTypes.addTitle')}
         onClose={() => setOpen(false)}
         footer={
           <>
-            <button className={f.btnSecondary} onClick={() => setOpen(false)}>Cancel</button>
+            <button className={f.btnSecondary} onClick={() => setOpen(false)}>{t('common.cancel')}</button>
             <button className={f.btnPrimary} form="loc-form" disabled={saving}>
-              {saving ? 'Saving…' : editing ? 'Save Changes' : 'Create'}
+              {saving ? t('common.saving') : editing ? t('common.save') : t('common.create')}
             </button>
           </>
         }
@@ -125,23 +127,23 @@ export default function LocationTypesTab() {
           {error && <p className={f.errorText}>{error}</p>}
           <div className={f.formRow}>
             <div className={f.field}>
-              <label className={`${f.label} ${f.required}`}>Name</label>
+              <label className={`${f.label} ${f.required}`}>{t('configuration.lookup.name')}</label>
               <input className={f.input} required value={name}
-                onChange={e => setName(e.target.value)} placeholder="e.g. Floor" />
+                onChange={e => setName(e.target.value)} placeholder={t('configuration.locationTypes.namePlaceholder')} />
             </div>
             <div className={f.field}>
-              <label className={`${f.label} ${f.required}`}>Code</label>
+              <label className={`${f.label} ${f.required}`}>{t('configuration.lookup.code')}</label>
               <input className={f.input} required value={code} disabled={!!editing}
-                onChange={e => setCode(e.target.value.toUpperCase())} placeholder="e.g. FLOOR" />
+                onChange={e => setCode(e.target.value.toUpperCase())} placeholder={t('configuration.locationTypes.codePlaceholder')} />
             </div>
           </div>
           <div className={f.field}>
-            <label className={f.label}>Description</label>
+            <label className={f.label}>{t('configuration.lookup.description')}</label>
             <textarea className={f.textarea} value={desc}
-              onChange={e => setDesc(e.target.value)} placeholder="Optional" />
+              onChange={e => setDesc(e.target.value)} placeholder={t('common.optional')} />
           </div>
           <div className={f.field}>
-            <label className={f.label}>Sort Order</label>
+            <label className={f.label}>{t('configuration.lookup.sortOrder')}</label>
             <input className={f.input} type="number" value={sortOrder}
               onChange={e => setSortOrder(parseInt(e.target.value, 10) || 0)} />
           </div>

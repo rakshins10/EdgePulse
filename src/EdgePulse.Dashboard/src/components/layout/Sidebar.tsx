@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setAlertCount } from '../../store/alertsSlice';
 import { fetchAlertCount } from '../../api/alerts';
@@ -12,17 +13,18 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
-  { to: '/dashboard',     icon: '⬛', label: 'Dashboard' },
-  { to: '/devices',       icon: '🔌', label: 'Devices'   },
-  { to: '/alerts',        icon: '🔔', label: 'Alerts'    },
-  { to: '/mills',         icon: '🏭', label: 'Mills'      },
-  { to: '/areas',         icon: '📍', label: 'Areas'      },
-  { to: '/configuration', icon: '⚙️', label: 'Configuration' },
+  { to: '/dashboard',     icon: '⬛', labelKey: 'nav.dashboard' },
+  { to: '/devices',       icon: '🔌', labelKey: 'nav.devices'   },
+  { to: '/alerts',        icon: '🔔', labelKey: 'nav.alerts'    },
+  { to: '/mills',         icon: '🏭', labelKey: 'nav.mills'      },
+  { to: '/areas',         icon: '📍', labelKey: 'nav.areas'      },
+  { to: '/configuration', icon: '⚙️', labelKey: 'nav.configuration' },
 ];
 
 const BADGE_REFRESH_MS = 30_000;
 
 export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { openCount, criticalOpenCount } = useAppSelector(
     (s) => s.alerts.count
@@ -63,11 +65,11 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     >
       <div className={styles.logo}>
         <div className={styles.logoText}>EdgePulse</div>
-        <div className={styles.logoSub}>Industrial IoT Platform</div>
+        <div className={styles.logoSub}>{t('nav.appSubtitle')}</div>
       </div>
 
       <nav className={styles.nav}>
-        {NAV_ITEMS.map(({ to, icon, label }) => (
+        {NAV_ITEMS.map(({ to, icon, labelKey }) => (
           <NavLink
             key={to}
             to={to}
@@ -78,9 +80,9 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             }
           >
             <span className={styles.navIcon}>{icon}</span>
-            <span>{label}</span>
+            <span>{t(labelKey)}</span>
 
-            {label === 'Alerts' && openCount > 0 && (
+            {labelKey === 'nav.alerts' && openCount > 0 && (
               <span className={styles.badgeWrapper}>
                 {criticalOpenCount > 0 && (
                   <span className={`${styles.badge} ${styles.badgeCritical}`}>
@@ -108,7 +110,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           className={styles.logoutBtn}
           onClick={() => keycloak.logout()}
         >
-          Sign out
+          {t('nav.signOut')}
         </button>
       </div>
     </aside>

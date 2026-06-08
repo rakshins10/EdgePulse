@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { getDeviceTelemetry } from '../../api/telemetry';
 import { useTimeRange } from '../../hooks/useTimeRange';
 import TelemetryChart from './TelemetryChart';
@@ -27,6 +28,7 @@ export default function TelemetryChartCard({
   globalReadings,
   globalLoading,
 }: Props) {
+  const { t } = useTranslation();
   const [overrideActive, setOverrideActive] = useState(false);
   const [toolbarOpen,    setToolbarOpen]    = useState(false);
 
@@ -65,15 +67,15 @@ export default function TelemetryChartCard({
     <div className={`${styles.card} ${overrideActive ? styles.overrideActive : ''}`}>
       <div className={styles.cardHeader}>
         <span className={styles.rangeTag}>
-          {overrideActive ? 'Custom range' : 'Global range'}
+          {overrideActive ? t('devices.detail.rangeTagCustom') : t('devices.detail.rangeTagGlobal')}
         </span>
 
         <button
           className={`${styles.overrideBtn} ${overrideActive ? styles.overrideBtnActive : ''}`}
           onClick={handleToggleOverride}
-          title={overrideActive ? 'Reset to global range' : 'Set a custom range for this chart'}
+          title={overrideActive ? t('devices.detail.resetRangeTitle') : t('devices.detail.customRangeTitle')}
         >
-          {overrideActive ? '↩ Reset to global' : '⊞ Custom range'}
+          {overrideActive ? t('devices.detail.resetToGlobal') : t('devices.detail.customRange')}
         </button>
       </div>
 
@@ -84,7 +86,7 @@ export default function TelemetryChartCard({
       )}
 
       {loading
-        ? <LoadingSpinner message="Loading…" />
+        ? <LoadingSpinner message={t('common.loading')} />
         : <TelemetryChart
             metricKey={metricKey}
             readings={readings}

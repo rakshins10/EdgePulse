@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   getDeviceTypes, createDeviceType, updateDeviceType, deleteDeviceType,
 } from '../../../api/configuration';
@@ -10,6 +11,7 @@ import styles from './LookupTable.module.css';
 import f from '../../../components/common/FormField.module.css';
 
 export default function DeviceTypesTab() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data = [], isLoading } = useQuery({ queryKey: ['device-types'], queryFn: getDeviceTypes });
 
@@ -47,33 +49,40 @@ export default function DeviceTypesTab() {
       await qc.invalidateQueries({ queryKey: ['device-types'] });
       setOpen(false);
     } catch {
-      setError(editing ? 'Failed to update.' : 'Failed to create. Code may already exist.');
+      setError(editing ? t('configuration.lookup.errorUpdate') : t('configuration.lookup.errorCreate'));
     } finally { setSaving(false); }
   }
 
   async function handleDelete(row: DeviceTypeDto) {
-    if (!confirm(`Delete device type "${row.name}"?\n\nDevices already of this type keep their assignment.`)) return;
+    if (!confirm(t('configuration.deviceTypes.deleteConfirm', { name: row.name }))) return;
     try {
       await deleteDeviceType(row.id);
       await qc.invalidateQueries({ queryKey: ['device-types'] });
-    } catch { alert('Failed to delete. It may be in use or be a system type.'); }
+    } catch { alert(t('configuration.lookup.errorDelete')); }
   }
 
-  if (isLoading) return <LoadingSpinner message="Loading…" />;
+  if (isLoading) return <LoadingSpinner message={t('common.loading')} />;
 
   return (
     <>
       <div className={styles.toolbar}>
-        <span className={styles.count}>{data.length} device types</span>
-        <button className={styles.addBtn} onClick={openAdd}>+ Add Device Type</button>
+        <span className={styles.count}>{t('configuration.deviceTypes.count', { count: data.length })}</span>
+        <button className={styles.addBtn} onClick={openAdd}>{t('configuration.deviceTypes.addBtn')}</button>
       </div>
 
       {data.length === 0 ? (
-        <div className={styles.empty}>No device types defined.</div>
+        <div className={styles.empty}>{t('configuration.lookup.empty')}</div>
       ) : (
         <table className={styles.table}>
           <thead>
-            <tr><th>Name</th><th>Code</th><th>Icon</th><th>Description</th><th>Sort</th><th className={styles.actionsCol} /></tr>
+            <tr>
+              <th>{t('configuration.lookup.name')}</th>
+              <th>{t('configuration.lookup.code')}</th>
+              <th>{t('configuration.lookup.icon')}</th>
+              <th>{t('configuration.lookup.description')}</th>
+              <th>{t('configuration.lookup.sort')}</th>
+              <th className={styles.actionsCol} />
+            </tr>
           </thead>
           <tbody>
             {data.slice().sort((a, b) => a.sortOrder - b.sortOrder).map(row => (
@@ -84,8 +93,8 @@ export default function DeviceTypesTab() {
                 <td className={styles.muted}>{row.description ?? '—'}</td>
                 <td className={styles.muted}>{row.sortOrder}</td>
                 <td className={styles.actionsCol}>
-                  <button className={styles.editBtn} onClick={() => openEdit(row)}>Edit</button>
-                  <button className={styles.deleteBtn} onClick={() => handleDelete(row)}>Delete</button>
+                  <button className={styles.editBtn} onClick={() => openEdit(row)}>{t('common.edit')}</button>
+                  <button className={styles.deleteBtn} onClick={() => handleDelete(row)}>{t('common.delete')}</button>
                 </td>
               </tr>
             ))}
@@ -95,13 +104,13 @@ export default function DeviceTypesTab() {
 
       <Modal
         open={open}
-        title={editing ? 'Edit Device Type' : 'Add Device Type'}
+        title={editing ? t('configuration.deviceTypes.editTitle') : t('configuration.deviceTypes.addTitle')}
         onClose={() => setOpen(false)}
         footer={
           <>
-            <button className={f.btnSecondary} onClick={() => setOpen(false)}>Cancel</button>
+            <button className={f.btnSecondary} onClick={() => setOpen(false)}>{t('common.cancel')}</button>
             <button className={f.btnPrimary} form="dt-form" disabled={saving}>
-              {saving ? 'Saving…' : editing ? 'Save Changes' : 'Create'}
+              {saving ? t('common.saving') : editing ? t('common.save') : t('common.create')}
             </button>
           </>
         }
@@ -110,32 +119,32 @@ export default function DeviceTypesTab() {
           {error && <p className={f.errorText}>{error}</p>}
           <div className={f.formRow}>
             <div className={f.field}>
-              <label className={`${f.label} ${f.required}`}>Name</label>
+              <label className={`${f.label} ${f.required}`}>{t('configuration.lookup.name')}</label>
               <input className={f.input} required value={name}
-                onChange={e => setName(e.target.value)} placeholder="e.g. Pump" />
+                onChange={e => setName(e.target.value)} placeholder={t('configuration.deviceTypes.namePlaceholder')} />
             </div>
             <div className={f.field}>
-              <label className={`${f.label} ${f.required}`}>Code</label>
+              <label className={`${f.label} ${f.required}`}>{t('configuration.lookup.code')}</label>
               <input className={f.input} required value={code} disabled={!!editing}
-                onChange={e => setCode(e.target.value.toUpperCase())} placeholder="e.g. PUMP" />
+                onChange={e => setCode(e.target.value.toUpperCase())} placeholder={t('configuration.deviceTypes.codePlaceholder')} />
             </div>
           </div>
           <div className={f.formRow}>
             <div className={f.field}>
-              <label className={f.label}>Icon</label>
+              <label className={f.label}>{t('configuration.lookup.icon')}</label>
               <input className={f.input} value={icon}
-                onChange={e => setIcon(e.target.value)} placeholder="e.g. 💧 or pump.svg" />
+                onChange={e => setIcon(e.target.value)} placeholder={t('configuration.deviceTypes.iconPlaceholder')} />
             </div>
             <div className={f.field}>
-              <label className={f.label}>Sort Order</label>
+              <label className={f.label}>{t('configuration.lookup.sortOrder')}</label>
               <input className={f.input} type="number" value={sortOrder}
                 onChange={e => setSortOrder(parseInt(e.target.value, 10) || 0)} />
             </div>
           </div>
           <div className={f.field}>
-            <label className={f.label}>Description</label>
+            <label className={f.label}>{t('configuration.lookup.description')}</label>
             <textarea className={f.textarea} value={desc}
-              onChange={e => setDesc(e.target.value)} placeholder="Optional" />
+              onChange={e => setDesc(e.target.value)} placeholder={t('common.optional')} />
           </div>
         </form>
       </Modal>

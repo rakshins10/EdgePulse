@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import LocationTypesTab from './tabs/LocationTypesTab';
 import MaintenanceTypesTab from './tabs/MaintenanceTypesTab';
 import MetricTypesTab from './tabs/MetricTypesTab';
@@ -8,33 +9,34 @@ import styles from './ConfigurationPage.module.css';
 
 type TabKey = 'location-types' | 'maintenance-types' | 'metric-types' | 'device-types' | 'device-statuses';
 
-const TABS: { key: TabKey; label: string; hint?: string }[] = [
-  { key: 'location-types',    label: 'Location Types',    hint: 'Building, Floor, Production Line, Section…' },
-  { key: 'device-types',      label: 'Device Types',      hint: 'Pump, Motor, Valve, Sensor…' },
-  { key: 'device-statuses',   label: 'Device Statuses',   hint: 'Online, Offline, Maintenance, Decommissioned' },
-  { key: 'maintenance-types', label: 'Maintenance Types', hint: 'Preventive, Corrective, Inspection…' },
-  { key: 'metric-types',      label: 'Metric Types',      hint: 'Temperature, Pressure, Vibration, Flow rate…' },
+const TABS: { key: TabKey; labelKey: string; hintKey: string }[] = [
+  { key: 'location-types',    labelKey: 'configuration.tabs.locationTypes',    hintKey: 'configuration.hints.locationTypes' },
+  { key: 'device-types',      labelKey: 'configuration.tabs.deviceTypes',      hintKey: 'configuration.hints.deviceTypes' },
+  { key: 'device-statuses',   labelKey: 'configuration.tabs.deviceStatuses',   hintKey: 'configuration.hints.deviceStatuses' },
+  { key: 'maintenance-types', labelKey: 'configuration.tabs.maintenanceTypes', hintKey: 'configuration.hints.maintenanceTypes' },
+  { key: 'metric-types',      labelKey: 'configuration.tabs.metricTypes',      hintKey: 'configuration.hints.metricTypes' },
 ];
 
 export default function ConfigurationPage() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<TabKey>('location-types');
-  const active = TABS.find(t => t.key === tab)!;
+  const active = TABS.find(tt => tt.key === tab)!;
 
   return (
     <div>
       <div className={styles.tabs}>
-        {TABS.map(t => (
+        {TABS.map(tt => (
           <button
-            key={t.key}
-            className={`${styles.tab} ${tab === t.key ? styles.tabActive : ''}`}
-            onClick={() => setTab(t.key)}
+            key={tt.key}
+            className={`${styles.tab} ${tab === tt.key ? styles.tabActive : ''}`}
+            onClick={() => setTab(tt.key)}
           >
-            {t.label}
+            {t(tt.labelKey)}
           </button>
         ))}
       </div>
 
-      {active.hint && <p className={styles.hint}>{active.hint}</p>}
+      <p className={styles.hint}>{t(active.hintKey)}</p>
 
       <div className={styles.body}>
         {tab === 'location-types'    && <LocationTypesTab />}

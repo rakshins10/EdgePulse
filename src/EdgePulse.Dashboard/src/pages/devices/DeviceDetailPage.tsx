@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { getDevices } from '../../api/devices';
 import { getDeviceTelemetry } from '../../api/telemetry';
 import Badge from '../../components/common/Badge';
@@ -12,6 +13,7 @@ import styles from './DeviceDetailPage.module.css';
 const CHART_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
 export default function DeviceDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
 
   const globalRange = useTimeRange();
@@ -35,13 +37,13 @@ export default function DeviceDetailPage() {
     enabled: !!id,
   });
 
-  if (devicesLoading) return <LoadingSpinner message="Loading device…" />;
+  if (devicesLoading) return <LoadingSpinner message={t('common.loading')} />;
 
   if (!device) {
     return (
       <div className={styles.noDevice}>
-        <p>Device not found or you don't have access to it.</p>
-        <Link to="/devices">← Back to Devices</Link>
+        <p>{t('devices.detail.notFound')}</p>
+        <Link to="/devices">{t('devices.detail.backLink')}</Link>
       </div>
     );
   }
@@ -53,7 +55,7 @@ export default function DeviceDetailPage() {
   return (
     <div className={styles.page}>
       <nav className={styles.breadcrumb}>
-        <Link to="/devices">Devices</Link>
+        <Link to="/devices">{t('devices.detail.backToDevices')}</Link>
         <span>›</span>
         <span>{device.name}</span>
       </nav>
@@ -68,20 +70,20 @@ export default function DeviceDetailPage() {
 
       <div className={styles.infoGrid}>
         <div className={styles.infoItem}>
-          <div className={styles.infoLabel}>Type</div>
+          <div className={styles.infoLabel}>{t('devices.detail.type')}</div>
           <div className={styles.infoValue}>{device.typeName}</div>
         </div>
         <div className={styles.infoItem}>
-          <div className={styles.infoLabel}>Mill</div>
+          <div className={styles.infoLabel}>{t('devices.detail.mill')}</div>
           <div className={styles.infoValue}>{device.millName}</div>
         </div>
         <div className={styles.infoItem}>
-          <div className={styles.infoLabel}>Area</div>
+          <div className={styles.infoLabel}>{t('devices.detail.area')}</div>
           <div className={styles.infoValue}>{device.areaName}</div>
         </div>
         {device.serialNumber && (
           <div className={styles.infoItem}>
-            <div className={styles.infoLabel}>Serial</div>
+            <div className={styles.infoLabel}>{t('devices.detail.serial')}</div>
             <div className={styles.infoValue}>{device.serialNumber}</div>
           </div>
         )}
@@ -90,32 +92,30 @@ export default function DeviceDetailPage() {
       <div>
         <div className={styles.stickyPanel}>
           <h2 className={styles.sectionTitle}>
-            Live Telemetry
-            {isLive && <span className={styles.refreshNote}>Auto-refreshes every 10s</span>}
+            {t('devices.detail.liveTelemetry')}
+            {isLive && <span className={styles.refreshNote}>{t('devices.detail.autoRefresh')}</span>}
           </h2>
 
           <div className={styles.globalToolbarWrap}>
             <div className={styles.globalToolbarLabel}>
               <span className={styles.globalIcon}>⊞</span>
-              Global range
-              <span className={styles.globalHint}> — applies to all charts unless individually overridden</span>
+              {t('devices.detail.globalRange')}
+              <span className={styles.globalHint}>{t('devices.detail.globalRangeHint')}</span>
             </div>
             <TimeRangeToolbar range={globalRange} />
           </div>
         </div>
 
-        {telLoading && <LoadingSpinner message="Loading telemetry…" />}
+        {telLoading && <LoadingSpinner message={t('devices.detail.loadingTelemetry')} />}
 
         {telError && (
-          <div className={styles.empty}>
-            Could not load telemetry data. Make sure the telemetry pipeline is running.
-          </div>
+          <div className={styles.empty}>{t('devices.detail.telemetryError')}</div>
         )}
 
         {!telLoading && !telError && metricKeys.length === 0 && (
           <div className={styles.empty}>
-            No telemetry data for this period.<br />
-            Try a different time range or make sure the OPC-UA Agent is publishing.
+            {t('devices.detail.noTelemetryPeriod')}<br />
+            {t('devices.detail.noTelemetryHint')}
           </div>
         )}
 
