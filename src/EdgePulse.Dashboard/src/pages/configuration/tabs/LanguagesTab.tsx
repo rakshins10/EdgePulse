@@ -1,10 +1,14 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useRef, type FormEvent } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   getLocales, createLocale, updateLocale, deleteLocale, setDefaultLocale,
+  getLookupSourceItems, bulkUpsertLookupTranslations, bulkUpsertUiStrings,
   type LocaleDto,
 } from '../../../api/localization';
+import {
+  englishUiStrings, buildExportCsv, splitImportRows,
+} from '../../../i18n/translationTools';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import Modal from '../../../components/common/Modal';
 import styles from './LookupTable.module.css';
@@ -25,12 +29,35 @@ export default function LanguagesTab() {
   const [sortOrder, setSortOrder] = useState(0);
   const [saving, setSaving]   = useState(false);
   const [error, setError]     = useState<string | null>(null);
+  const [prefill, setPrefill] = useState(true);
+
+  // Import / Export panel state
+  const [ioLocale, setIoLocale] = useState('');
+  const [ioBusy, setIoBusy]     = useState(false);
+  const [ioMsg, setIoMsg]       = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   function refresh() {
     return Promise.all([
       qc.invalidateQueries({ queryKey: ['locales', 'all'] }),
       qc.invalidateQueries({ queryKey: ['locales', 'enabled'] }),
     ]);
+  }
+
+  // Copy English values (UI keys + lookup item names) into a locale as a
+  // starting point. Used on create when "pre-fill" is checked.
+  async function prefillFromEnglish(localeCode: string): Promise<number> {
+    const ui = englishUiStrings();
+    const uiEntries = Object.entries(ui).map(([key, value]) => ({ key, value }));
+    const uiRes = await bulkUpsertUiStrings(localeCode, uiEntries);
+
+    const items = await getLookupSourceItems();
+    const lookupEntries = items.map(i => ({
+      lookupType: i.lookupType, itemId: i.itemId, name: i.sourceName,
+    }));
+    const lookupRes = await bulkUpsertLookupTranslations(localeCode, lookupEntries);
+
+    return uiRes.affected + lookupRes.affected;
   }
 
   function openAdd() {
@@ -58,12 +85,56 @@ export default function LanguagesTab() {
         await createLocale({
           code, displayName, nativeName, flag: flag || undefined, isEnabled: enabled, sortOrder,
         });
+        if (prefill) {
+          setIoMsg(t('configuration.languages.prefilling'));
+          const count = await prefillFromEnglish(code.trim().toLowerCase());
+          setIoMsg(t('configuration.languages.prefillDone', { count }));
+        }
       }
       await refresh();
       setOpen(false);
     } catch {
       setError(editing ? t('configuration.languages.errorUpdate') : t('configuration.languages.errorCreate'));
     } finally { setSaving(false); }
+  }
+
+  // ── Export / Import ────────────────────────────────────────────────────────
+  async function handleExport() {
+    if (!ioLocale) return;
+    setIoBusy(true); setIoMsg(null);
+    try {
+      const csv = await buildExportCsv(ioLocale);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `edgepulse-translations-${ioLocale}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setIoMsg(t('configuration.languages.exportError'));
+    } finally { setIoBusy(false); }
+  }
+
+  async function handleImportFile(file: File) {
+    if (!ioLocale) return;
+    setIoBusy(true); setIoMsg(null);
+    try {
+      const text = await file.text();
+      const { ui, lookups, skipped } = splitImportRows(text);
+      const uiRes = ui.length ? await bulkUpsertUiStrings(ioLocale, ui) : { affected: 0 };
+      const lookupRes = lookups.length
+        ? await bulkUpsertLookupTranslations(ioLocale, lookups) : { affected: 0 };
+      setIoMsg(t('configuration.languages.importDone', {
+        ui: uiRes.affected, lookup: lookupRes.affected, skipped,
+      }));
+      await qc.invalidateQueries();
+    } catch {
+      setIoMsg(t('configuration.languages.importError'));
+    } finally {
+      setIoBusy(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
   }
 
   async function handleDelete(row: LocaleDto) {
@@ -136,6 +207,41 @@ export default function LanguagesTab() {
         </tbody>
       </table>
 
+      {/* Import / Export panel */}
+      <div className={styles.ioPanel}>
+        <div className={styles.ioHeader}>{t('configuration.languages.ioTitle')}</div>
+        <p className={styles.ioHint}>{t('configuration.languages.ioHint')}</p>
+        <div className={styles.ioRow}>
+          <select
+            className={f.select}
+            style={{ width: 'auto' }}
+            value={ioLocale}
+            onChange={e => { setIoLocale(e.target.value); setIoMsg(null); }}
+          >
+            <option value="">—</option>
+            {data.map(l => (
+              <option key={l.code} value={l.code}>
+                {l.flag ? `${l.flag} ` : ''}{l.nativeName} ({l.code})
+              </option>
+            ))}
+          </select>
+          <button className={styles.editBtn} disabled={!ioLocale || ioBusy} onClick={handleExport}>
+            {ioBusy ? t('configuration.languages.exporting') : t('configuration.languages.exportBtn')}
+          </button>
+          <button className={styles.editBtn} disabled={!ioLocale || ioBusy} onClick={() => fileRef.current?.click()}>
+            {ioBusy ? t('configuration.languages.importing') : t('configuration.languages.importBtn')}
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".csv,text/csv"
+            style={{ display: 'none' }}
+            onChange={e => { const file = e.target.files?.[0]; if (file) void handleImportFile(file); }}
+          />
+          {ioMsg && <span className={styles.ioMsg}>{ioMsg}</span>}
+        </div>
+      </div>
+
       <Modal
         open={open}
         title={editing ? t('configuration.languages.editTitle') : t('configuration.languages.addTitle')}
@@ -192,6 +298,15 @@ export default function LanguagesTab() {
               </label>
             </div>
           </div>
+          {!editing && (
+            <div className={f.field}>
+              <label className={f.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <input type="checkbox" checked={prefill}
+                  onChange={e => setPrefill(e.target.checked)} />
+                {t('configuration.languages.prefill')}
+              </label>
+            </div>
+          )}
         </form>
       </Modal>
     </>

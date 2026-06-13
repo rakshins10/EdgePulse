@@ -77,3 +77,45 @@ export interface UpsertTranslationBody {
 
 export const upsertLookupTranslation = (body: UpsertTranslationBody): Promise<void> =>
   apiClient.put('/localization/translations', body).then(() => undefined);
+
+// ── Bulk + source items + UI strings (Phase 2B) ─────────────────────────────
+
+export interface LookupSourceItem {
+  lookupType: string;
+  itemId: string;
+  sourceName: string;
+}
+
+export const getLookupSourceItems = (): Promise<LookupSourceItem[]> =>
+  apiClient.get<LookupSourceItem[]>('/localization/lookup-source-items').then(r => r.data);
+
+export interface BulkLookupEntry {
+  lookupType: string;
+  itemId: string;
+  name?: string;
+}
+
+export const bulkUpsertLookupTranslations = (
+  localeCode: string, entries: BulkLookupEntry[],
+): Promise<{ affected: number }> =>
+  apiClient
+    .put<{ affected: number }>('/localization/translations/bulk', { localeCode, entries })
+    .then(r => r.data);
+
+/** DB UI-string overrides for a locale, as a flat key→value map. */
+export const getUiStrings = (locale: string): Promise<Record<string, string>> =>
+  apiClient
+    .get<Record<string, string>>('/localization/ui-strings', { params: { locale } })
+    .then(r => r.data);
+
+export interface UiStringEntry {
+  key: string;
+  value?: string;
+}
+
+export const bulkUpsertUiStrings = (
+  localeCode: string, entries: UiStringEntry[],
+): Promise<{ affected: number }> =>
+  apiClient
+    .put<{ affected: number }>('/localization/ui-strings/bulk', { localeCode, entries })
+    .then(r => r.data);

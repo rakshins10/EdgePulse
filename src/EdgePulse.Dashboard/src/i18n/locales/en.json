@@ -231,7 +231,19 @@
       "errorCreate": "Failed to create language. The code may already exist.",
       "errorUpdate": "Failed to update language.",
       "errorDelete": "Failed to delete language.",
-      "errorSetDefault": "Failed to set default language."
+      "errorSetDefault": "Failed to set default language.",
+      "prefill": "Pre-fill new languages with English values (editable starting point)",
+      "ioTitle": "Import / Export translations",
+      "ioHint": "Export a CSV of every key with its English source, fill the Translation column, then import it back.",
+      "exportBtn": "Export CSV",
+      "importBtn": "Import CSV",
+      "exporting": "Exporting…",
+      "importing": "Importing…",
+      "importDone": "Imported: {{ui}} UI + {{lookup}} lookup ({{skipped}} skipped)",
+      "exportError": "Export failed.",
+      "importError": "Import failed. Check the file format.",
+      "prefilling": "Pre-filling from English…",
+      "prefillDone": "Pre-filled {{count}} values from English."
     },
     "translations": {
       "hint": "Translate lookup item names for each language. Empty fields fall back to the English source name.",

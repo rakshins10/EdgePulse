@@ -23,6 +23,7 @@ public interface IApplicationDbContext
     // Localization
     IQueryable<Locale> Locales { get; }
     IQueryable<LookupTranslation> LookupTranslations { get; }
+    IQueryable<UiStringTranslation> UiStringTranslations { get; }
 
     // Core Entities
     IQueryable<Tenant> Tenants { get; }

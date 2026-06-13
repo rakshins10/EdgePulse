@@ -6,6 +6,40 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+/* Import / Export panel (Languages tab) */
+.ioPanel {
+  border-top: 1px solid var(--color-border);
+  padding: 16px 20px;
+  background: var(--color-surface-2);
+}
+
+.ioHeader {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.ioHint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0 0 10px;
+}
+
+.ioRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ioMsg {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
 .count {
   font-size: 12px;
   color: var(--color-text-muted);

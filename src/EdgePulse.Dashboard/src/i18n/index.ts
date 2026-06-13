@@ -24,7 +24,9 @@ void i18n
       sv: { translation: sv },
     },
     fallbackLng: 'en',
-    supportedLngs: SUPPORTED_LANGUAGES.map(l => l.code),
+    // No supportedLngs restriction: locales are data-driven, so a runtime-added
+    // language (e.g. "de") must be selectable. Bundled JSON covers en/fi/sv;
+    // other locales layer DB-backed UI overrides on top of the English fallback.
     interpolation: { escapeValue: false },
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],

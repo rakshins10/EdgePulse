@@ -231,7 +231,19 @@
       "errorCreate": "Det gick inte att skapa språket. Koden kan redan finnas.",
       "errorUpdate": "Det gick inte att uppdatera språket.",
       "errorDelete": "Det gick inte att ta bort språket.",
-      "errorSetDefault": "Det gick inte att ange standardspråk."
+      "errorSetDefault": "Det gick inte att ange standardspråk.",
+      "prefill": "Förifyll nya språk med engelska värden (redigerbar utgångspunkt)",
+      "ioTitle": "Importera / exportera översättningar",
+      "ioHint": "Exportera en CSV med varje nyckel och dess engelska källa, fyll i kolumnen Översättning och importera tillbaka den.",
+      "exportBtn": "Exportera CSV",
+      "importBtn": "Importera CSV",
+      "exporting": "Exporterar…",
+      "importing": "Importerar…",
+      "importDone": "Importerat: {{ui}} gränssnitt + {{lookup}} uppslag ({{skipped}} hoppade över)",
+      "exportError": "Exporten misslyckades.",
+      "importError": "Importen misslyckades. Kontrollera filformatet.",
+      "prefilling": "Förifyller från engelska…",
+      "prefillDone": "Förifyllde {{count}} värden från engelska."
     },
     "translations": {
       "hint": "Översätt namn på uppslagsobjekt för varje språk. Tomma fält faller tillbaka på det engelska källnamnet.",

@@ -132,6 +132,66 @@ public class LocalizationController : ControllerBase
             cancellationToken);
         return NoContent();
     }
+
+    /// <summary>Bulk upsert lookup translations (CSV import / pre-fill).</summary>
+    [HttpPut("translations/bulk")]
+    [ProducesResponseType(typeof(BulkResult), 200)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> BulkUpsertTranslations(
+        [FromBody] BulkLookupRequest request,
+        CancellationToken cancellationToken)
+    {
+        var affected = await _mediator.Send(
+            new BulkUpsertLookupTranslationsCommand(
+                request.LocaleCode,
+                request.Entries
+                    .Select(e => new LookupTranslationEntry(e.LookupType, e.ItemId, e.Name))
+                    .ToList()),
+            cancellationToken);
+        return Ok(new BulkResult(affected));
+    }
+
+    /// <summary>All translatable lookup items with English source names.</summary>
+    [HttpGet("lookup-source-items")]
+    [ProducesResponseType(typeof(List<LookupSourceItemDto>), 200)]
+    public async Task<IActionResult> GetLookupSourceItems(CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetLookupSourceItemsQuery(), cancellationToken);
+        return Ok(result);
+    }
+
+    // ============================================================
+    // UI STRING OVERRIDES
+    // ============================================================
+
+    /// <summary>DB-stored UI string overrides for a locale (flat key→value map).</summary>
+    [HttpGet("ui-strings")]
+    [ProducesResponseType(typeof(Dictionary<string, string>), 200)]
+    public async Task<IActionResult> GetUiStrings(
+        [FromQuery] string locale,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetUiStringsQuery(locale), cancellationToken);
+        return Ok(result);
+    }
+
+    /// <summary>Bulk upsert UI string overrides (CSV import / pre-fill).</summary>
+    [HttpPut("ui-strings/bulk")]
+    [ProducesResponseType(typeof(BulkResult), 200)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> BulkUpsertUiStrings(
+        [FromBody] BulkUiStringsRequest request,
+        CancellationToken cancellationToken)
+    {
+        var affected = await _mediator.Send(
+            new BulkUpsertUiStringsCommand(
+                request.LocaleCode,
+                request.Entries.Select(e => new UiStringEntry(e.Key, e.Value)).ToList()),
+            cancellationToken);
+        return Ok(new BulkResult(affected));
+    }
 }
 
 // Request models
@@ -159,3 +219,11 @@ public record UpsertTranslationRequest(
     string? Name,
     string? Description = null
 );
+
+public record BulkResult(int Affected);
+
+public record BulkLookupRequest(string LocaleCode, List<BulkLookupEntry> Entries);
+public record BulkLookupEntry(string LookupType, Guid ItemId, string? Name);
+
+public record BulkUiStringsRequest(string LocaleCode, List<BulkUiStringEntry> Entries);
+public record BulkUiStringEntry(string Key, string? Value);

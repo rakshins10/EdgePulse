@@ -231,7 +231,19 @@
       "errorCreate": "Kielen luonti epäonnistui. Koodi voi olla jo käytössä.",
       "errorUpdate": "Kielen päivitys epäonnistui.",
       "errorDelete": "Kielen poisto epäonnistui.",
-      "errorSetDefault": "Oletuskielen asetus epäonnistui."
+      "errorSetDefault": "Oletuskielen asetus epäonnistui.",
+      "prefill": "Esitäytä uudet kielet englanninkielisillä arvoilla (muokattava lähtökohta)",
+      "ioTitle": "Tuo / vie käännökset",
+      "ioHint": "Vie CSV, jossa on jokainen avain ja englanninkielinen lähde, täytä Käännös-sarake ja tuo se takaisin.",
+      "exportBtn": "Vie CSV",
+      "importBtn": "Tuo CSV",
+      "exporting": "Viedään…",
+      "importing": "Tuodaan…",
+      "importDone": "Tuotu: {{ui}} käyttöliittymä + {{lookup}} hakuarvo ({{skipped}} ohitettu)",
+      "exportError": "Vienti epäonnistui.",
+      "importError": "Tuonti epäonnistui. Tarkista tiedostomuoto.",
+      "prefilling": "Esitäytetään englannista…",
+      "prefillDone": "Esitäytetty {{count}} arvoa englannista."
     },
     "translations": {
       "hint": "Käännä hakuarvojen nimet kullekin kielelle. Tyhjät kentät käyttävät englanninkielistä lähdenimeä.",

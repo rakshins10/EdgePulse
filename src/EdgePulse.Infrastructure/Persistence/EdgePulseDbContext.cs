@@ -33,6 +33,7 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     // Localization
     public DbSet<Locale> Locales => Set<Locale>();
     public DbSet<LookupTranslation> LookupTranslations => Set<LookupTranslation>();
+    public DbSet<UiStringTranslation> UiStringTranslations => Set<UiStringTranslation>();
 
     // Core Entities
     public DbSet<Tenant> Tenants => Set<Tenant>();
@@ -62,6 +63,7 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     IQueryable<TenantLookupOverride> IApplicationDbContext.TenantLookupOverrides => Set<TenantLookupOverride>();
     IQueryable<Locale> IApplicationDbContext.Locales => Set<Locale>();
     IQueryable<LookupTranslation> IApplicationDbContext.LookupTranslations => Set<LookupTranslation>();
+    IQueryable<UiStringTranslation> IApplicationDbContext.UiStringTranslations => Set<UiStringTranslation>();
     IQueryable<Tenant> IApplicationDbContext.Tenants => Set<Tenant>();
     IQueryable<Mill> IApplicationDbContext.Mills => Set<Mill>();
     IQueryable<Area> IApplicationDbContext.Areas => Set<Area>();
