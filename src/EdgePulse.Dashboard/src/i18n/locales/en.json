@@ -205,7 +205,52 @@
       "deviceTypes": "Device Types",
       "deviceStatuses": "Device Statuses",
       "maintenanceTypes": "Maintenance Types",
-      "metricTypes": "Metric Types"
+      "metricTypes": "Metric Types",
+      "languages": "Languages",
+      "translations": "Translations"
+    },
+    "languages": {
+      "hint": "Manage the languages available across the platform. The default language cannot be disabled or deleted.",
+      "count_one": "{{count}} language",
+      "count_other": "{{count}} languages",
+      "addBtn": "+ Add Language",
+      "addTitle": "Add Language",
+      "editTitle": "Edit Language",
+      "code": "Code",
+      "codeHint": "BCP-47 tag, e.g. en, fi, sv, de, pt-BR",
+      "displayName": "Display Name",
+      "displayNameHint": "English label, e.g. German",
+      "nativeName": "Native Name",
+      "nativeNameHint": "As written in that language, e.g. Deutsch",
+      "flag": "Flag",
+      "enabled": "Enabled (shown in the language switcher)",
+      "default": "Default",
+      "setDefault": "Set default",
+      "sortOrder": "Sort Order",
+      "deleteConfirm": "Delete language \"{{name}}\"?\n\nThis also removes all translations entered for it.",
+      "errorCreate": "Failed to create language. The code may already exist.",
+      "errorUpdate": "Failed to update language.",
+      "errorDelete": "Failed to delete language.",
+      "errorSetDefault": "Failed to set default language."
+    },
+    "translations": {
+      "hint": "Translate lookup item names for each language. Empty fields fall back to the English source name.",
+      "lookupType": "Item type",
+      "locale": "Language",
+      "sourceName": "Source (English)",
+      "translation": "Translation",
+      "saved": "Saved",
+      "saveError": "Failed to save",
+      "placeholder": "Type translation…",
+      "noItems": "No items to translate for this type.",
+      "lookupTypes": {
+        "DeviceType": "Device Types",
+        "DeviceStatus": "Device Statuses",
+        "LocationType": "Location Types",
+        "MaintenanceType": "Maintenance Types",
+        "MetricType": "Metric Types",
+        "AlertSeverity": "Alert Severities"
+      }
     },
     "hints": {
       "locationTypes": "Building, Floor, Production Line, Section…",

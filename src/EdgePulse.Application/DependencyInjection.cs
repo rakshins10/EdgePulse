@@ -1,4 +1,6 @@
 using EdgePulse.Application.Common.Behaviours;
+using EdgePulse.Application.Common.Interfaces;
+using EdgePulse.Application.Common.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,9 @@ public static class DependencyInjection
         services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(
                 Assembly.GetExecutingAssembly()));
+
+        // Localization resolver
+        services.AddScoped<ILookupTranslator, LookupTranslator>();
 
         // FluentValidation -- scans for validators
         services.AddValidatorsFromAssembly(

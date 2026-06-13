@@ -20,6 +20,10 @@ public interface IApplicationDbContext
     IQueryable<TenantLookupOverride> TenantLookupOverrides { get; }
     IQueryable<DeviceApiKey> DeviceApiKeys { get; }
 
+    // Localization
+    IQueryable<Locale> Locales { get; }
+    IQueryable<LookupTranslation> LookupTranslations { get; }
+
     // Core Entities
     IQueryable<Tenant> Tenants { get; }
     IQueryable<Mill> Mills { get; }

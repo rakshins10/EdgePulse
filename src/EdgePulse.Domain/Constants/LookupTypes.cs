@@ -18,4 +18,16 @@ public static class LookupTypes
     public const string LocationType       = "LocationType";
     public const string DeviceManufacturer = "DeviceManufacturer";
     public const string DeviceModel        = "DeviceModel";
+
+    /// <summary>
+    /// Lookup types exposed for translation in the Configuration UI.
+    /// </summary>
+    public static readonly IReadOnlySet<string> Translatable = new HashSet<string>
+    {
+        DeviceType, DeviceStatus, LocationType,
+        MaintenanceType, MetricType, AlertSeverity,
+    };
+
+    public static bool IsTranslatable(string lookupType) =>
+        Translatable.Contains(lookupType);
 }

@@ -205,7 +205,52 @@
       "deviceTypes": "Laitetyypit",
       "deviceStatuses": "Laitetilat",
       "maintenanceTypes": "Huoltotyypit",
-      "metricTypes": "Mittaustyypit"
+      "metricTypes": "Mittaustyypit",
+      "languages": "Kielet",
+      "translations": "Käännökset"
+    },
+    "languages": {
+      "hint": "Hallitse alustalla käytettävissä olevia kieliä. Oletuskieltä ei voi poistaa käytöstä tai poistaa.",
+      "count_one": "{{count}} kieli",
+      "count_other": "{{count}} kieltä",
+      "addBtn": "+ Lisää kieli",
+      "addTitle": "Lisää kieli",
+      "editTitle": "Muokkaa kieltä",
+      "code": "Koodi",
+      "codeHint": "BCP-47-tunnus, esim. en, fi, sv, de, pt-BR",
+      "displayName": "Näyttönimi",
+      "displayNameHint": "Englanninkielinen nimi, esim. German",
+      "nativeName": "Alkuperäinen nimi",
+      "nativeNameHint": "Kielellä kirjoitettuna, esim. Deutsch",
+      "flag": "Lippu",
+      "enabled": "Käytössä (näkyy kielivalitsimessa)",
+      "default": "Oletus",
+      "setDefault": "Aseta oletukseksi",
+      "sortOrder": "Järjestys",
+      "deleteConfirm": "Poista kieli \"{{name}}\"?\n\nTämä poistaa myös kaikki sille syötetyt käännökset.",
+      "errorCreate": "Kielen luonti epäonnistui. Koodi voi olla jo käytössä.",
+      "errorUpdate": "Kielen päivitys epäonnistui.",
+      "errorDelete": "Kielen poisto epäonnistui.",
+      "errorSetDefault": "Oletuskielen asetus epäonnistui."
+    },
+    "translations": {
+      "hint": "Käännä hakuarvojen nimet kullekin kielelle. Tyhjät kentät käyttävät englanninkielistä lähdenimeä.",
+      "lookupType": "Kohdetyyppi",
+      "locale": "Kieli",
+      "sourceName": "Lähde (englanti)",
+      "translation": "Käännös",
+      "saved": "Tallennettu",
+      "saveError": "Tallennus epäonnistui",
+      "placeholder": "Kirjoita käännös…",
+      "noItems": "Tälle tyypille ei ole käännettäviä kohteita.",
+      "lookupTypes": {
+        "DeviceType": "Laitetyypit",
+        "DeviceStatus": "Laitetilat",
+        "LocationType": "Sijaintityypit",
+        "MaintenanceType": "Huoltotyypit",
+        "MetricType": "Mittaustyypit",
+        "AlertSeverity": "Hälytystasot"
+      }
     },
     "hints": {
       "locationTypes": "Rakennus, Kerros, Tuotantolinja, Osasto…",

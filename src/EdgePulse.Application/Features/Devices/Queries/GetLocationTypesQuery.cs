@@ -1,4 +1,5 @@
 using EdgePulse.Application.Common.Interfaces;
+using EdgePulse.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,20 +21,23 @@ public class GetLocationTypesQueryHandler
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUser;
+    private readonly ILookupTranslator _translator;
 
     public GetLocationTypesQueryHandler(
         IApplicationDbContext context,
-        ICurrentUserService currentUser)
+        ICurrentUserService currentUser,
+        ILookupTranslator translator)
     {
         _context = context;
         _currentUser = currentUser;
+        _translator = translator;
     }
 
     public async Task<List<LocationTypeDto>> Handle(
         GetLocationTypesQuery request,
         CancellationToken cancellationToken)
     {
-        return await _context.LocationTypes
+        var locationTypes = await _context.LocationTypes
             .Where(x => !x.IsDeleted && x.IsActive)
             .Where(x => x.TenantId == null ||
                         x.TenantId == _currentUser.TenantId)
@@ -43,5 +47,16 @@ public class GetLocationTypesQueryHandler
                 x.Id, x.Name, x.Code,
                 x.Description, x.IsSystem, x.SortOrder))
             .ToListAsync(cancellationToken);
+
+        var translations = await _translator.GetMapAsync(
+            LookupTypes.LocationType, cancellationToken);
+        if (translations.Count == 0)
+            return locationTypes;
+
+        return locationTypes
+            .Select(l => translations.TryGetValue(l.Id, out var tr)
+                ? l with { Name = tr.Name, Description = tr.Description ?? l.Description }
+                : l)
+            .ToList();
     }
 }

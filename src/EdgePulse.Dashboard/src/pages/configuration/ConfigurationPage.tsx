@@ -5,16 +5,22 @@ import MaintenanceTypesTab from './tabs/MaintenanceTypesTab';
 import MetricTypesTab from './tabs/MetricTypesTab';
 import DeviceTypesTab from './tabs/DeviceTypesTab';
 import DeviceStatusesTab from './tabs/DeviceStatusesTab';
+import LanguagesTab from './tabs/LanguagesTab';
+import TranslationsTab from './tabs/TranslationsTab';
 import styles from './ConfigurationPage.module.css';
 
-type TabKey = 'location-types' | 'maintenance-types' | 'metric-types' | 'device-types' | 'device-statuses';
+type TabKey =
+  | 'location-types' | 'maintenance-types' | 'metric-types'
+  | 'device-types' | 'device-statuses' | 'languages' | 'translations';
 
-const TABS: { key: TabKey; labelKey: string; hintKey: string }[] = [
+const TABS: { key: TabKey; labelKey: string; hintKey?: string }[] = [
   { key: 'location-types',    labelKey: 'configuration.tabs.locationTypes',    hintKey: 'configuration.hints.locationTypes' },
   { key: 'device-types',      labelKey: 'configuration.tabs.deviceTypes',      hintKey: 'configuration.hints.deviceTypes' },
   { key: 'device-statuses',   labelKey: 'configuration.tabs.deviceStatuses',   hintKey: 'configuration.hints.deviceStatuses' },
   { key: 'maintenance-types', labelKey: 'configuration.tabs.maintenanceTypes', hintKey: 'configuration.hints.maintenanceTypes' },
   { key: 'metric-types',      labelKey: 'configuration.tabs.metricTypes',      hintKey: 'configuration.hints.metricTypes' },
+  { key: 'languages',         labelKey: 'configuration.tabs.languages' },
+  { key: 'translations',      labelKey: 'configuration.tabs.translations' },
 ];
 
 export default function ConfigurationPage() {
@@ -36,7 +42,7 @@ export default function ConfigurationPage() {
         ))}
       </div>
 
-      <p className={styles.hint}>{t(active.hintKey)}</p>
+      {active.hintKey && <p className={styles.hint}>{t(active.hintKey)}</p>}
 
       <div className={styles.body}>
         {tab === 'location-types'    && <LocationTypesTab />}
@@ -44,6 +50,8 @@ export default function ConfigurationPage() {
         {tab === 'metric-types'      && <MetricTypesTab />}
         {tab === 'device-types'      && <DeviceTypesTab />}
         {tab === 'device-statuses'   && <DeviceStatusesTab />}
+        {tab === 'languages'         && <LanguagesTab />}
+        {tab === 'translations'      && <TranslationsTab />}
       </div>
     </div>
   );

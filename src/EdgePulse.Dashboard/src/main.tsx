@@ -5,7 +5,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { store } from './store/index';
 import keycloak from './keycloak';
 import { ThemeProvider } from './context/ThemeContext';
-import './i18n';
+import i18n from './i18n';
 import App from './App';
 import './index.css';
 
@@ -16,6 +16,13 @@ const queryClient = new QueryClient({
       staleTime: 15_000,
     },
   },
+});
+
+// When the UI language changes, server-resolved names (device types, statuses,
+// etc.) change too — drop cached query data so everything refetches in the
+// newly-selected locale.
+i18n.on('languageChanged', () => {
+  void queryClient.invalidateQueries();
 });
 
 async function bootstrap() {

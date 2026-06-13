@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<ILocaleContext, LocaleContext>();
 
         services.AddDbContext<EdgePulseDbContext>(options =>
             options.UseSqlServer(

@@ -1,4 +1,5 @@
 using EdgePulse.Application.Common.Interfaces;
+using EdgePulse.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,13 +22,16 @@ public class GetDeviceTypesQueryHandler
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUser;
+    private readonly ILookupTranslator _translator;
 
     public GetDeviceTypesQueryHandler(
         IApplicationDbContext context,
-        ICurrentUserService currentUser)
+        ICurrentUserService currentUser,
+        ILookupTranslator translator)
     {
         _context = context;
         _currentUser = currentUser;
+        _translator = translator;
     }
 
     public async Task<List<DeviceTypeDto>> Handle(
@@ -51,6 +55,15 @@ public class GetDeviceTypesQueryHandler
                 x.SortOrder))
             .ToListAsync(cancellationToken);
 
-        return deviceTypes;
+        var translations = await _translator.GetMapAsync(
+            LookupTypes.DeviceType, cancellationToken);
+        if (translations.Count == 0)
+            return deviceTypes;
+
+        return deviceTypes
+            .Select(d => translations.TryGetValue(d.Id, out var tr)
+                ? d with { Name = tr.Name, Description = tr.Description ?? d.Description }
+                : d)
+            .ToList();
     }
 }

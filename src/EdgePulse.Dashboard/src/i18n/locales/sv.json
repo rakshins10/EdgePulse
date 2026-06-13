@@ -205,7 +205,52 @@
       "deviceTypes": "Enhetstyper",
       "deviceStatuses": "Enhetsstatusar",
       "maintenanceTypes": "Underhållstyper",
-      "metricTypes": "Mätetyper"
+      "metricTypes": "Mätetyper",
+      "languages": "Språk",
+      "translations": "Översättningar"
+    },
+    "languages": {
+      "hint": "Hantera språken som är tillgängliga i plattformen. Standardspråket kan inte inaktiveras eller tas bort.",
+      "count_one": "{{count}} språk",
+      "count_other": "{{count}} språk",
+      "addBtn": "+ Lägg till språk",
+      "addTitle": "Lägg till språk",
+      "editTitle": "Redigera språk",
+      "code": "Kod",
+      "codeHint": "BCP-47-tagg, t.ex. en, fi, sv, de, pt-BR",
+      "displayName": "Visningsnamn",
+      "displayNameHint": "Engelskt namn, t.ex. German",
+      "nativeName": "Eget namn",
+      "nativeNameHint": "Skrivet på språket, t.ex. Deutsch",
+      "flag": "Flagga",
+      "enabled": "Aktiverad (visas i språkväljaren)",
+      "default": "Standard",
+      "setDefault": "Ange som standard",
+      "sortOrder": "Sorteringsordning",
+      "deleteConfirm": "Ta bort språket \"{{name}}\"?\n\nDetta tar även bort alla översättningar som angetts för det.",
+      "errorCreate": "Det gick inte att skapa språket. Koden kan redan finnas.",
+      "errorUpdate": "Det gick inte att uppdatera språket.",
+      "errorDelete": "Det gick inte att ta bort språket.",
+      "errorSetDefault": "Det gick inte att ange standardspråk."
+    },
+    "translations": {
+      "hint": "Översätt namn på uppslagsobjekt för varje språk. Tomma fält faller tillbaka på det engelska källnamnet.",
+      "lookupType": "Objekttyp",
+      "locale": "Språk",
+      "sourceName": "Källa (engelska)",
+      "translation": "Översättning",
+      "saved": "Sparad",
+      "saveError": "Kunde inte spara",
+      "placeholder": "Skriv översättning…",
+      "noItems": "Inga objekt att översätta för den här typen.",
+      "lookupTypes": {
+        "DeviceType": "Enhetstyper",
+        "DeviceStatus": "Enhetsstatusar",
+        "LocationType": "Platstyper",
+        "MaintenanceType": "Underhållstyper",
+        "MetricType": "Mätetyper",
+        "AlertSeverity": "Larmnivåer"
+      }
     },
     "hints": {
       "locationTypes": "Byggnad, Våning, Produktionslinje, Sektion…",

@@ -4,6 +4,7 @@ using EdgePulse.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EdgePulse.Infrastructure.Migrations
 {
     [DbContext(typeof(EdgePulseDbContext))]
-    partial class EdgePulseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260613105803_Sprint15_Localization")]
+    partial class Sprint15_Localization
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1235,50 +1238,6 @@ namespace EdgePulse.Infrastructure.Migrations
                         .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Locales", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("a0000001-0000-0000-0000-000000000001"),
-                            Code = "en",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayName = "English",
-                            Flag = "🇬🇧",
-                            IsDefault = true,
-                            IsDeleted = false,
-                            IsEnabled = true,
-                            NativeName = "English",
-                            SortOrder = 10,
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000001-0000-0000-0000-000000000002"),
-                            Code = "fi",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayName = "Finnish",
-                            Flag = "🇫🇮",
-                            IsDefault = false,
-                            IsDeleted = false,
-                            IsEnabled = true,
-                            NativeName = "Suomi",
-                            SortOrder = 20,
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000001-0000-0000-0000-000000000003"),
-                            Code = "sv",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DisplayName = "Swedish",
-                            Flag = "🇸🇪",
-                            IsDefault = false,
-                            IsDeleted = false,
-                            IsEnabled = true,
-                            NativeName = "Svenska",
-                            SortOrder = 30,
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        });
                 });
 
             modelBuilder.Entity("EdgePulse.Domain.Entities.LocationType", b =>

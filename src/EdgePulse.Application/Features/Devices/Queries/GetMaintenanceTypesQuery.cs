@@ -1,4 +1,5 @@
 using EdgePulse.Application.Common.Interfaces;
+using EdgePulse.Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,20 +22,23 @@ public class GetMaintenanceTypesQueryHandler
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUser;
+    private readonly ILookupTranslator _translator;
 
     public GetMaintenanceTypesQueryHandler(
         IApplicationDbContext context,
-        ICurrentUserService currentUser)
+        ICurrentUserService currentUser,
+        ILookupTranslator translator)
     {
         _context = context;
         _currentUser = currentUser;
+        _translator = translator;
     }
 
     public async Task<List<MaintenanceTypeDto>> Handle(
         GetMaintenanceTypesQuery request,
         CancellationToken cancellationToken)
     {
-        return await _context.MaintenanceTypes
+        var maintenanceTypes = await _context.MaintenanceTypes
             .Where(x => !x.IsDeleted && x.IsActive)
             .Where(x => x.TenantId == null ||
                         x.TenantId == _currentUser.TenantId)
@@ -45,5 +49,16 @@ public class GetMaintenanceTypesQueryHandler
                 x.Description, x.Color,
                 x.IsSystem, x.SortOrder))
             .ToListAsync(cancellationToken);
+
+        var translations = await _translator.GetMapAsync(
+            LookupTypes.MaintenanceType, cancellationToken);
+        if (translations.Count == 0)
+            return maintenanceTypes;
+
+        return maintenanceTypes
+            .Select(m => translations.TryGetValue(m.Id, out var tr)
+                ? m with { Name = tr.Name, Description = tr.Description ?? m.Description }
+                : m)
+            .ToList();
     }
 }
