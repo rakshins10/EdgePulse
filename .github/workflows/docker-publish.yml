@@ -1,0 +1,80 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# CD — Build & publish Docker images to GitHub Container Registry (ghcr.io)
+#
+# Runs after code lands on main (and can be triggered manually). It builds all
+# five service images and pushes them to ghcr.io/<owner>/edgepulse-<name>.
+#
+# Auth uses the automatic GITHUB_TOKEN — no Docker Hub account or manual secrets
+# required. `permissions: packages: write` lets that token push to GHCR.
+#
+# A matrix runs one parallel job per image, each with its own build context and
+# Dockerfile (the .NET images build from the repo root so project references
+# resolve; the Node/dashboard images build from their own folders).
+# ─────────────────────────────────────────────────────────────────────────────
+name: Docker Publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # adds a manual "Run workflow" button in the Actions tab
+
+permissions:
+  contents: read
+  packages: write           # required to push images to GHCR
+
+jobs:
+  build-and-push:
+    name: ${{ matrix.image.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false       # one image failing shouldn't cancel the others
+      matrix:
+        image:
+          - name: api
+            context: .
+            dockerfile: src/EdgePulse.API/Dockerfile
+          - name: telemetry-processor
+            context: .
+            dockerfile: src/EdgePulse.TelemetryProcessor/Dockerfile
+          - name: dashboard
+            context: src/EdgePulse.Dashboard
+            dockerfile: src/EdgePulse.Dashboard/Dockerfile
+          - name: ingestion
+            context: src/EdgePulse.Ingestion
+            dockerfile: src/EdgePulse.Ingestion/Dockerfile
+          - name: opcua-agent
+            context: src/EdgePulse.OpcUaAgent
+            dockerfile: src/EdgePulse.OpcUaAgent/Dockerfile
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Computes tags + labels. On main it produces :latest plus a :sha-<commit>
+      # tag so every build is traceable to a commit.
+      - name: Derive image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/edgepulse-${{ matrix.image.name }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,prefix=sha-
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.image.context }}
+          file: ${{ matrix.image.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

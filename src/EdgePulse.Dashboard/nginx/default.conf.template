@@ -1,0 +1,31 @@
+# nginx config for the EdgePulse dashboard container.
+#
+# The official nginx image runs `envsubst` over files in /etc/nginx/templates/
+# at container start, substituting ONLY variables that are defined in the
+# environment. So ${API_URL} below is replaced with the API_URL env var, while
+# nginx's own $host / $uri / $scheme are left untouched.
+
+server {
+    listen       80;
+    server_name  _;
+
+    root   /usr/share/nginx/html;
+    index  index.html;
+
+    # Forward API calls to the backend service. API_URL defaults to the API
+    # container's internal address (see Dockerfile) and can be overridden at run.
+    location /api/ {
+        proxy_pass         ${API_URL};
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+
+    # Single-page app: any unmatched path returns index.html so client-side
+    # routing (React Router) can handle it.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

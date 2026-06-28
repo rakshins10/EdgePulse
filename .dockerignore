@@ -1,0 +1,16 @@
+# Keep host build artifacts and local cruft out of Docker build contexts.
+# Critically, **/obj and **/bin must be excluded: their project.assets.json
+# contains absolute paths to the HOST NuGet cache, which break `dotnet publish`
+# inside the container (ResolvePackageAssets task failure).
+
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/.git
+**/.vs
+**/.vscode
+**/*.user
+**/.DS_Store
+src/EdgePulse.Dashboard/playwright-report
+src/EdgePulse.Dashboard/test-results

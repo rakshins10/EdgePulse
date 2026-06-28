@@ -1,0 +1,59 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# CI — Continuous Integration
+#
+# Runs on every push to main and every pull request targeting main. It proves
+# the code still compiles before anything gets merged. Two independent jobs run
+# in parallel: one for the .NET backend, one for the React dashboard.
+#
+# (There are no .NET unit-test projects yet, so the backend job only builds.
+#  The dashboard's Playwright E2E suite needs the full stack and is run locally;
+#  wiring it into CI is a documented future step.)
+# ─────────────────────────────────────────────────────────────────────────────
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Build .NET solution
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Install the .NET 9 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore NuGet dependencies
+        run: dotnet restore src/EdgePulse.sln
+
+      - name: Build (Release, no restore — already restored above)
+        run: dotnet build src/EdgePulse.sln --configuration Release --no-restore
+
+  frontend:
+    name: Build React dashboard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: src/EdgePulse.Dashboard/package-lock.json
+
+      - name: Install dependencies (clean, from package-lock)
+        run: npm ci
+        working-directory: src/EdgePulse.Dashboard
+
+      - name: Build (type-check + production bundle)
+        run: npm run build
+        working-directory: src/EdgePulse.Dashboard
