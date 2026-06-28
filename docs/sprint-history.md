@@ -2,7 +2,11 @@
 
 > A chronological record of what was built, why decisions were made, and what was learned.
 > Written as a technical journal — readable by anyone joining the project mid-stream.
-> Last updated: May 2026
+> Last updated: June 2026
+>
+> Detailed narrative below covers the Foundation through Sprint 4. Sprints 5–16
+> are summarised in the "Sprints 5–16" section, with a dedicated doc per recent
+> sprint under `docs/sprints/`.
 
 ---
 
@@ -410,32 +414,78 @@ Sprint 4 is now **complete**. All four stories delivered and verified end-to-end
 
 ---
 
+## Sprints 5–16 — Summary
+
+> Condensed entries. Each recent sprint also has a standalone doc in `docs/sprints/`.
+
+**Sprint 5 — Telemetry Ingestion** — NestJS ingestion service: `POST /ingest`
+with per-device API-key auth, validates and publishes readings to RabbitMQ.
+
+**Sprint 6 — TelemetryProcessor** — .NET 9 worker consuming `telemetry.readings`,
+storing to MongoDB and evaluating thresholds. (Notable later fix: register
+MongoDB `GuidSerializer` as string — without it every message was silently dropped.)
+
+**Sprint 7 — React Dashboard** — Vite + React + TypeScript dashboard, Keycloak
+auth, Alerts page, sidebar alert badge, device telemetry charts. Plain CSS Modules.
+
+**Sprint 8 — Alerts Engine** — thresholds, 3-consecutive-breach rule, alert state
+machine (Open → Acknowledged → Resolved), CQRS API + frontend.
+
+**Sprint 9 — Demo Seed** — NordPulp demo data with fixed GUIDs (`DemoSeedService`),
+run via `dotnet run --project src/EdgePulse.API -- --seed`.
+
+**Sprint 10 — Dark Mode + Responsive** — theme system (CSS vars, `data-theme`),
+mobile-responsive sidebar/layout.
+
+**Sprint 11 — OPC-UA Edge Agent** — simulator + agent bridging OPC-UA →
+RabbitMQ, Dockerised; completes the on-premise telemetry path.
+
+**Sprint 12 — Executive Dashboard** — KPI tiles, 7-day alert trend (pure SVG),
+severity distribution, top-5 devices. See `sprints/sprint-12-executive-dashboard.md`.
+
+**Sprint 13 — Devices/Mills/Areas Pages + Configuration CRUD** — restored
+management pages (lost in the Sprint 8 routing refactor), Recharts device
+telemetry, Create operations, Configuration lookup-table tabs.
+See `sprints/sprint-13-crud-configuration.md`.
+
+**Sprint 14 — Edit/Delete CRUD** — backend PUT/DELETE + UI for Mills/Areas/Devices
+with safety guards; first Playwright E2E suite. See `sprints/sprint-14-edit-delete-crud.md`.
+
+**Sprint 15 — Localization (i18n)** — data-driven locales, server-resolved lookup
+translations, DB-backed UI string overrides, CSV import/export round-trip.
+See `sprints/sprint-15-localization.md`.
+
+**Sprint 16 — CI/CD** — GitHub Actions CI (build backend + dashboard) and CD
+(publish 5 Docker images to GHCR). See `sprints/sprint-16-cicd.md` and
+`devops/01-cicd-guide.md`.
+
+---
+
 ## Appendix: GitHub Milestones
 
-| Milestone | Number | Status |
-|-----------|--------|--------|
-| Sprint 1 -- Configuration Module | 1 | Complete |
-| Sprint 2 -- Organisation Module | 2 | Complete |
-| Sprint 3 -- Device Management | 3 | In Progress |
-| Sprint 4 -- Identity & Auth | 4 | Complete |
-| Sprint 5 -- Telemetry Pipeline | 5 | Not started |
-| Sprint 6 -- Alerts & Notifications | 6 | Not started |
-| Sprint 7 -- Dashboard & Reports | 7 | Not started |
-| Sprint 8 -- DevOps & CI/CD | 8 | Not started |
-| Sprint 9 -- AI Features | 9 | Not started |
-| Sprint 10 -- Polish & Go Live | 10 | Not started |
-| Sprint 11 -- Mobile App (React Native) | 11 | Not started |
-| Sprint 12 -- Predictive Maintenance (ML) | 12 | Not started |
-| Sprint 13 -- Energy Monitoring & ESG | 13 | Not started |
-| Sprint 14 -- OPC-UA & SCADA Integration | 14 | Not started |
-| Sprint 15 -- Maintenance Work Orders | 15 | Not started |
-| Sprint 16 -- Compliance & Audit Reports | 16 | Not started |
-| Sprint 17 -- Multi-Language Support | 17 | Not started |
-| Sprint 18 -- Digital Twin | 18 | Not started |
-| Sprint 19 -- Edge AI (On-Premise ML) | 19 | Not started |
-| Sprint 20 -- API Marketplace | 20 | Not started |
-| Sprint 21 -- White Label & Partner Programme | 21 | Not started |
-| Sprint 22 -- Commercialisation & Go To Market | 22 | Not started |
+> **Note on numbering:** execution diverged from the original 22-sprint plan.
+> The table below reflects the **sprints as actually built**. The original
+> long-term plan (Predictive Maintenance, Digital Twin, Edge AI, etc.) still
+> lives in `PRODUCT-ROADMAP.md` and the GitHub EPIC issues as the future backlog.
+
+| Sprint (as built) | Status |
+|-------------------|--------|
+| 1 — Configuration Module | ✅ Complete |
+| 2 — Organisation Module | ✅ Complete |
+| 3 — Device Management | ✅ Complete |
+| 4 — Identity & Auth | ✅ Complete |
+| 5 — Telemetry Ingestion (NestJS + RabbitMQ + MongoDB) | ✅ Complete |
+| 6 — TelemetryProcessor (.NET worker) | ✅ Complete |
+| 7 — React Dashboard | ✅ Complete |
+| 8 — Alerts Engine | ✅ Complete |
+| 9 — Demo Data Seed | ✅ Complete |
+| 10 — Dark Mode + Responsive | ✅ Complete |
+| 11 — OPC-UA Edge Agent | ✅ Complete |
+| 12 — Executive Dashboard | ✅ Complete |
+| 13 — Devices/Mills/Areas + Configuration CRUD | ✅ Complete |
+| 14 — Edit/Delete CRUD | ✅ Complete |
+| 15 — Localization (i18n) | ✅ Complete |
+| 16 — CI/CD Pipeline | ✅ Complete |
 
 ## Appendix: Closed Issues
 

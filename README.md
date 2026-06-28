@@ -386,38 +386,46 @@ EdgePulse/
 | Document | Status | Description |
 |----------|--------|-------------|
 | [Requirements](docs/01-requirements.md) | ✅ Complete | Functional & non-functional requirements |
-| Architecture | 🔄 In Progress | System design & component architecture |
-| Data Design | 📋 Planned | Database schemas & data flow |
-| API Design | 📋 Planned | REST API endpoints & contracts |
-| Identity Design | 📋 Planned | Keycloak config & SSO flows |
-| Infrastructure | 📋 Planned | Docker, Azure, CI/CD setup |
+| [Architecture](docs/02-architecture.md) | ✅ Complete | System design & component architecture |
+| [Data Design](docs/03-data_design.md) | ✅ Complete | Database schemas & data flow |
+| [Sprint History](docs/sprint-history.md) | ✅ Ongoing | Per-sprint journal; details in `docs/sprints/` |
+| [Keycloak Setup](docs/keycloak-setup.md) | ✅ Complete | Realm, clients, protocol mappers, test users |
+| [Local Test Guide](docs/testing/local-test-guide.md) | ✅ Complete | Run the full stack locally, step by step |
+| [CI/CD Guide](docs/devops/01-cicd-guide.md) | ✅ Complete | GitHub Actions + GHCR, beginner-oriented |
+| API Reference | 📋 Planned | Per-endpoint REST docs (issue #78) |
+| Operations Guide | 📋 Planned | Monitoring, backup, hardening (issue #77) |
 
 ---
 
 ## 🗺️ Roadmap
 
-### Phase 1 — Core API & Deployment *(Months 1–2)*
-- [x] Project setup & documentation
-- [ ] .NET 9 Device API with Clean Architecture
-- [ ] JWT authentication via Keycloak
-- [ ] Docker + Docker Compose local stack
-- [ ] GitHub Actions CI/CD pipeline
-- [ ] Deploy to Azure Container Apps
+### Delivered (Sprints 1–16)
+- [x] Configuration module — configurable lookup tables (industry templates + tenant overrides)
+- [x] Organisation hierarchy — Tenant → Mill → Area, role-scoped
+- [x] Device management — registration, hashed API keys, full CRUD
+- [x] Keycloak JWT auth — 5 roles, tenant/mill/area-scoped claims
+- [x] Telemetry pipeline — NestJS ingestion → RabbitMQ → .NET processor → MongoDB
+- [x] OPC-UA edge agent + simulator (on-premise telemetry path)
+- [x] Alerts engine — thresholds, 3-breach rule, state machine
+- [x] React dashboard — alerts, device telemetry charts, executive KPIs
+- [x] Dark mode + responsive layout
+- [x] Full CRUD UI for Devices / Mills / Areas + Configuration screen
+- [x] Localization (i18n) — data-driven locales, server-resolved lookup
+      translations, DB-backed UI overrides, CSV import/export
+- [x] CI/CD — GitHub Actions build checks + Docker images published to GHCR
 
-### Phase 2 — Telemetry Pipeline *(Months 3–4)*
-- [ ] Node.js Telemetry Ingestion Service
-- [ ] Azure Service Bus integration
-- [ ] .NET Worker Service — telemetry processor
-- [ ] Cosmos DB telemetry storage
-- [ ] Anomaly detection (3-reading threshold rule)
+### Next candidates
+- [ ] Reports & exports (cross-mill comparison, PDF/CSV)
+- [ ] Notifications delivery (email / in-app) for alerts
+- [ ] File attachments for devices (Azure Blob / MinIO)
+- [ ] User management (role assignment, AD group mapping)
+- [ ] AI alert summaries (Azure OpenAI / Ollama)
+- [ ] E2E tests in CI + .NET unit/integration tests
+- [ ] Deployment from GHCR (Azure Container Apps / Kubernetes)
 
-### Phase 3 — AI, Polish & Portfolio *(Months 5–6)*
-- [ ] Azure Key Vault + Managed Identity
-- [ ] Azure Application Insights (distributed tracing)
-- [ ] Azure OpenAI alert summaries
-- [ ] React Dashboard
-- [ ] Cross-mill comparison reports
-- [ ] Public demo deployment
+> Longer-term product epics (Predictive Maintenance, Digital Twin, Energy/ESG,
+> Mobile, API Marketplace, etc.) are tracked in `PRODUCT-ROADMAP.md` and the
+> GitHub EPIC issues.
 
 ---
 
