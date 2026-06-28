@@ -9,7 +9,9 @@ import styles from './Sidebar.module.css';
 
 interface SidebarProps {
   isOpen?: boolean;
+  collapsed?: boolean;
   onClose?: () => void;
+  onToggleCollapse?: () => void;
 }
 
 const NAV_ITEMS = [
@@ -23,7 +25,12 @@ const NAV_ITEMS = [
 
 const BADGE_REFRESH_MS = 30_000;
 
-export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
+export default function Sidebar({
+  isOpen = false,
+  collapsed = false,
+  onClose,
+  onToggleCollapse,
+}: SidebarProps) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { openCount, criticalOpenCount } = useAppSelector(
@@ -59,13 +66,30 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
   const userEmail = keycloak.tokenParsed?.email as string | undefined;
 
+  const asideClass = [
+    styles.sidebar,
+    isOpen ? styles.sidebarOpen : '',
+    collapsed ? styles.sidebarCollapsed : '',
+  ].filter(Boolean).join(' ');
+
   return (
-    <aside
-      className={`${styles.sidebar}${isOpen ? ` ${styles.sidebarOpen}` : ''}`}
-    >
+    <aside className={asideClass}>
       <div className={styles.logo}>
-        <div className={styles.logoText}>EdgePulse</div>
-        <div className={styles.logoSub}>{t('nav.appSubtitle')}</div>
+        <button
+          className={styles.collapseBtn}
+          onClick={onToggleCollapse}
+          aria-label="Toggle menu"
+          title="Toggle menu"
+        >
+          ☰
+        </button>
+        <div className={styles.logoBrand}>
+          <div className={styles.logoText}>
+            <span className={styles.logoFull}>EdgePulse</span>
+            <span className={styles.logoMark}>EP</span>
+          </div>
+          <div className={styles.logoSub}>{t('nav.appSubtitle')}</div>
+        </div>
       </div>
 
       <nav className={styles.nav}>
@@ -73,6 +97,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           <NavLink
             key={to}
             to={to}
+            title={collapsed ? t(labelKey) : undefined}
             className={({ isActive }) =>
               isActive
                 ? `${styles.navItem} ${styles.navItemActive}`
@@ -80,7 +105,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             }
           >
             <span className={styles.navIcon}>{icon}</span>
-            <span>{t(labelKey)}</span>
+            <span className={styles.navLabel}>{t(labelKey)}</span>
 
             {labelKey === 'nav.alerts' && openCount > 0 && (
               <span className={styles.badgeWrapper}>
@@ -109,8 +134,10 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         <button
           className={styles.logoutBtn}
           onClick={() => keycloak.logout()}
+          title={t('nav.signOut')}
         >
-          {t('nav.signOut')}
+          <span className={styles.logoutFull}>{t('nav.signOut')}</span>
+          <span className={styles.logoutMark}>⏻</span>
         </button>
       </div>
     </aside>

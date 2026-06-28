@@ -1,7 +1,10 @@
 /* ── Shell ──────────────────────────────────────────────────────────────────── */
+/* Lock to the viewport height so the page never body-scrolls: the topbar and
+   sidebar stay fixed and only .content scrolls internally. */
 .shell {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: var(--color-bg);
 }
 
@@ -39,7 +42,7 @@
   gap: 8px;
 }
 
-/* ── Hamburger (mobile only) ────────────────────────────────────────────────── */
+/* ── Menu toggle — mobile only (opens the drawer) ───────────────────────────── */
 .menuBtn {
   display: none;
   align-items: center;

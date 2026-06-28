@@ -53,7 +53,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 12px;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
   padding: 16px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -112,17 +112,21 @@
   color: var(--color-text-secondary);
 }
 
-/* ── Sticky panel: wraps section title + global toolbar ──── */
+/* ── Sticky global-range toolbar ─────────────────────────────────────────────
+   Only the toolbar card sticks (the heading scrolls away normally). Page-bg
+   padding around the card lets charts scroll cleanly underneath it. */
 
-.stickyPanel {
+.stickyToolbar {
   position: sticky;
   top: 0;
   z-index: 20;
   background: var(--color-bg);
-  margin-left:  -24px;
-  margin-right: -24px;
-  padding: 12px 24px 8px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  padding: 8px 0 12px;
+  /* A page-bg block painted above the element covers the ~24px strip (the
+     .content top padding) so charts don't peek through when the toolbar sticks.
+     Kept to 24px — smaller than the info card's 32px bottom margin — so it
+     never paints over the card above. Invisible when not stuck (page bg). */
+  box-shadow: 0 -24px 0 0 var(--color-bg);
 }
 
 .globalToolbarWrap {

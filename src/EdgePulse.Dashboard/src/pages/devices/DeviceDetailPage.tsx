@@ -90,7 +90,7 @@ export default function DeviceDetailPage() {
       </div>
 
       <div>
-        <div className={styles.stickyPanel}>
+        <div className={styles.stickyToolbar}>
           <h2 className={styles.sectionTitle}>
             {t('devices.detail.liveTelemetry')}
             {isLive && <span className={styles.refreshNote}>{t('devices.detail.autoRefresh')}</span>}

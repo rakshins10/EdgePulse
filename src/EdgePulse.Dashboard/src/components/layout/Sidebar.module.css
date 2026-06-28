@@ -1,19 +1,105 @@
 /* ── Sidebar shell ─────────────────────────────────────────────────────────── */
 .sidebar {
   width: 220px;
-  min-height: 100vh;
+  height: 100vh;
   background: var(--color-surface);
   border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition: width 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
+/* Compact "mark" variants are hidden in the normal (expanded) state. */
+.logoMark,
+.logoutMark {
+  display: none;
+}
+
+/* ── Collapsed (desktop icon-only rail) ──────────────────────────────────────── */
+.sidebarCollapsed {
+  width: 64px;
+}
+
+.sidebarCollapsed .logo {
+  padding: 0;
+  justify-content: center;
+}
+
+/* Collapsed rail: show only the toggle button, hide the brand text. */
+.sidebarCollapsed .logoBrand {
+  display: none;
+}
+
+.sidebarCollapsed .navItem {
+  padding: 10px 0;
+  justify-content: center;
+  gap: 0;
+}
+
+.sidebarCollapsed .navLabel {
+  display: none;
+}
+
+.sidebarCollapsed .badgeWrapper {
+  display: none;
+}
+
+.sidebarCollapsed .footer {
+  padding: 12px 8px;
+}
+
+.sidebarCollapsed .userEmail {
+  display: none;
+}
+
+.sidebarCollapsed .logoutBtn {
+  padding: 6px 0;
+  font-size: 1rem;
+}
+
+.sidebarCollapsed .logoutFull { display: none; }
+.sidebarCollapsed .logoutMark { display: inline; }
+
 /* ── Logo ──────────────────────────────────────────────────────────────────── */
+/* Height matches the topbar (52px) so the two bottom borders line up exactly. */
 .logo {
-  padding: 20px 20px 16px;
+  height: 52px;
+  padding: 0 14px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
   border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+/* Collapse / expand toggle — lives on the logo header */
+.collapseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.collapseBtn:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text);
+}
+
+.logoBrand {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .logoText {
@@ -30,8 +116,12 @@
 }
 
 /* ── Nav ───────────────────────────────────────────────────────────────────── */
+/* flex:1 fills the space between logo and footer; min-height:0 + overflow lets
+   the nav scroll internally on short viewports so the footer stays pinned. */
 .nav {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   padding: 12px 0;
 }
 
@@ -150,4 +240,26 @@
   .sidebarOpen {
     transform: translateX(0);
   }
+
+  /* The in-sidebar collapse toggle is desktop-only; mobile uses the topbar
+     hamburger + overlay to open/close the drawer. */
+  .collapseBtn { display: none; }
+
+  /* The desktop "collapsed" preference must not shrink the mobile drawer. */
+  .sidebarCollapsed {
+    width: 220px;
+  }
+  .sidebarCollapsed .logo { padding: 0 14px; justify-content: flex-start; }
+  .sidebarCollapsed .logoBrand { display: flex; }
+  .sidebarCollapsed .logoFull { display: inline; }
+  .sidebarCollapsed .logoMark { display: none; }
+  .sidebarCollapsed .logoSub { display: block; }
+  .sidebarCollapsed .navItem { padding: 10px 20px; justify-content: flex-start; gap: 10px; }
+  .sidebarCollapsed .navLabel { display: inline; }
+  .sidebarCollapsed .badgeWrapper { display: flex; }
+  .sidebarCollapsed .footer { padding: 16px 20px; }
+  .sidebarCollapsed .userEmail { display: block; }
+  .sidebarCollapsed .logoutBtn { padding: 5px 10px; font-size: 0.75rem; }
+  .sidebarCollapsed .logoutFull { display: inline; }
+  .sidebarCollapsed .logoutMark { display: none; }
 }

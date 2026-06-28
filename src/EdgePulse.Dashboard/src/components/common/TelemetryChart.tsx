@@ -36,11 +36,12 @@ function generateTicks(fromMs: number, toMs: number, spanMs: number): number[] {
   const ticks: number[] = [];
 
   if (spanMs <= 2 * DAY_MS) {
+    // Day view: one tick per hour (00:00 … 24:00) so every hour is labelled.
     const d = new Date(fromMs);
     d.setHours(0, 0, 0, 0);
     while (d.getTime() <= toMs) {
       if (d.getTime() >= fromMs) ticks.push(d.getTime());
-      d.setTime(d.getTime() + 4 * HOUR_MS);
+      d.setTime(d.getTime() + HOUR_MS);
     }
   } else if (spanMs <= WEEK_MS) {
     const d = new Date(fromMs);
@@ -74,7 +75,9 @@ function makeFmtTick(spanMs: number) {
   return (ts: number): string => {
     const d = new Date(ts);
     if (spanMs <= 2 * DAY_MS) {
-      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      // Hourly ticks across a day — compact 24-hour label (00..23) so all
+      // hours fit on the axis.
+      return String(d.getHours()).padStart(2, '0');
     }
     if (spanMs <= MONTH_MS) {
       return d.toLocaleDateString([], { weekday: 'short', day: 'numeric' });
@@ -144,9 +147,10 @@ export default function TelemetryChart({ metricKey, readings, color, unit, from,
               domain={[periodFromMs, periodToMs]}
               ticks={ticks}
               tickFormatter={fmtTick}
-              tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }}
+              tick={{ fontSize: 10, fill: 'var(--color-text-secondary)' }}
               axisLine={false}
               tickLine={false}
+              interval={0}
             />
             <YAxis hide />
           </AreaChart>
@@ -187,10 +191,10 @@ export default function TelemetryChart({ metricKey, readings, color, unit, from,
             domain={[periodFromMs, periodToMs]}
             ticks={ticks}
             tickFormatter={fmtTick}
-            tick={{ fontSize: 11, fill: 'var(--color-text-secondary)' }}
+            tick={{ fontSize: 10, fill: 'var(--color-text-secondary)' }}
             axisLine={false}
             tickLine={false}
-            minTickGap={50}
+            interval={0}
           />
 
           <YAxis
