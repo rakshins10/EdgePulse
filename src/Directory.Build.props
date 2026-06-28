@@ -1,0 +1,19 @@
+<!--
+  Shared MSBuild properties for ALL .NET projects under src/.
+  MSBuild imports this automatically for every .csproj in the tree.
+
+  This is the single source of truth for the BACKEND version (the API and the
+  TelemetryProcessor, which share the Domain/Application/Infrastructure libraries
+  and are therefore versioned together as one "backend" line).
+
+  To release the backend: bump <Version> here, commit, then push a tag
+  `backend-v<this-version>` (see RELEASING.md). The Node apps (dashboard,
+  ingestion, opcua-agent) version independently via their own package.json.
+-->
+<Project>
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+    <Product>EdgePulse</Product>
+    <Company>Rakshith N S</Company>
+  </PropertyGroup>
+</Project>

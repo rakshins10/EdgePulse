@@ -1,0 +1,74 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Publish — Backend (API + TelemetryProcessor)
+#
+# These two .NET services share the Domain/Application/Infrastructure libraries,
+# so they version together as one "backend" line (source: src/Directory.Build.props).
+#
+#   • Push to main touching backend code → BETA images (:main, :sha-<commit>)
+#   • Push tag `backend-v1.2.3`          → RELEASE images (:1.2.3, :1.2, :latest)
+#                                          + a GitHub Release
+# ─────────────────────────────────────────────────────────────────────────────
+name: Publish — Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/EdgePulse.Domain/**'
+      - 'src/EdgePulse.Application/**'
+      - 'src/EdgePulse.Infrastructure/**'
+      - 'src/EdgePulse.API/**'
+      - 'src/EdgePulse.TelemetryProcessor/**'
+      - 'src/Directory.Build.props'
+    tags: ['backend-v*']
+
+permissions:
+  contents: write     # create the GitHub Release on a tag
+  packages: write     # push images to GHCR
+
+jobs:
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      channel: ${{ steps.m.outputs.channel }}
+      version: ${{ steps.m.outputs.version }}
+    steps:
+      - id: m
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "channel=release" >> "$GITHUB_OUTPUT"
+            echo "version=${GITHUB_REF_NAME#backend-v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "channel=beta" >> "$GITHUB_OUTPUT"
+            echo "version=" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish:
+    needs: meta
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - { name: api,                 dockerfile: src/EdgePulse.API/Dockerfile }
+          - { name: telemetry-processor, dockerfile: src/EdgePulse.TelemetryProcessor/Dockerfile }
+    uses: ./.github/workflows/_publish-image.yml
+    with:
+      image: ${{ matrix.image.name }}
+      context: .
+      dockerfile: ${{ matrix.image.dockerfile }}
+      channel: ${{ needs.meta.outputs.channel }}
+      version: ${{ needs.meta.outputs.version }}
+    secrets: inherit
+
+  release:
+    needs: [meta, publish]
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "${{ github.ref_name }}" --title "Backend ${{ needs.meta.outputs.version }}" --generate-notes

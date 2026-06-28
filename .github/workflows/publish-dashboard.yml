@@ -1,0 +1,56 @@
+# Publish — Dashboard
+#   • Push to main touching the dashboard → BETA image (:main, :sha-<commit>)
+#   • Push tag `dashboard-v1.2.3`         → RELEASE image (:1.2.3, :1.2, :latest) + GitHub Release
+# Version source: src/EdgePulse.Dashboard/package.json
+name: Publish — Dashboard
+
+on:
+  push:
+    branches: [main]
+    paths: ['src/EdgePulse.Dashboard/**']
+    tags: ['dashboard-v*']
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      channel: ${{ steps.m.outputs.channel }}
+      version: ${{ steps.m.outputs.version }}
+    steps:
+      - id: m
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "channel=release" >> "$GITHUB_OUTPUT"
+            echo "version=${GITHUB_REF_NAME#dashboard-v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "channel=beta" >> "$GITHUB_OUTPUT"
+            echo "version=" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish:
+    needs: meta
+    uses: ./.github/workflows/_publish-image.yml
+    with:
+      image: dashboard
+      context: src/EdgePulse.Dashboard
+      dockerfile: src/EdgePulse.Dashboard/Dockerfile
+      channel: ${{ needs.meta.outputs.channel }}
+      version: ${{ needs.meta.outputs.version }}
+    secrets: inherit
+
+  release:
+    needs: [meta, publish]
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "${{ github.ref_name }}" --title "Dashboard ${{ needs.meta.outputs.version }}" --generate-notes

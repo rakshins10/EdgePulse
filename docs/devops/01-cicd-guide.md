@@ -160,44 +160,33 @@ at container start. Override it when running if your API lives elsewhere:
 
 ---
 
-## 5. The CD workflow, explained
+## 5. The CD workflows — per-component publishing
 
-File: [`.github/workflows/docker-publish.yml`](../../.github/workflows/docker-publish.yml)
+CD is split into **one workflow per component** so each versions and publishes
+independently (a dashboard change doesn't rebuild the backend). They all share a
+**reusable** build/push workflow.
 
-```yaml
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:   # also lets you run it by hand from the Actions tab
-permissions:
-  contents: read
-  packages: write      # lets the built-in token push to GHCR
-```
+| Workflow | Builds | Triggers on |
+|----------|--------|-------------|
+| `publish-backend.yml` | `api` + `telemetry-processor` | main pushes touching `.NET` paths, or `backend-v*` tags |
+| `publish-dashboard.yml` | `dashboard` | main pushes touching the dashboard, or `dashboard-v*` tags |
+| `publish-ingestion.yml` | `ingestion` | …`ingestion-v*` tags |
+| `publish-opcua-agent.yml` | `opcua-agent` | …`opcua-agent-v*` tags |
+| `_publish-image.yml` | (reusable, called by the above) | `workflow_call` only |
 
-```yaml
-strategy:
-  fail-fast: false
-  matrix:
-    image:
-      - { name: api, context: ., dockerfile: src/EdgePulse.API/Dockerfile }
-      - ... (5 entries)
-```
-A **matrix** clones this one job once per image, all in parallel. Each entry
-carries its own `context` and `dockerfile`. `fail-fast: false` means if (say)
-the dashboard image fails, the other four still publish.
+**Two channels** (full details in [`02-releasing.md`](02-releasing.md)):
+- **Beta** — a push to `main` touching a component publishes `:main` + `:sha-<commit>`.
+  The `paths:` filter means *only the changed component* rebuilds.
+- **Release** — pushing a tag like `dashboard-v0.2.0` publishes `:0.2.0`, `:0.2`,
+  `:latest` and creates a GitHub Release. The tag prefix selects the component.
 
-The steps:
-1. **`docker/login-action`** — log in to `ghcr.io` using `github.actor` (you) and
-   `secrets.GITHUB_TOKEN`. This token is created automatically for every run; you
-   never set it up.
-2. **`docker/metadata-action`** — compute the tags. On `main` it emits `:latest`
-   plus `:sha-<commit>` so each image is traceable to the exact commit.
-3. **`docker/build-push-action`** — build the image and push it. `cache-from/
-   cache-to: type=gha` reuses layers between runs via GitHub's cache, so repeat
-   builds are much faster.
+How a component workflow decides the channel: a small `meta` job checks
+`github.ref_type` — `tag` → release (version parsed from the tag), otherwise beta.
+It then calls `_publish-image.yml`, which computes the tag list and runs
+`docker/login-action` → `docker/build-push-action` (with `cache-from/to: type=gha`).
 
-Result: `ghcr.io/<your-username>/edgepulse-api:latest` (and `:sha-…`), and the
-same for the other four.
+> The old single `docker-publish.yml` (one matrix, unified `:latest`) was
+> replaced by this per-component model.
 
 ---
 
@@ -287,7 +276,13 @@ public portfolio):
 | File | Purpose |
 |------|---------|
 | `.github/workflows/ci.yml` | Build the backend + dashboard on push/PR |
-| `.github/workflows/docker-publish.yml` | Build + push 5 images to GHCR on merge to main |
+| `.github/workflows/_publish-image.yml` | Reusable: build + push one image to GHCR (beta/release tags) |
+| `.github/workflows/publish-backend.yml` | Publish api + telemetry-processor (beta on main, release on `backend-v*`) |
+| `.github/workflows/publish-dashboard.yml` | Publish dashboard (`dashboard-v*`) |
+| `.github/workflows/publish-ingestion.yml` | Publish ingestion (`ingestion-v*`) |
+| `.github/workflows/publish-opcua-agent.yml` | Publish opcua-agent (`opcua-agent-v*`) |
+| `src/Directory.Build.props` | Backend version source (`<Version>`) for all .NET projects |
+| `docs/devops/02-releasing.md` | Versioning model + how to cut a release |
 | `.dockerignore` (repo root) | Keep `bin/`, `obj/`, `node_modules/` out of build contexts |
 | `src/EdgePulse.API/Dockerfile` | API image (.NET, context = repo root) |
 | `src/EdgePulse.TelemetryProcessor/Dockerfile` | Worker image (.NET, context = repo root) |

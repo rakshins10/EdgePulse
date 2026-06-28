@@ -1,6 +1,6 @@
 {
   "name": "edgepulse-opcua-agent",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "OPC-UA to RabbitMQ edge agent for EdgePulse IIoT Platform",
   "main": "dist/index.js",
   "scripts": {
