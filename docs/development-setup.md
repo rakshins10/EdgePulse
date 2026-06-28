@@ -39,7 +39,6 @@ MongoDB Compass     Latest      https://www.mongodb.com/try/download/compass
 ### VS Code Extensions
 
 ```
-Claude Code                 -> AI pair programmer (reads CLAUDE.md)
 C# Dev Kit                  -> .NET development
 ESLint                      -> JavaScript/TypeScript linting
 Prettier                    -> Code formatting
@@ -98,8 +97,8 @@ EdgePulse/
     04-api-design.md            <- TODO
     05-identity-design.md       <- TODO
     06-infrastructure.md        <- TODO
-  CLAUDE.md
-  CLAUDE-SETUP.md               <- this file
+  project-guide.md
+  development-setup.md               <- this file
   DOCKER-COMMANDS.md
   README.md
   LICENSE

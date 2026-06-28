@@ -1,6 +1,6 @@
-# CLAUDE.md — EdgePulse Project Memory
+# EdgePulse — Project Guide
 
-> This file is read automatically by Claude Code on every session.
+> Engineering standards, architecture rules, and project conventions for EdgePulse.
 > Keep it updated. It is the single source of truth for project context.
 > Last updated: May 2026 | Sprint 11 complete — Sprint 12 next
 
@@ -467,8 +467,8 @@ superadmin | customeradmin | millmanager | operator | executive
 ## Files To Know
 
 ```
-CLAUDE.md              This file — read every session
-CLAUDE-SETUP.md        All setup commands
+project-guide.md              This file — read every session
+development-setup.md        All setup commands
 DOCKER-COMMANDS.md     All Docker commands
 PRODUCT-ROADMAP.md     Full 22-sprint product vision
 ARCHITECTURE.md        Solution architecture guide

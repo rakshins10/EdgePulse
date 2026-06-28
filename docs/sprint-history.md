@@ -94,7 +94,7 @@ in the UI reads from a database table. Tenants can add custom values and overrid
 
 .NET 9 solution scaffolded with four Clean Architecture projects. NuGet packages pinned
 at specific versions — EF Core 9.0.5 and Swashbuckle 6.9.0 pinned specifically because
-later versions had breaking changes. This is documented in CLAUDE.md as a hard rule.
+later versions had breaking changes. This is documented in project-guide.md as a hard rule.
 
 #### Domain Layer (commit `ce247fe`)
 
