@@ -71,4 +71,7 @@ jobs:
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "${{ github.ref_name }}" --title "Backend ${{ needs.meta.outputs.version }}" --generate-notes
+        run: |
+          gh release view "${{ github.ref_name }}" >/dev/null 2>&1 \
+            && echo "Release ${{ github.ref_name }} already exists — skipping." \
+            || gh release create "${{ github.ref_name }}" --title "Backend ${{ needs.meta.outputs.version }}" --generate-notes
