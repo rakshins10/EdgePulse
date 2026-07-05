@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgePulse.API", "EdgePulse.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgePulse.TelemetryProcessor", "EdgePulse.TelemetryProcessor\EdgePulse.TelemetryProcessor.csproj", "{9E456BA7-2218-4DCA-9470-B5006E0819A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgePulse.Domain.Tests", "..\..\tests\EdgePulse.Domain.Tests\EdgePulse.Domain.Tests.csproj", "{0765A04B-7DCA-4A3C-83F7-CF4600008243}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgePulse.Application.Tests", "..\..\tests\EdgePulse.Application.Tests\EdgePulse.Application.Tests.csproj", "{03E168F9-9D24-45E6-A564-B148F08A3F38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +46,13 @@ Global
 		{9E456BA7-2218-4DCA-9470-B5006E0819A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E456BA7-2218-4DCA-9470-B5006E0819A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E456BA7-2218-4DCA-9470-B5006E0819A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0765A04B-7DCA-4A3C-83F7-CF4600008243}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0765A04B-7DCA-4A3C-83F7-CF4600008243}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0765A04B-7DCA-4A3C-83F7-CF4600008243}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0765A04B-7DCA-4A3C-83F7-CF4600008243}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03E168F9-9D24-45E6-A564-B148F08A3F38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03E168F9-9D24-45E6-A564-B148F08A3F38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03E168F9-9D24-45E6-A564-B148F08A3F38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03E168F9-9D24-45E6-A564-B148F08A3F38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

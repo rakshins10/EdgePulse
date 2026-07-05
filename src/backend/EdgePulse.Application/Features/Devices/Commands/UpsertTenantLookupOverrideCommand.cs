@@ -2,7 +2,6 @@ using EdgePulse.Application.Common.Exceptions;
 using EdgePulse.Application.Common.Interfaces;
 using EdgePulse.Domain.Constants;
 using EdgePulse.Domain.Entities;
-using EdgePulse.Domain.Entities;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

@@ -2,12 +2,13 @@
 # CI — Continuous Integration
 #
 # Runs on every push to main and every pull request targeting main. It proves
-# the code still compiles before anything gets merged. Two independent jobs run
-# in parallel: one for the .NET backend, one for the React dashboard.
+# the code still compiles and the unit tests pass before anything gets merged.
+# Two independent jobs run in parallel: one for the .NET backend, one for the
+# React dashboard.
 #
-# (There are no .NET unit-test projects yet, so the backend job only builds.
-#  The dashboard's Playwright E2E suite needs the full stack and is run locally;
-#  wiring it into CI is a documented future step.)
+# (The backend job builds the solution and runs the Domain + Application unit
+#  tests. The dashboard's Playwright E2E suite needs the full stack and is run
+#  locally; wiring it into CI is a documented future step.)
 # ─────────────────────────────────────────────────────────────────────────────
 name: CI
 
@@ -19,7 +20,7 @@ on:
 
 jobs:
   backend:
-    name: Build .NET solution
+    name: Build & test .NET solution
     runs-on: ubuntu-latest
     steps:
       - name: Check out the code
@@ -35,6 +36,9 @@ jobs:
 
       - name: Build (Release, no restore — already restored above)
         run: dotnet build src/backend/EdgePulse.sln --configuration Release --no-restore
+
+      - name: Run unit tests (Domain + Application)
+        run: dotnet test src/backend/EdgePulse.sln --configuration Release --no-build --verbosity normal
 
   frontend:
     name: Build React dashboard
