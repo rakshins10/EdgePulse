@@ -263,7 +263,7 @@ Navigate to `http://localhost:3000/alerts`, click **Ack** on the open alert.
 
 ## Configuration
 
-`src/EdgePulse.TelemetryProcessor/appsettings.json`:
+`src/backend/EdgePulse.TelemetryProcessor/appsettings.json`:
 ```json
 {
   "ConnectionStrings": {

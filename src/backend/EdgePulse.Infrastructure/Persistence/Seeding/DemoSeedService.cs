@@ -16,7 +16,7 @@ namespace EdgePulse.Infrastructure.Persistence.Seeding;
 /// with the same IDs every time.
 ///
 /// Idempotent: safe to run multiple times — checks existence before inserting.
-/// Run via: dotnet run --project src/EdgePulse.API -- --seed
+/// Run via: dotnet run --project src/backend/EdgePulse.API -- --seed
 /// </summary>
 public class DemoSeedService
 {

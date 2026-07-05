@@ -20,7 +20,7 @@ each time the processor restarted.
 
 ### 1. `DemoIds.cs` — Fixed GUIDs for All Demo Entities
 
-`src/EdgePulse.Domain/Constants/DemoIds.cs`
+`src/backend/EdgePulse.Domain/Constants/DemoIds.cs`
 
 All demo entities have permanent, hard-coded GUIDs with a recognisable prefix pattern:
 
@@ -41,7 +41,7 @@ Purpose: documentation, curl scripts, and integration tests reference the same I
 
 ### 2. `DemoSeedService` — Idempotent Seed
 
-`src/EdgePulse.Infrastructure/Persistence/Seeding/DemoSeedService.cs`
+`src/backend/EdgePulse.Infrastructure/Persistence/Seeding/DemoSeedService.cs`
 
 **Seeded entities:**
 - 1 Tenant: NordPulp Industries (`nordpulp`)
@@ -63,10 +63,10 @@ from day one of the year, not today.
 
 ### 3. `--seed` CLI Flag in Program.cs
 
-`src/EdgePulse.API/Program.cs`
+`src/backend/EdgePulse.API/Program.cs`
 
 ```bash
-dotnet run --project src/EdgePulse.API --seed
+dotnet run --project src/backend/EdgePulse.API --seed
 ```
 
 - Resolves `EdgePulseDbContext` and `ILogger<DemoSeedService>` from the DI container
@@ -78,7 +78,7 @@ dotnet run --project src/EdgePulse.API --seed
 
 ### 4. `PreloadOpenAlertsAsync` — Alert Dedup Fix
 
-`src/EdgePulse.TelemetryProcessor/Services/AlertEngineService.cs`
+`src/backend/EdgePulse.TelemetryProcessor/Services/AlertEngineService.cs`
 
 **Problem:** The `_openAlertKeys` deduplication dictionary lived only in memory. Every
 processor restart cleared it, causing any OPEN/ACKNOWLEDGED alert to be re-fired on the
@@ -126,11 +126,11 @@ Populates `_openAlertKeys` so the processor's dedup state survives restarts.
 
 | File | Change |
 |------|--------|
-| `src/EdgePulse.Domain/Constants/DemoIds.cs` | **NEW** — all demo fixed GUIDs |
-| `src/EdgePulse.Infrastructure/Persistence/Seeding/DemoSeedService.cs` | **NEW** — idempotent seed |
-| `src/EdgePulse.API/Program.cs` | Modified — `--seed` CLI flag |
-| `src/EdgePulse.TelemetryProcessor/Services/AlertEngineService.cs` | Modified — `PreloadOpenAlertsAsync` |
-| `src/EdgePulse.TelemetryProcessor/Worker.cs` | Modified — call preload on startup |
+| `src/backend/EdgePulse.Domain/Constants/DemoIds.cs` | **NEW** — all demo fixed GUIDs |
+| `src/backend/EdgePulse.Infrastructure/Persistence/Seeding/DemoSeedService.cs` | **NEW** — idempotent seed |
+| `src/backend/EdgePulse.API/Program.cs` | Modified — `--seed` CLI flag |
+| `src/backend/EdgePulse.TelemetryProcessor/Services/AlertEngineService.cs` | Modified — `PreloadOpenAlertsAsync` |
+| `src/backend/EdgePulse.TelemetryProcessor/Worker.cs` | Modified — call preload on startup |
 | `docs/domain/02-demo-data-setup.md` | **NEW** — full demo reference doc |
 
 ---
@@ -144,11 +144,11 @@ docker compose -f infrastructure/docker-compose.onpremise.yml up -d sqlserver
 
 # Apply latest migrations first (if needed)
 dotnet ef database update \
-  --project src/EdgePulse.Infrastructure \
-  --startup-project src/EdgePulse.API
+  --project src/backend/EdgePulse.Infrastructure \
+  --startup-project src/backend/EdgePulse.API
 
 # Run seed
-dotnet run --project src/EdgePulse.API --seed
+dotnet run --project src/backend/EdgePulse.API --seed
 ```
 
 Expected output:

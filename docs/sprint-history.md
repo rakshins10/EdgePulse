@@ -432,7 +432,7 @@ auth, Alerts page, sidebar alert badge, device telemetry charts. Plain CSS Modul
 machine (Open → Acknowledged → Resolved), CQRS API + frontend.
 
 **Sprint 9 — Demo Seed** — NordPulp demo data with fixed GUIDs (`DemoSeedService`),
-run via `dotnet run --project src/EdgePulse.API -- --seed`.
+run via `dotnet run --project src/backend/EdgePulse.API -- --seed`.
 
 **Sprint 10 — Dark Mode + Responsive** — theme system (CSS vars, `data-theme`),
 mobile-responsive sidebar/layout.

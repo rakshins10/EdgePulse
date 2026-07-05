@@ -34,12 +34,12 @@ Wire Keycloak as the identity provider into the .NET 9 API so that:
 
 | File | Change |
 |------|--------|
-| [src/EdgePulse.API/Program.cs](../../src/EdgePulse.API/Program.cs) | JWT Bearer setup, MapInboundClaims, Swagger Bearer button |
-| [src/EdgePulse.API/appsettings.json](../../src/EdgePulse.API/appsettings.json) | Keycloak section added |
-| [src/EdgePulse.Infrastructure/Services/CurrentUserService.cs](../../src/EdgePulse.Infrastructure/Services/CurrentUserService.cs) | Full rewrite — reads from JWT claims |
-| [src/EdgePulse.API/Controllers/ConfigurationController.cs](../../src/EdgePulse.API/Controllers/ConfigurationController.cs) | `[Authorize]` added |
-| [src/EdgePulse.API/Controllers/OrganisationController.cs](../../src/EdgePulse.API/Controllers/OrganisationController.cs) | `[Authorize]` added |
-| [src/EdgePulse.API/Controllers/DevicesController.cs](../../src/EdgePulse.API/Controllers/DevicesController.cs) | `[Authorize]` added |
+| [src/backend/EdgePulse.API/Program.cs](../../src/backend/EdgePulse.API/Program.cs) | JWT Bearer setup, MapInboundClaims, Swagger Bearer button |
+| [src/backend/EdgePulse.API/appsettings.json](../../src/backend/EdgePulse.API/appsettings.json) | Keycloak section added |
+| [src/backend/EdgePulse.Infrastructure/Services/CurrentUserService.cs](../../src/backend/EdgePulse.Infrastructure/Services/CurrentUserService.cs) | Full rewrite — reads from JWT claims |
+| [src/backend/EdgePulse.API/Controllers/ConfigurationController.cs](../../src/backend/EdgePulse.API/Controllers/ConfigurationController.cs) | `[Authorize]` added |
+| [src/backend/EdgePulse.API/Controllers/OrganisationController.cs](../../src/backend/EdgePulse.API/Controllers/OrganisationController.cs) | `[Authorize]` added |
+| [src/backend/EdgePulse.API/Controllers/DevicesController.cs](../../src/backend/EdgePulse.API/Controllers/DevicesController.cs) | `[Authorize]` added |
 | [docs/keycloak-setup.md](../keycloak-setup.md) | Full manual Keycloak setup guide (Option A: import, Option B: step-by-step) |
 | [infrastructure/keycloak/edgepulse-realm.json](../../infrastructure/keycloak/edgepulse-realm.json) | Realm export for fast re-setup |
 

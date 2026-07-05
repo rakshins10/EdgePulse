@@ -115,8 +115,8 @@ Composes all components:
 ## Files changed
 
 ```
-src/EdgePulse.Application/Features/Dashboard/Queries/GetDashboardSummaryQuery.cs  (new)
-src/EdgePulse.API/Controllers/DashboardController.cs                               (new)
+src/backend/EdgePulse.Application/Features/Dashboard/Queries/GetDashboardSummaryQuery.cs  (new)
+src/backend/EdgePulse.API/Controllers/DashboardController.cs                               (new)
 src/EdgePulse.Dashboard/src/types/dashboard.ts                                     (new)
 src/EdgePulse.Dashboard/src/api/dashboard.ts                                       (new)
 src/EdgePulse.Dashboard/src/components/dashboard/KpiTile.tsx                       (new)

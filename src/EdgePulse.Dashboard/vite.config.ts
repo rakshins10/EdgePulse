@@ -7,7 +7,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        // API runs on 5104 per src/EdgePulse.API/Properties/launchSettings.json
+        // API runs on 5104 per src/backend/EdgePulse.API/Properties/launchSettings.json
         target: 'http://localhost:5104',
         changeOrigin: true,
       },
