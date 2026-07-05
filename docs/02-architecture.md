@@ -845,7 +845,7 @@ Terminal 1: Start infrastructure only
   docker compose up keycloak postgres sqlserver
 
 Terminal 2: Run Device API natively
-  cd src/EdgePulse.API
+  cd src/backend/EdgePulse.API
   dotnet run
 
 Terminal 3: Run Telemetry Service natively

@@ -2,13 +2,13 @@
 # Publish — Backend (API + TelemetryProcessor)
 #
 # These two .NET services share the Domain/Application/Infrastructure libraries,
-# so they version together as one "backend" line (source: src/Directory.Build.props).
+# so they version together as one "backend" line (source: src/backend/Directory.Build.props).
 #
 #   • Push to main touching backend code → BETA images (:X.Y.Z-beta.N, :beta, :main, :sha-<commit>)
 #   • Push tag `backend-v1.2.3`          → RELEASE images (:1.2.3, :1.2, :latest)
 #                                          + a GitHub Release
 #
-# Next-version source: the "## [Unreleased]" line of src/CHANGELOG.md.
+# Next-version source: the "## [Unreleased]" line of src/backend/CHANGELOG.md.
 # ─────────────────────────────────────────────────────────────────────────────
 name: Publish — Backend
 
@@ -16,13 +16,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'src/EdgePulse.Domain/**'
-      - 'src/EdgePulse.Application/**'
-      - 'src/EdgePulse.Infrastructure/**'
-      - 'src/EdgePulse.API/**'
-      - 'src/EdgePulse.TelemetryProcessor/**'
-      - 'src/Directory.Build.props'
-      - 'src/CHANGELOG.md'
+      - 'src/backend/EdgePulse.Domain/**'
+      - 'src/backend/EdgePulse.Application/**'
+      - 'src/backend/EdgePulse.Infrastructure/**'
+      - 'src/backend/EdgePulse.API/**'
+      - 'src/backend/EdgePulse.TelemetryProcessor/**'
+      - 'src/backend/Directory.Build.props'
+      - 'src/backend/CHANGELOG.md'
     tags: ['backend-v*']
 
 permissions:
@@ -43,10 +43,10 @@ jobs:
         uses: ./.github/actions/component-version
         with:
           tag-prefix: backend
-          changelog: src/CHANGELOG.md
+          changelog: src/backend/CHANGELOG.md
           paths: >-
-            src/EdgePulse.Domain src/EdgePulse.Application src/EdgePulse.Infrastructure
-            src/EdgePulse.API src/EdgePulse.TelemetryProcessor src/Directory.Build.props src/CHANGELOG.md
+            src/backend/EdgePulse.Domain src/backend/EdgePulse.Application src/backend/EdgePulse.Infrastructure
+            src/backend/EdgePulse.API src/backend/EdgePulse.TelemetryProcessor src/backend/Directory.Build.props src/backend/CHANGELOG.md
 
   publish:
     needs: meta
@@ -54,8 +54,8 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - { name: api,                 dockerfile: src/EdgePulse.API/Dockerfile }
-          - { name: telemetry-processor, dockerfile: src/EdgePulse.TelemetryProcessor/Dockerfile }
+          - { name: api,                 dockerfile: src/backend/EdgePulse.API/Dockerfile }
+          - { name: telemetry-processor, dockerfile: src/backend/EdgePulse.TelemetryProcessor/Dockerfile }
     uses: ./.github/workflows/_publish-image.yml
     with:
       image: ${{ matrix.image.name }}

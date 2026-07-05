@@ -90,8 +90,8 @@ jobs:
       - uses: actions/checkout@v4            # 1. copy the repo onto the runner
       - uses: actions/setup-dotnet@v4        # 2. install the .NET 9 SDK
         with: { dotnet-version: '9.0.x' }
-      - run: dotnet restore src/EdgePulse.sln   # 3. download NuGet packages
-      - run: dotnet build src/EdgePulse.sln -c Release --no-restore  # 4. compile
+      - run: dotnet restore src/backend/EdgePulse.sln   # 3. download NuGet packages
+      - run: dotnet build src/backend/EdgePulse.sln -c Release --no-restore  # 4. compile
 ```
 Four steps: get the code, install the toolchain, restore dependencies, compile.
 If compilation fails, the job goes red and the PR is blocked (once you enable
@@ -118,8 +118,8 @@ everything it needs. We publish five:
 
 | Image | Built from | Base runtime |
 |-------|-----------|--------------|
-| `edgepulse-api` | `src/EdgePulse.API/Dockerfile` | .NET ASP.NET 9 |
-| `edgepulse-telemetry-processor` | `src/EdgePulse.TelemetryProcessor/Dockerfile` | .NET runtime 9 |
+| `edgepulse-api` | `src/backend/EdgePulse.API/Dockerfile` | .NET ASP.NET 9 |
+| `edgepulse-telemetry-processor` | `src/backend/EdgePulse.TelemetryProcessor/Dockerfile` | .NET runtime 9 |
 | `edgepulse-dashboard` | `src/EdgePulse.Dashboard/Dockerfile` | nginx (serves static build) |
 | `edgepulse-ingestion` | `src/EdgePulse.Ingestion/Dockerfile` | Node 20 |
 | `edgepulse-opcua-agent` | `src/EdgePulse.OpcUaAgent/Dockerfile` | Node 20 |
@@ -250,7 +250,7 @@ public portfolio):
 - **Common failures:**
   | Symptom | Likely cause | Fix |
   |---------|-------------|-----|
-  | `dotnet build` error | real compile error | reproduce locally with `dotnet build src/EdgePulse.sln -c Release` |
+  | `dotnet build` error | real compile error | reproduce locally with `dotnet build src/backend/EdgePulse.sln -c Release` |
   | `npm run build` error | TypeScript error | run `npm run build` in `src/EdgePulse.Dashboard` |
   | `ResolvePackageAssets task failed` in Docker | `bin/obj` leaked into context | ensure root `.dockerignore` exists |
   | `denied: permission_denied` on push to GHCR | missing `packages: write` | already set in our workflow |
@@ -281,11 +281,11 @@ public portfolio):
 | `.github/workflows/publish-dashboard.yml` | Publish dashboard (`dashboard-v*`) |
 | `.github/workflows/publish-ingestion.yml` | Publish ingestion (`ingestion-v*`) |
 | `.github/workflows/publish-opcua-agent.yml` | Publish opcua-agent (`opcua-agent-v*`) |
-| `src/Directory.Build.props` | Backend version source (`<Version>`) for all .NET projects |
+| `src/backend/Directory.Build.props` | Backend version source (`<Version>`) for all .NET projects |
 | `docs/devops/02-releasing.md` | Versioning model + how to cut a release |
 | `.dockerignore` (repo root) | Keep `bin/`, `obj/`, `node_modules/` out of build contexts |
-| `src/EdgePulse.API/Dockerfile` | API image (.NET, context = repo root) |
-| `src/EdgePulse.TelemetryProcessor/Dockerfile` | Worker image (.NET, context = repo root) |
+| `src/backend/EdgePulse.API/Dockerfile` | API image (.NET, context = repo root) |
+| `src/backend/EdgePulse.TelemetryProcessor/Dockerfile` | Worker image (.NET, context = repo root) |
 | `src/EdgePulse.Dashboard/Dockerfile` | Dashboard image (Vite build → nginx) |
 | `src/EdgePulse.Dashboard/nginx/default.conf.template` | nginx SPA + `/api` proxy config |
 | `src/EdgePulse.Ingestion/Dockerfile` | Ingestion image (pre-existing) |

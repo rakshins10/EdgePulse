@@ -173,10 +173,10 @@ mkdir -p src
 dotnet new sln -n EdgePulse -o src
 
 # Create Clean Architecture projects
-dotnet new classlib -n EdgePulse.Domain        -o src/EdgePulse.Domain
-dotnet new classlib -n EdgePulse.Application   -o src/EdgePulse.Application
-dotnet new classlib -n EdgePulse.Infrastructure -o src/EdgePulse.Infrastructure
-dotnet new webapi   -n EdgePulse.API           -o src/EdgePulse.API
+dotnet new classlib -n EdgePulse.Domain        -o src/backend/EdgePulse.Domain
+dotnet new classlib -n EdgePulse.Application   -o src/backend/EdgePulse.Application
+dotnet new classlib -n EdgePulse.Infrastructure -o src/backend/EdgePulse.Infrastructure
+dotnet new webapi   -n EdgePulse.API           -o src/backend/EdgePulse.API
 ```
 
 ### Step 2 -- Add Projects To Solution
@@ -274,13 +274,13 @@ dotnet add EdgePulse.API/EdgePulse.API.csproj \
 
 ```bash
 # Remove default files created by templates
-rm src/EdgePulse.Domain/Class1.cs
-rm src/EdgePulse.Application/Class1.cs
-rm src/EdgePulse.Infrastructure/Class1.cs
+rm src/backend/EdgePulse.Domain/Class1.cs
+rm src/backend/EdgePulse.Application/Class1.cs
+rm src/backend/EdgePulse.Infrastructure/Class1.cs
 
 # Remove default WeatherForecast files from API
-rm src/EdgePulse.API/Controllers/WeatherForecastController.cs
-rm src/EdgePulse.API/WeatherForecast.cs
+rm src/backend/EdgePulse.API/Controllers/WeatherForecastController.cs
+rm src/backend/EdgePulse.API/WeatherForecast.cs
 ```
 
 ### Clean Architecture Folder Structure
@@ -331,7 +331,7 @@ src/
 ### Run The API
 
 ```bash
-cd /c/Studies/EdgePulse-Application/src/EdgePulse.API
+cd /c/Studies/EdgePulse-Application/src/backend/EdgePulse.API
 dotnet run
 
 # API available at:
@@ -473,7 +473,7 @@ dotnet ef database drop \
   --startup-project EdgePulse.API
 
 # Step 2: Delete all migration files manually
-rm src/EdgePulse.Infrastructure/Persistence/Migrations/*.cs
+rm src/backend/EdgePulse.Infrastructure/Persistence/Migrations/*.cs
 
 # Step 3: Create fresh migration
 dotnet ef migrations add InitialCreate \
@@ -683,7 +683,7 @@ Password: admin
 docker compose -f infrastructure/docker-compose.onpremise.yml up -d
 
 # Terminal 2: Device API
-cd src/EdgePulse.API && dotnet run
+cd src/backend/EdgePulse.API && dotnet run
 
 # Terminal 3: Telemetry Service
 cd src/EdgePulse.TelemetryService && npm run start:dev

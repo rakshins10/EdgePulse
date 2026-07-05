@@ -4,7 +4,7 @@
 # references sibling projects (Domain, Application, Infrastructure). The CI
 # workflow sets `context: .` accordingly.
 #
-#   docker build -f src/EdgePulse.API/Dockerfile -t edgepulse-api .
+#   docker build -f src/backend/EdgePulse.API/Dockerfile -t edgepulse-api .
 
 # ── Build stage: the full .NET SDK (compiler + tooling) ──────────────────────
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
@@ -13,17 +13,17 @@ WORKDIR /src
 # Copy only the project files first and restore. Docker caches this layer, so
 # dependencies are re-downloaded only when a .csproj changes — not on every
 # source edit. This makes rebuilds much faster.
-COPY src/EdgePulse.Domain/EdgePulse.Domain.csproj                 EdgePulse.Domain/
-COPY src/EdgePulse.Application/EdgePulse.Application.csproj         EdgePulse.Application/
-COPY src/EdgePulse.Infrastructure/EdgePulse.Infrastructure.csproj  EdgePulse.Infrastructure/
-COPY src/EdgePulse.API/EdgePulse.API.csproj                        EdgePulse.API/
+COPY src/backend/EdgePulse.Domain/EdgePulse.Domain.csproj                 EdgePulse.Domain/
+COPY src/backend/EdgePulse.Application/EdgePulse.Application.csproj         EdgePulse.Application/
+COPY src/backend/EdgePulse.Infrastructure/EdgePulse.Infrastructure.csproj  EdgePulse.Infrastructure/
+COPY src/backend/EdgePulse.API/EdgePulse.API.csproj                        EdgePulse.API/
 RUN dotnet restore EdgePulse.API/EdgePulse.API.csproj
 
 # Now copy the rest of the source and publish a Release build.
-COPY src/EdgePulse.Domain/         EdgePulse.Domain/
-COPY src/EdgePulse.Application/     EdgePulse.Application/
-COPY src/EdgePulse.Infrastructure/ EdgePulse.Infrastructure/
-COPY src/EdgePulse.API/            EdgePulse.API/
+COPY src/backend/EdgePulse.Domain/         EdgePulse.Domain/
+COPY src/backend/EdgePulse.Application/     EdgePulse.Application/
+COPY src/backend/EdgePulse.Infrastructure/ EdgePulse.Infrastructure/
+COPY src/backend/EdgePulse.API/            EdgePulse.API/
 RUN dotnet publish EdgePulse.API/EdgePulse.API.csproj -c Release -o /app --no-restore
 
 # ── Runtime stage: the smaller ASP.NET runtime (no SDK) ──────────────────────

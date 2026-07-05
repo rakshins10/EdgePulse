@@ -13,7 +13,7 @@ lines**, each with its own `CHANGELOG.md`:
 
 | Component line | What it covers | Next version declared in | Release tag |
 |----------------|----------------|--------------------------|-------------|
-| **backend** | `edgepulse-api` + `edgepulse-telemetry-processor` | `src/CHANGELOG.md` | `backend-vX.Y.Z` |
+| **backend** | `edgepulse-api` + `edgepulse-telemetry-processor` | `src/backend/CHANGELOG.md` | `backend-vX.Y.Z` |
 | **dashboard** | `edgepulse-dashboard` | `src/EdgePulse.Dashboard/CHANGELOG.md` | `dashboard-vX.Y.Z` |
 | **ingestion** | `edgepulse-ingestion` | `src/EdgePulse.Ingestion/CHANGELOG.md` | `ingestion-vX.Y.Z` |
 | **opcua-agent** | `edgepulse-opcua-agent` | `src/EdgePulse.OpcUaAgent/CHANGELOG.md` | `opcua-agent-vX.Y.Z` |

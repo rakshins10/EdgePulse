@@ -26,7 +26,7 @@ what was seeded, how to re-seed, and how to drive a live demo with real alerts.
 
 ```bash
 cd EdgePulse
-dotnet run --project src/EdgePulse.API -- --seed
+dotnet run --project src/backend/EdgePulse.API -- --seed
 ```
 
 **The seed is idempotent** — safe to run multiple times.
@@ -129,8 +129,8 @@ All IDs are deterministic so demo scripts always work without discovery calls.
 
 Before running the alert scenarios you need:
 
-1. **API running:** `dotnet run --project src/EdgePulse.API`
-2. **TelemetryProcessor running:** `dotnet run --project src/EdgePulse.TelemetryProcessor`
+1. **API running:** `dotnet run --project src/backend/EdgePulse.API`
+2. **TelemetryProcessor running:** `dotnet run --project src/backend/EdgePulse.TelemetryProcessor`
 3. **RabbitMQ running:** `docker-compose up rabbitmq` (or use the full stack)
 4. **Auth token:** Get a Keycloak token for the NordPulp CustomerAdmin user
 
@@ -314,7 +314,7 @@ curl -s "http://localhost:5170/api/alerts/count" \
 To completely reset the demo data:
 
 ```bash
-dotnet run --project src/EdgePulse.API -- --seed
+dotnet run --project src/backend/EdgePulse.API -- --seed
 ```
 
 The seed will:

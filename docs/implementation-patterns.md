@@ -40,7 +40,7 @@ WHILE CODING:
   7. Stop API between builds (files get locked otherwise)
 
 AFTER CODING:
-  8. Run API: cd src/EdgePulse.API && dotnet run
+  8. Run API: cd src/backend/EdgePulse.API && dotnet run
   9. Test every acceptance criterion in Swagger
   10. Move card to "In Review"
   11. git push origin feature/US-XXX-...

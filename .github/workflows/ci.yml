@@ -31,10 +31,10 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Restore NuGet dependencies
-        run: dotnet restore src/EdgePulse.sln
+        run: dotnet restore src/backend/EdgePulse.sln
 
       - name: Build (Release, no restore — already restored above)
-        run: dotnet build src/EdgePulse.sln --configuration Release --no-restore
+        run: dotnet build src/backend/EdgePulse.sln --configuration Release --no-restore
 
   frontend:
     name: Build React dashboard

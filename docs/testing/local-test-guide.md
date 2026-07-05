@@ -87,7 +87,7 @@ All containers should show `(healthy)`. Keycloak may take 60–90 seconds.
 cd C:\Studies\EdgePulse-Application\EdgePulse
 
 # Apply EF Core migrations (creates the EdgePulse database + all tables)
-dotnet run --project src/EdgePulse.API -- --seed
+dotnet run --project src/backend/EdgePulse.API -- --seed
 ```
 
 Expected output:
@@ -108,7 +108,7 @@ Demo seed complete. Exiting.
 ## Step 3 — Start the API
 
 ```powershell
-dotnet run --project src/EdgePulse.API
+dotnet run --project src/backend/EdgePulse.API
 ```
 
 Expected output:
@@ -130,7 +130,7 @@ info: Microsoft.Hosting.Lifetime[0]
 Open a new terminal:
 
 ```powershell
-dotnet run --project src/EdgePulse.TelemetryProcessor
+dotnet run --project src/backend/EdgePulse.TelemetryProcessor
 ```
 
 Expected output:
@@ -320,7 +320,7 @@ Navigate to `/alerts`:
 ## Troubleshooting
 
 ### "Failed to load dashboard data"
-- API is not running → start it with `dotnet run --project src/EdgePulse.API`
+- API is not running → start it with `dotnet run --project src/backend/EdgePulse.API`
 - Keycloak token expired → hard-refresh the browser; Keycloak will prompt for re-login
 
 ### Dashboard redirects to Keycloak login in a loop

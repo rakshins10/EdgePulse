@@ -301,7 +301,7 @@ docker compose -f infrastructure/docker-compose.onpremise.yml down
 
 ```bash
 # Run once after applying migrations — fully idempotent, safe to re-run
-dotnet run --project src/EdgePulse.API --seed
+dotnet run --project src/backend/EdgePulse.API --seed
 ```
 
 Seeds: NordPulp tenant, 2 mills, 8 areas, 20 devices, 21 alert thresholds.

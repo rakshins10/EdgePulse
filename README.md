@@ -277,13 +277,13 @@ docker compose -f infrastructure/docker-compose.onpremise.yml up -d `
     sqlserver mongodb rabbitmq postgres keycloak
 
 # 3. Apply EF migrations + seed NordPulp demo data
-dotnet run --project src/EdgePulse.API -- --seed
+dotnet run --project src/backend/EdgePulse.API -- --seed
 
 # 4. Start the API (new terminal — leave running)
-dotnet run --project src/EdgePulse.API
+dotnet run --project src/backend/EdgePulse.API
 
 # 5. Start the TelemetryProcessor (new terminal — leave running)
-dotnet run --project src/EdgePulse.TelemetryProcessor
+dotnet run --project src/backend/EdgePulse.TelemetryProcessor
 
 # 6. Start the OPC-UA simulator + agent (publishes telemetry to RabbitMQ)
 docker compose -f infrastructure/docker-compose.onpremise.yml up -d `
