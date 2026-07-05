@@ -41,4 +41,31 @@ public class MaintenanceTypeTests
         var act = () => mt.Deactivate();
         act.Should().Throw<InvalidOperationException>();
     }
+
+    [Fact]
+    public void UpdateColor_CustomValue_UpdatesColor()
+    {
+        var mt = MaintenanceType.CreateCustomValue(_tenantId, "Preventive", "PREV", "#3b82f6");
+        mt.UpdateColor("#ef4444");
+        mt.Color.Should().Be("#ef4444");
+    }
+
+    [Fact]
+    public void UpdateColor_ToNull_ClearsColor()
+    {
+        var mt = MaintenanceType.CreateCustomValue(_tenantId, "Preventive", "PREV", "#3b82f6");
+        mt.UpdateColor(null);
+        mt.Color.Should().BeNull();
+    }
+
+    [Fact]
+    public void UpdateColor_SystemValue_Throws()
+    {
+        var id = Guid.NewGuid();
+        var mt = MaintenanceType.CreateSystemValue(id, _templateId, "Routine", "ROUTINE", "#22c55e");
+
+        var act = () => mt.UpdateColor("#ff0000");
+        act.Should().Throw<InvalidOperationException>()
+           .WithMessage("*System maintenance types*");
+    }
 }

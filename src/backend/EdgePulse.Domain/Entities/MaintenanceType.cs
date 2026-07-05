@@ -35,4 +35,18 @@ public class MaintenanceType : LookupBaseEntity
             CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow
         };
     }
+
+    /// <summary>
+    /// Update the display colour. System maintenance types are protected —
+    /// tenants customise them via a TenantLookupOverride instead.
+    /// </summary>
+    public void UpdateColor(string? color)
+    {
+        if (IsSystem)
+            throw new InvalidOperationException(
+                "System maintenance types cannot be modified directly. " +
+                "Use TenantLookupOverride instead.");
+        Color = color;
+        MarkAsUpdated();
+    }
 }

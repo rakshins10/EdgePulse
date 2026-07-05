@@ -261,6 +261,43 @@ public class ConfigurationController : ControllerBase
         return CreatedAtAction(nameof(GetMaintenanceTypes), new { }, id);
     }
 
+    /// <summary>
+    /// Update a custom maintenance type (name, description, colour).
+    /// </summary>
+    [HttpPut("maintenance-types/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> UpdateMaintenanceType(
+        Guid id,
+        [FromBody] UpdateMaintenanceTypeRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new UpdateMaintenanceTypeCommand(
+                id, request.Name, request.Description,
+                request.Color, request.SortOrder),
+            cancellationToken);
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Delete (deactivate) a custom maintenance type.
+    /// </summary>
+    [HttpDelete("maintenance-types/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> DeleteMaintenanceType(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new DeleteMaintenanceTypeCommand(id), cancellationToken);
+        return NoContent();
+    }
+
     // =============================================
     // LOCATION TYPES
     // =============================================
@@ -543,6 +580,13 @@ public record CreateDeviceModelRequest(
 public record CreateMaintenanceTypeRequest(
     string Name,
     string Code,
+    string? Description,
+    string? Color,
+    int SortOrder = 0
+);
+
+public record UpdateMaintenanceTypeRequest(
+    string Name,
     string? Description,
     string? Color,
     int SortOrder = 0
