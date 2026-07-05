@@ -1,7 +1,7 @@
 # Publish — Ingestion
-#   • Push to main touching ingestion → BETA image (:main, :sha-<commit>)
+#   • Push to main touching ingestion → BETA image (:X.Y.Z-beta.N, :beta, :main, :sha-<commit>)
 #   • Push tag `ingestion-v1.2.3`     → RELEASE image (:1.2.3, :1.2, :latest) + GitHub Release
-# Version source: src/EdgePulse.Ingestion/package.json
+# Next-version source: the "## [Unreleased]" line of src/EdgePulse.Ingestion/CHANGELOG.md
 name: Publish — Ingestion
 
 on:
@@ -21,15 +21,15 @@ jobs:
       channel: ${{ steps.m.outputs.channel }}
       version: ${{ steps.m.outputs.version }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # need tags + full history for the beta number
       - id: m
-        run: |
-          if [ "${{ github.ref_type }}" = "tag" ]; then
-            echo "channel=release" >> "$GITHUB_OUTPUT"
-            echo "version=${GITHUB_REF_NAME#ingestion-v}" >> "$GITHUB_OUTPUT"
-          else
-            echo "channel=beta" >> "$GITHUB_OUTPUT"
-            echo "version=" >> "$GITHUB_OUTPUT"
-          fi
+        uses: ./.github/actions/component-version
+        with:
+          tag-prefix: ingestion
+          changelog: src/EdgePulse.Ingestion/CHANGELOG.md
+          paths: src/EdgePulse.Ingestion
 
   publish:
     needs: meta

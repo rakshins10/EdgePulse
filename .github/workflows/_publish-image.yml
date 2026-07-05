@@ -2,10 +2,11 @@
 # Reusable workflow: build one Docker image and push it to GHCR.
 #
 # Called by the per-component publish workflows. Centralises the tag logic:
-#   - channel=beta    → :main, :sha-<short>           (rolling pre-release)
-#   - channel=release → :X.Y.Z, :X.Y, :latest         (a cut version)
+#   - channel=beta    → :X.Y.Z-beta.N, :beta, :main, :sha-<short>   (rolling pre-release)
+#   - channel=release → :X.Y.Z, :X.Y, :latest                       (a cut version)
 #
-# Not meant to be run on its own — it's invoked via `uses:` with inputs.
+# The caller always passes a fully-formed `version` (the beta number is computed
+# upstream by the component-version action). Not meant to be run on its own.
 # ─────────────────────────────────────────────────────────────────────────────
 name: _publish-image
 
@@ -16,7 +17,7 @@ on:
       context:    { required: true,  type: string }   # docker build context
       dockerfile: { required: true,  type: string }   # path to the Dockerfile
       channel:    { required: true,  type: string }   # "beta" or "release"
-      version:    { required: false, type: string, default: '' }  # X.Y.Z (release only)
+      version:    { required: true,  type: string }   # X.Y.Z (release) or X.Y.Z-beta.N (beta)
 
 permissions:
   contents: read
@@ -44,24 +45,24 @@ jobs:
         run: |
           IMG="ghcr.io/${{ github.repository_owner }}/edgepulse-${{ inputs.image }}"
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          V="${{ inputs.version }}"
           if [ "${{ inputs.channel }}" = "release" ]; then
-            V="${{ inputs.version }}"
             MM="${V%.*}"   # major.minor (e.g. 0.1.0 → 0.1)
-            {
-              echo "tags<<EOF"
-              echo "$IMG:$V"
-              echo "$IMG:$MM"
-              echo "$IMG:latest"
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
+            TAGS="$IMG:$V
+          $IMG:$MM
+          $IMG:latest"
           else
-            {
-              echo "tags<<EOF"
-              echo "$IMG:main"
-              echo "$IMG:sha-$SHORT_SHA"
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
+            # beta, e.g. V=0.0.1-beta.3
+            TAGS="$IMG:$V
+          $IMG:beta
+          $IMG:main
+          $IMG:sha-$SHORT_SHA"
           fi
+          {
+            echo "tags<<EOF"
+            echo "$TAGS" | sed 's/^[[:space:]]*//'
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Build and push
         uses: docker/build-push-action@v6

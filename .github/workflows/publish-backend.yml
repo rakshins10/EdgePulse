@@ -4,9 +4,11 @@
 # These two .NET services share the Domain/Application/Infrastructure libraries,
 # so they version together as one "backend" line (source: src/Directory.Build.props).
 #
-#   • Push to main touching backend code → BETA images (:main, :sha-<commit>)
+#   • Push to main touching backend code → BETA images (:X.Y.Z-beta.N, :beta, :main, :sha-<commit>)
 #   • Push tag `backend-v1.2.3`          → RELEASE images (:1.2.3, :1.2, :latest)
 #                                          + a GitHub Release
+#
+# Next-version source: the "## [Unreleased]" line of src/CHANGELOG.md.
 # ─────────────────────────────────────────────────────────────────────────────
 name: Publish — Backend
 
@@ -20,6 +22,7 @@ on:
       - 'src/EdgePulse.API/**'
       - 'src/EdgePulse.TelemetryProcessor/**'
       - 'src/Directory.Build.props'
+      - 'src/CHANGELOG.md'
     tags: ['backend-v*']
 
 permissions:
@@ -33,15 +36,17 @@ jobs:
       channel: ${{ steps.m.outputs.channel }}
       version: ${{ steps.m.outputs.version }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # need tags + full history for the beta number
       - id: m
-        run: |
-          if [ "${{ github.ref_type }}" = "tag" ]; then
-            echo "channel=release" >> "$GITHUB_OUTPUT"
-            echo "version=${GITHUB_REF_NAME#backend-v}" >> "$GITHUB_OUTPUT"
-          else
-            echo "channel=beta" >> "$GITHUB_OUTPUT"
-            echo "version=" >> "$GITHUB_OUTPUT"
-          fi
+        uses: ./.github/actions/component-version
+        with:
+          tag-prefix: backend
+          changelog: src/CHANGELOG.md
+          paths: >-
+            src/EdgePulse.Domain src/EdgePulse.Application src/EdgePulse.Infrastructure
+            src/EdgePulse.API src/EdgePulse.TelemetryProcessor src/Directory.Build.props src/CHANGELOG.md
 
   publish:
     needs: meta

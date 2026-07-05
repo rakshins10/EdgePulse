@@ -1,0 +1,85 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Composite action: compute a component's channel + version.
+#
+#   • On a release tag (<prefix>-vX.Y.Z)  → channel=release, version=X.Y.Z
+#   • On a push to main (beta)            → channel=beta,
+#         version = <next>-beta.<N>
+#     where:
+#       <next> = the target version on the "## [Unreleased]" line of the
+#                component's CHANGELOG.md (e.g. "## [Unreleased] — v0.0.1")
+#       <N>    = number of commits touching this component since its last
+#                release tag (or since the changelog was introduced). Auto-
+#                increments every merge and resets to 1 after each release.
+#
+# Requires the calling job to check out with fetch-depth: 0 (needs tags + history).
+# ─────────────────────────────────────────────────────────────────────────────
+name: Compute component version
+description: Emit channel + version for one release line (release from tag, else <changelog-target>-beta.<N>).
+
+inputs:
+  tag-prefix:
+    description: 'Release tag prefix for this component, e.g. "dashboard" (tags look like dashboard-v1.2.3).'
+    required: true
+  changelog:
+    description: 'Path to this component''s CHANGELOG.md (its "## [Unreleased]" line declares the next version).'
+    required: true
+  paths:
+    description: 'Space-separated paths that belong to this component (used to count commits for the beta number).'
+    required: true
+
+outputs:
+  channel:
+    description: '"release" or "beta".'
+    value: ${{ steps.compute.outputs.channel }}
+  version:
+    description: 'X.Y.Z for a release, or X.Y.Z-beta.N for a beta.'
+    value: ${{ steps.compute.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - id: compute
+      shell: bash
+      run: |
+        set -euo pipefail
+        PREFIX='${{ inputs.tag-prefix }}'
+        CHANGELOG='${{ inputs.changelog }}'
+        PATHS='${{ inputs.paths }}'
+
+        # --- next target version from the changelog's Unreleased heading --------
+        BASE=$(grep -m1 -iE '^##[[:space:]]*\[unreleased\]' "$CHANGELOG" \
+                 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
+        if [ -z "$BASE" ]; then
+          echo "::error::Could not read a target version from the '## [Unreleased]' line of $CHANGELOG (expected e.g. '## [Unreleased] — v0.0.1')."
+          exit 1
+        fi
+
+        # --- release: version comes straight from the tag ----------------------
+        if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
+          echo "channel=release" >> "$GITHUB_OUTPUT"
+          echo "version=${GITHUB_REF_NAME#${PREFIX}-v}" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        # --- guard: the Unreleased target must not already be released ----------
+        if git rev-parse -q --verify "refs/tags/${PREFIX}-v${BASE}" >/dev/null 2>&1; then
+          echo "::error::${PREFIX} v${BASE} is already released, but the changelog '## [Unreleased]' target is still ${BASE}. Bump it to the next version."
+          exit 1
+        fi
+
+        # --- beta number: commits since the last release (or changelog birth) ---
+        LAST_TAG=$(git tag -l "${PREFIX}-v*" --sort=-v:refname | head -1 || true)
+        if [ -n "$LAST_TAG" ]; then
+          RANGE="${LAST_TAG}..HEAD"
+        else
+          BASELINE=$(git log --diff-filter=A --format=%H -- "$CHANGELOG" | tail -1 || true)
+          if [ -n "$BASELINE" ]; then RANGE="${BASELINE}..HEAD"; else RANGE="HEAD"; fi
+        fi
+
+        # shellcheck disable=SC2086
+        N=$(git rev-list --count $RANGE -- $PATHS 2>/dev/null || echo 0)
+        [ "$N" -lt 1 ] && N=1
+
+        echo "channel=beta" >> "$GITHUB_OUTPUT"
+        echo "version=${BASE}-beta.${N}" >> "$GITHUB_OUTPUT"
+        echo "Computed beta version: ${BASE}-beta.${N}  (range: ${RANGE})"

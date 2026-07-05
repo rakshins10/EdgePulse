@@ -1,7 +1,7 @@
 # Publish — Dashboard
-#   • Push to main touching the dashboard → BETA image (:main, :sha-<commit>)
+#   • Push to main touching the dashboard → BETA image (:X.Y.Z-beta.N, :beta, :main, :sha-<commit>)
 #   • Push tag `dashboard-v1.2.3`         → RELEASE image (:1.2.3, :1.2, :latest) + GitHub Release
-# Version source: src/EdgePulse.Dashboard/package.json
+# Next-version source: the "## [Unreleased]" line of src/EdgePulse.Dashboard/CHANGELOG.md
 name: Publish — Dashboard
 
 on:
@@ -21,15 +21,15 @@ jobs:
       channel: ${{ steps.m.outputs.channel }}
       version: ${{ steps.m.outputs.version }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # need tags + full history for the beta number
       - id: m
-        run: |
-          if [ "${{ github.ref_type }}" = "tag" ]; then
-            echo "channel=release" >> "$GITHUB_OUTPUT"
-            echo "version=${GITHUB_REF_NAME#dashboard-v}" >> "$GITHUB_OUTPUT"
-          else
-            echo "channel=beta" >> "$GITHUB_OUTPUT"
-            echo "version=" >> "$GITHUB_OUTPUT"
-          fi
+        uses: ./.github/actions/component-version
+        with:
+          tag-prefix: dashboard
+          changelog: src/EdgePulse.Dashboard/CHANGELOG.md
+          paths: src/EdgePulse.Dashboard
 
   publish:
     needs: meta
