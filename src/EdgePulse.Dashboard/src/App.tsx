@@ -1,4 +1,6 @@
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import { ToastProvider } from './context/ToastContext';
+import { ConfirmProvider } from './context/ConfirmContext';
 import AppLayout from './components/layout/AppLayout';
 import AlertsPage from './pages/alerts/AlertsPage';
 import DashboardPage from './pages/DashboardPage';
@@ -26,5 +28,11 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ToastProvider>
+      <ConfirmProvider>
+        <RouterProvider router={router} />
+      </ConfirmProvider>
+    </ToastProvider>
+  );
 }

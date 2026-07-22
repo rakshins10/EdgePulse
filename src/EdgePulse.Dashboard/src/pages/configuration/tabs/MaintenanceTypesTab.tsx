@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import {
   getMaintenanceTypes, createMaintenanceType, updateMaintenanceType, deleteMaintenanceType,
 } from '../../../api/configuration';
+import { useConfirm } from '../../../context/ConfirmContext';
+import { useToast } from '../../../context/ToastContext';
 import type { MaintenanceTypeDto } from '../../../types/api';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import Modal from '../../../components/common/Modal';
@@ -13,6 +15,8 @@ import f from '../../../components/common/FormField.module.css';
 export default function MaintenanceTypesTab() {
   const { t } = useTranslation();
   const qc = useQueryClient();
+  const confirm = useConfirm();
+  const toast = useToast();
   const { data = [], isLoading } = useQuery({ queryKey: ['maintenance-types'], queryFn: getMaintenanceTypes });
 
   const [open, setOpen]       = useState(false);
@@ -54,11 +58,17 @@ export default function MaintenanceTypesTab() {
   }
 
   async function handleDelete(row: MaintenanceTypeDto) {
-    if (!confirm(t('configuration.maintenanceTypes.deleteConfirm', { name: row.name }))) return;
+    const ok = await confirm({
+      message: t('configuration.maintenanceTypes.deleteConfirm', { name: row.name }),
+      variant: 'danger',
+      confirmLabel: t('common.delete'),
+    });
+    if (!ok) return;
     try {
       await deleteMaintenanceType(row.id);
       await qc.invalidateQueries({ queryKey: ['maintenance-types'] });
-    } catch { alert(t('configuration.lookup.errorDelete')); }
+      toast.success(t('configuration.lookup.deleted', { name: row.name }));
+    } catch { toast.error(t('configuration.lookup.errorDelete')); }
   }
 
   if (isLoading) return <LoadingSpinner message={t('common.loading')} />;

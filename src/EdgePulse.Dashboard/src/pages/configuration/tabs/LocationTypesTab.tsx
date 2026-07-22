@@ -7,6 +7,8 @@ import {
   updateLocationType,
   deleteLocationType,
 } from '../../../api/configuration';
+import { useConfirm } from '../../../context/ConfirmContext';
+import { useToast } from '../../../context/ToastContext';
 import type { LocationTypeDto } from '../../../types/api';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import Modal from '../../../components/common/Modal';
@@ -16,6 +18,8 @@ import f from '../../../components/common/FormField.module.css';
 export default function LocationTypesTab() {
   const { t } = useTranslation();
   const qc = useQueryClient();
+  const confirm = useConfirm();
+  const toast = useToast();
   const { data = [], isLoading } = useQuery({ queryKey: ['location-types'], queryFn: getLocationTypes });
 
   const [open, setOpen]       = useState(false);
@@ -59,12 +63,18 @@ export default function LocationTypesTab() {
   }
 
   async function handleDelete(row: LocationTypeDto) {
-    if (!confirm(t('configuration.locationTypes.deleteConfirm', { name: row.name }))) return;
+    const ok = await confirm({
+      message: t('configuration.locationTypes.deleteConfirm', { name: row.name }),
+      variant: 'danger',
+      confirmLabel: t('common.delete'),
+    });
+    if (!ok) return;
     try {
       await deleteLocationType(row.id);
       await qc.invalidateQueries({ queryKey: ['location-types'] });
+      toast.success(t('configuration.lookup.deleted', { name: row.name }));
     } catch {
-      alert(t('configuration.lookup.errorDelete'));
+      toast.error(t('configuration.lookup.errorDelete'));
     }
   }
 

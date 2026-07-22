@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import {
   getMetricTypes, createMetricType, updateMetricType, deleteMetricType,
 } from '../../../api/configuration';
+import { useConfirm } from '../../../context/ConfirmContext';
+import { useToast } from '../../../context/ToastContext';
 import type { MetricTypeDto } from '../../../types/api';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import Modal from '../../../components/common/Modal';
@@ -13,6 +15,8 @@ import f from '../../../components/common/FormField.module.css';
 export default function MetricTypesTab() {
   const { t } = useTranslation();
   const qc = useQueryClient();
+  const confirm = useConfirm();
+  const toast = useToast();
   const { data = [], isLoading } = useQuery({ queryKey: ['metric-types'], queryFn: getMetricTypes });
 
   const [open, setOpen]       = useState(false);
@@ -54,11 +58,17 @@ export default function MetricTypesTab() {
   }
 
   async function handleDelete(row: MetricTypeDto) {
-    if (!confirm(t('configuration.metricTypes.deleteConfirm', { name: row.name }))) return;
+    const ok = await confirm({
+      message: t('configuration.metricTypes.deleteConfirm', { name: row.name }),
+      variant: 'danger',
+      confirmLabel: t('common.delete'),
+    });
+    if (!ok) return;
     try {
       await deleteMetricType(row.id);
       await qc.invalidateQueries({ queryKey: ['metric-types'] });
-    } catch { alert(t('configuration.lookup.errorDelete')); }
+      toast.success(t('configuration.lookup.deleted', { name: row.name }));
+    } catch { toast.error(t('configuration.lookup.errorDelete')); }
   }
 
   if (isLoading) return <LoadingSpinner message={t('common.loading')} />;

@@ -7,6 +7,8 @@ import { getMills, getAreas } from '../../api/organisation';
 import { getDeviceTypes, getDeviceStatuses } from '../../api/configuration';
 import type { DeviceListDto } from '../../types/api';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
+import { useConfirm } from '../../context/ConfirmContext';
+import { useToast } from '../../context/ToastContext';
 import Badge from '../../components/common/Badge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Modal from '../../components/common/Modal';
@@ -26,6 +28,8 @@ export default function DevicesPage() {
   const navigate = useNavigate();
   const user = useCurrentUser();
   const qc = useQueryClient();
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const [millFilter, setMillFilter] = useState('');
   const [areaFilter, setAreaFilter] = useState('');
@@ -92,13 +96,18 @@ export default function DevicesPage() {
 
   // ── Decommission ──────────────────────────────────────────────────────────
   async function handleDecommission(device: DeviceListDto) {
-    const ok = confirm(t('devices.decommissionConfirm', { name: device.name }));
+    const ok = await confirm({
+      message: t('devices.decommissionConfirm', { name: device.name }),
+      variant: 'danger',
+      confirmLabel: t('devices.decommission'),
+    });
     if (!ok) return;
     try {
       await decommissionDevice(device.id);
       await qc.invalidateQueries({ queryKey: ['devices'] });
+      toast.success(t('devices.decommissioned', { name: device.name }));
     } catch {
-      alert(t('devices.decommissionError'));
+      toast.error(t('devices.decommissionError'));
     }
   }
 

@@ -9,6 +9,8 @@ import {
 import {
   englishUiStrings, buildExportCsv, splitImportRows,
 } from '../../../i18n/translationTools';
+import { useConfirm } from '../../../context/ConfirmContext';
+import { useToast } from '../../../context/ToastContext';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import Modal from '../../../components/common/Modal';
 import styles from './LookupTable.module.css';
@@ -17,6 +19,8 @@ import f from '../../../components/common/FormField.module.css';
 export default function LanguagesTab() {
   const { t } = useTranslation();
   const qc = useQueryClient();
+  const confirm = useConfirm();
+  const toast = useToast();
   const { data = [], isLoading } = useQuery({ queryKey: ['locales', 'all'], queryFn: () => getLocales(false) });
 
   const [open, setOpen]       = useState(false);
@@ -138,14 +142,20 @@ export default function LanguagesTab() {
   }
 
   async function handleDelete(row: LocaleDto) {
-    if (!confirm(t('configuration.languages.deleteConfirm', { name: row.displayName }))) return;
+    const ok = await confirm({
+      message: t('configuration.languages.deleteConfirm', { name: row.displayName }),
+      variant: 'danger',
+      confirmLabel: t('common.delete'),
+    });
+    if (!ok) return;
     try {
       await deleteLocale(row.id);
       await refresh();
+      toast.success(t('configuration.lookup.deleted', { name: row.displayName }));
     } catch (err) {
       const msg = (err as { response?: { data?: { title?: string } } })?.response?.data?.title
         ?? t('configuration.languages.errorDelete');
-      alert(msg);
+      toast.error(msg);
     }
   }
 
@@ -154,7 +164,7 @@ export default function LanguagesTab() {
       await setDefaultLocale(row.id);
       await refresh();
     } catch {
-      alert(t('configuration.languages.errorSetDefault'));
+      toast.error(t('configuration.languages.errorSetDefault'));
     }
   }
 

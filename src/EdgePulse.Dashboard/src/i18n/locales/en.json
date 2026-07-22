@@ -7,9 +7,11 @@
     "create": "Create",
     "creating": "Creating…",
     "cancel": "Cancel",
+    "confirm": "Confirm",
     "close": "Close",
     "edit": "Edit",
     "delete": "Delete",
+    "deleted": "\"{{name}}\" deleted.",
     "add": "Add",
     "yes": "Yes",
     "no": "No",
@@ -126,6 +128,7 @@
     "decommission": "Decommission",
     "decommissionConfirm": "Decommission \"{{name}}\"?\n\nThis will revoke its API keys. Telemetry data is preserved.",
     "decommissionError": "Failed to decommission device.",
+    "decommissioned": "\"{{name}}\" decommissioned.",
     "registerModal": {
       "title": "Register Device",
       "name": "Device Name",
@@ -283,7 +286,8 @@
       "empty": "No items defined.",
       "errorCreate": "Failed to create. Code may already exist.",
       "errorUpdate": "Failed to update.",
-      "errorDelete": "Failed to delete. It may be in use or be a system item."
+      "errorDelete": "Failed to delete. It may be in use or be a system item.",
+      "deleted": "\"{{name}}\" deleted."
     },
     "locationTypes": {
       "count_one": "{{count}} location type",

@@ -7,9 +7,11 @@
     "create": "Skapa",
     "creating": "Skapar…",
     "cancel": "Avbryt",
+    "confirm": "Bekräfta",
     "close": "Stäng",
     "edit": "Redigera",
     "delete": "Ta bort",
+    "deleted": "\"{{name}}\" borttagen.",
     "add": "Lägg till",
     "yes": "Ja",
     "no": "Nej",
@@ -126,6 +128,7 @@
     "decommission": "Avveckla",
     "decommissionConfirm": "Avveckla \"{{name}}\"?\n\nDetta återkallar dess API-nycklar. Telemetridata bevaras.",
     "decommissionError": "Det gick inte att avveckla enheten.",
+    "decommissioned": "\"{{name}}\" avvecklad.",
     "registerModal": {
       "title": "Registrera enhet",
       "name": "Enhetsnamn",
@@ -283,7 +286,8 @@
       "empty": "Inga objekt definierade.",
       "errorCreate": "Det gick inte att skapa. Koden kan redan finnas.",
       "errorUpdate": "Det gick inte att uppdatera.",
-      "errorDelete": "Det gick inte att ta bort. Det kan vara i bruk eller vara ett systemobjekt."
+      "errorDelete": "Det gick inte att ta bort. Det kan vara i bruk eller vara ett systemobjekt.",
+      "deleted": "\"{{name}}\" borttagen."
     },
     "locationTypes": {
       "count_one": "{{count}} platstyp",

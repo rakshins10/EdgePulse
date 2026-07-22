@@ -7,9 +7,11 @@
     "create": "Luo",
     "creating": "Luodaan…",
     "cancel": "Peruuta",
+    "confirm": "Vahvista",
     "close": "Sulje",
     "edit": "Muokkaa",
     "delete": "Poista",
+    "deleted": "\"{{name}}\" poistettu.",
     "add": "Lisää",
     "yes": "Kyllä",
     "no": "Ei",
@@ -126,6 +128,7 @@
     "decommission": "Poista käytöstä",
     "decommissionConfirm": "Poista käytöstä \"{{name}}\"?\n\nTämä mitätöi API-avaimet. Telemetriadata säilyy.",
     "decommissionError": "Laitteen käytöstä poisto epäonnistui.",
+    "decommissioned": "\"{{name}}\" poistettu käytöstä.",
     "registerModal": {
       "title": "Rekisteröi laite",
       "name": "Laitteen nimi",
@@ -283,7 +286,8 @@
       "empty": "Ei kohteita määritetty.",
       "errorCreate": "Luonti epäonnistui. Koodi voi olla jo käytössä.",
       "errorUpdate": "Päivitys epäonnistui.",
-      "errorDelete": "Poisto epäonnistui. Se voi olla käytössä tai järjestelmäkohde."
+      "errorDelete": "Poisto epäonnistui. Se voi olla käytössä tai järjestelmäkohde.",
+      "deleted": "\"{{name}}\" poistettu."
     },
     "locationTypes": {
       "count_one": "{{count}} sijaintityyppi",

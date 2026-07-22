@@ -7,6 +7,8 @@ import {
   createArea, updateArea, deleteArea,
 } from '../../api/organisation';
 import { getLocationTypes } from '../../api/configuration';
+import { useConfirm } from '../../context/ConfirmContext';
+import { useToast } from '../../context/ToastContext';
 import type { MillDto, AreaDto, DeploymentMode } from '../../types/api';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
 import Badge from '../../components/common/Badge';
@@ -36,6 +38,8 @@ export default function MillsPage() {
   const { t } = useTranslation();
   const user = useCurrentUser();
   const qc = useQueryClient();
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const { data: mills = [], isLoading: millsLoading } = useQuery({ queryKey: ['mills'], queryFn: getMills });
   const { data: areas = [], isLoading: areasLoading } = useQuery({ queryKey: ['areas'], queryFn: () => getAreas() });
@@ -89,14 +93,20 @@ export default function MillsPage() {
   }
 
   async function handleDeleteMill(mill: MillDto) {
-    if (!confirm(t('mills.deleteConfirm', { name: mill.name }))) return;
+    const ok = await confirm({
+      message: t('mills.deleteConfirm', { name: mill.name }),
+      variant: 'danger',
+      confirmLabel: t('common.delete'),
+    });
+    if (!ok) return;
     try {
       await deleteMill(mill.id);
       await qc.invalidateQueries({ queryKey: ['mills'] });
+      toast.success(t('common.deleted', { name: mill.name }));
     } catch (err) {
       const msg = (err as { response?: { data?: { title?: string } } })?.response?.data?.title
         ?? t('mills.deleteFallback');
-      alert(msg);
+      toast.error(msg);
     }
   }
 
@@ -153,14 +163,20 @@ export default function MillsPage() {
   }
 
   async function handleDeleteArea(area: AreaDto) {
-    if (!confirm(t('mills.deleteAreaConfirm', { name: area.name }))) return;
+    const ok = await confirm({
+      message: t('mills.deleteAreaConfirm', { name: area.name }),
+      variant: 'danger',
+      confirmLabel: t('common.delete'),
+    });
+    if (!ok) return;
     try {
       await deleteArea(area.id);
       await qc.invalidateQueries({ queryKey: ['areas'] });
+      toast.success(t('common.deleted', { name: area.name }));
     } catch (err) {
       const msg = (err as { response?: { data?: { title?: string } } })?.response?.data?.title
         ?? t('mills.deleteAreaFallback');
-      alert(msg);
+      toast.error(msg);
     }
   }
 

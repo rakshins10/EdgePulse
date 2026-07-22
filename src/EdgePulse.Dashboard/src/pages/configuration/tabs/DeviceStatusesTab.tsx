@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import {
   getDeviceStatuses, createDeviceStatus, updateDeviceStatus, deleteDeviceStatus,
 } from '../../../api/configuration';
+import { useConfirm } from '../../../context/ConfirmContext';
+import { useToast } from '../../../context/ToastContext';
 import type { DeviceStatusDto } from '../../../types/api';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import Modal from '../../../components/common/Modal';
@@ -13,6 +15,8 @@ import f from '../../../components/common/FormField.module.css';
 export default function DeviceStatusesTab() {
   const { t } = useTranslation();
   const qc = useQueryClient();
+  const confirm = useConfirm();
+  const toast = useToast();
   const { data = [], isLoading } = useQuery({ queryKey: ['device-statuses'], queryFn: getDeviceStatuses });
 
   const [open, setOpen]       = useState(false);
@@ -54,11 +58,17 @@ export default function DeviceStatusesTab() {
   }
 
   async function handleDelete(row: DeviceStatusDto) {
-    if (!confirm(t('configuration.deviceStatuses.deleteConfirm', { name: row.name }))) return;
+    const ok = await confirm({
+      message: t('configuration.deviceStatuses.deleteConfirm', { name: row.name }),
+      variant: 'danger',
+      confirmLabel: t('common.delete'),
+    });
+    if (!ok) return;
     try {
       await deleteDeviceStatus(row.id);
       await qc.invalidateQueries({ queryKey: ['device-statuses'] });
-    } catch { alert(t('configuration.lookup.errorDelete')); }
+      toast.success(t('configuration.lookup.deleted', { name: row.name }));
+    } catch { toast.error(t('configuration.lookup.errorDelete')); }
   }
 
   if (isLoading) return <LoadingSpinner message={t('common.loading')} />;
