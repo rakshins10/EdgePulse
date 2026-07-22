@@ -335,6 +335,43 @@ public class ConfigurationController : ControllerBase
         return CreatedAtAction(nameof(GetLocationTypes), new { }, id);
     }
 
+    /// <summary>
+    /// Update a custom location type.
+    /// </summary>
+    [HttpPut("location-types/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> UpdateLocationType(
+        Guid id,
+        [FromBody] UpdateLocationTypeRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new UpdateLocationTypeCommand(
+                id, request.Name, request.Description, request.SortOrder),
+            cancellationToken);
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Delete (deactivate) a custom location type.
+    /// </summary>
+    [HttpDelete("location-types/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> DeleteLocationType(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new DeleteLocationTypeCommand(id), cancellationToken);
+        return NoContent();
+    }
+
     // =============================================
     // METRIC TYPES -- POST
     // =============================================
@@ -358,6 +395,43 @@ public class ConfigurationController : ControllerBase
                 request.SortOrder),
             cancellationToken);
         return CreatedAtAction(nameof(GetMetricTypes), new { }, id);
+    }
+
+    /// <summary>
+    /// Update a custom metric type.
+    /// </summary>
+    [HttpPut("metric-types/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> UpdateMetricType(
+        Guid id,
+        [FromBody] UpdateMetricTypeRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new UpdateMetricTypeCommand(
+                id, request.Name, request.DefaultUnit,
+                request.Description, request.SortOrder),
+            cancellationToken);
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Delete (deactivate) a custom metric type.
+    /// </summary>
+    [HttpDelete("metric-types/{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> DeleteMetricType(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new DeleteMetricTypeCommand(id), cancellationToken);
+        return NoContent();
     }
 
     // =============================================
@@ -599,9 +673,22 @@ public record CreateLocationTypeRequest(
     int SortOrder = 0
 );
 
+public record UpdateLocationTypeRequest(
+    string Name,
+    string? Description,
+    int SortOrder = 0
+);
+
 public record CreateMetricTypeRequest(
     string Name,
     string Code,
+    string DefaultUnit,
+    string? Description,
+    int SortOrder = 0
+);
+
+public record UpdateMetricTypeRequest(
+    string Name,
     string DefaultUnit,
     string? Description,
     int SortOrder = 0

@@ -59,4 +59,18 @@ public class MetricType : LookupBaseEntity
             UpdatedAt = DateTime.UtcNow
         };
     }
+
+    /// <summary>
+    /// Update the default unit of measure. System metric types are protected —
+    /// tenants customise them via a TenantLookupOverride instead.
+    /// </summary>
+    public void UpdateDefaultUnit(string defaultUnit)
+    {
+        if (IsSystem)
+            throw new InvalidOperationException(
+                "System metric types cannot be modified directly. " +
+                "Use TenantLookupOverride instead.");
+        DefaultUnit = defaultUnit;
+        MarkAsUpdated();
+    }
 }
