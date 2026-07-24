@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet, useMatches } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Sidebar from './Sidebar';
 import ThemeToggle from './ThemeToggle';
 import LanguageSwitcher from './LanguageSwitcher';
 import NotificationBell from './NotificationBell';
+import { useQuery } from '@tanstack/react-query';
+import { getBranding } from '../../api/branding';
 import styles from './AppLayout.module.css';
 
 interface RouteHandle {
@@ -20,6 +22,23 @@ export default function AppLayout() {
   const lastMatch = matches[matches.length - 1];
   const handle = lastMatch?.handle as RouteHandle | undefined;
   const title = handle?.titleKey ? t(handle.titleKey) : (handle?.title ?? 'EdgePulse');
+
+  // White-label branding: product name in the tab title, accent colour as CSS var
+  const { data: branding } = useQuery({ queryKey: ['branding'], queryFn: getBranding });
+  useEffect(() => {
+    if (!branding) return;
+    document.title = branding.productName;
+    const root = document.documentElement;
+    if (branding.accentColor) {
+      root.style.setProperty('--color-accent', branding.accentColor);
+      root.style.setProperty('--color-accent-hover', branding.accentColor);
+      root.style.setProperty('--color-nav-active-border', branding.accentColor);
+    } else {
+      root.style.removeProperty('--color-accent');
+      root.style.removeProperty('--color-accent-hover');
+      root.style.removeProperty('--color-nav-active-border');
+    }
+  }, [branding]);
 
   // Mobile drawer (overlay) state
   const [sidebarOpen, setSidebarOpen] = useState(false);

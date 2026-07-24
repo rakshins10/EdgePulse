@@ -7,11 +7,12 @@ import DeviceTypesTab from './tabs/DeviceTypesTab';
 import DeviceStatusesTab from './tabs/DeviceStatusesTab';
 import LanguagesTab from './tabs/LanguagesTab';
 import TranslationsTab from './tabs/TranslationsTab';
+import BrandingTab from './tabs/BrandingTab';
 import styles from './ConfigurationPage.module.css';
 
 type TabKey =
   | 'location-types' | 'maintenance-types' | 'metric-types'
-  | 'device-types' | 'device-statuses' | 'languages' | 'translations';
+  | 'device-types' | 'device-statuses' | 'languages' | 'translations' | 'branding';
 
 const TABS: { key: TabKey; labelKey: string; hintKey?: string }[] = [
   { key: 'location-types',    labelKey: 'configuration.tabs.locationTypes',    hintKey: 'configuration.hints.locationTypes' },
@@ -21,6 +22,7 @@ const TABS: { key: TabKey; labelKey: string; hintKey?: string }[] = [
   { key: 'metric-types',      labelKey: 'configuration.tabs.metricTypes',      hintKey: 'configuration.hints.metricTypes' },
   { key: 'languages',         labelKey: 'configuration.tabs.languages' },
   { key: 'translations',      labelKey: 'configuration.tabs.translations' },
+  { key: 'branding',          labelKey: 'configuration.tabs.branding',         hintKey: 'configuration.hints.branding' },
 ];
 
 export default function ConfigurationPage() {
@@ -52,6 +54,7 @@ export default function ConfigurationPage() {
         {tab === 'device-statuses'   && <DeviceStatusesTab />}
         {tab === 'languages'         && <LanguagesTab />}
         {tab === 'translations'      && <TranslationsTab />}
+        {tab === 'branding'          && <BrandingTab />}
       </div>
     </div>
   );

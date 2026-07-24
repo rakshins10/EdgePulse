@@ -242,7 +242,8 @@
       "maintenanceTypes": "Underhållstyper",
       "metricTypes": "Mätetyper",
       "languages": "Språk",
-      "translations": "Översättningar"
+      "translations": "Översättningar",
+      "branding": "Varumärke"
     },
     "languages": {
       "hint": "Hantera språken som är tillgängliga i plattformen. Standardspråket kan inte inaktiveras eller tas bort.",
@@ -304,7 +305,8 @@
       "deviceTypes": "Pump, Motor, Ventil, Sensor…",
       "deviceStatuses": "Online, Offline, Underhåll, Avvecklad",
       "maintenanceTypes": "Förebyggande, Korrigerande, Inspektion…",
-      "metricTypes": "Temperatur, Tryck, Vibration, Flöde…"
+      "metricTypes": "Temperatur, Tryck, Vibration, Flöde…",
+      "branding": "Anpassa plattformen för denna kund: produktnamn, logotyp och accentfärg gäller hela gränssnittet."
     },
     "lookup": {
       "name": "Namn",
@@ -372,6 +374,14 @@
       "codePlaceholder": "t.ex. temperature",
       "unitPlaceholder": "t.ex. °C, mm/s, bar",
       "deleteConfirm": "Ta bort mätetypen \"{{name}}\"?"
+    },
+    "branding": {
+      "productName": "Produktnamn",
+      "logoUrl": "Logotypens URL",
+      "accent": "Accentfärg",
+      "accentDefault": "EdgePulse-standard",
+      "saved": "Varumärket sparat. Gäller direkt.",
+      "saveError": "Det gick inte att spara varumärket."
     }
   },
   "language": {

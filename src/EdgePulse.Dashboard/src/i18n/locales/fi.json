@@ -242,7 +242,8 @@
       "maintenanceTypes": "Huoltotyypit",
       "metricTypes": "Mittaustyypit",
       "languages": "Kielet",
-      "translations": "Käännökset"
+      "translations": "Käännökset",
+      "branding": "Brändäys"
     },
     "languages": {
       "hint": "Hallitse alustalla käytettävissä olevia kieliä. Oletuskieltä ei voi poistaa käytöstä tai poistaa.",
@@ -304,7 +305,8 @@
       "deviceTypes": "Pumppu, Moottori, Venttiili, Anturi…",
       "deviceStatuses": "Online, Offline, Huolto, Käytöstä poistettu",
       "maintenanceTypes": "Ennakoiva, Korjaava, Tarkastus…",
-      "metricTypes": "Lämpötila, Paine, Tärinä, Virtaus…"
+      "metricTypes": "Lämpötila, Paine, Tärinä, Virtaus…",
+      "branding": "Mukauta alusta tälle asiakkaalle: tuotenimi, logo ja korostusväri vaikuttavat koko käyttöliittymään."
     },
     "lookup": {
       "name": "Nimi",
@@ -372,6 +374,14 @@
       "codePlaceholder": "esim. temperature",
       "unitPlaceholder": "esim. °C, mm/s, bar",
       "deleteConfirm": "Poista mittaustyyppi \"{{name}}\"?"
+    },
+    "branding": {
+      "productName": "Tuotenimi",
+      "logoUrl": "Logon URL",
+      "accent": "Korostusväri",
+      "accentDefault": "EdgePulse-oletus",
+      "saved": "Brändäys tallennettu. Tulee voimaan heti.",
+      "saveError": "Brändäyksen tallennus epäonnistui."
     }
   },
   "language": {

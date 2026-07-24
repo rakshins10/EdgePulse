@@ -242,7 +242,8 @@
       "maintenanceTypes": "Maintenance Types",
       "metricTypes": "Metric Types",
       "languages": "Languages",
-      "translations": "Translations"
+      "translations": "Translations",
+      "branding": "Branding"
     },
     "languages": {
       "hint": "Manage the languages available across the platform. The default language cannot be disabled or deleted.",
@@ -304,7 +305,8 @@
       "deviceTypes": "Pump, Motor, Valve, Sensor…",
       "deviceStatuses": "Online, Offline, Maintenance, Decommissioned",
       "maintenanceTypes": "Preventive, Corrective, Inspection…",
-      "metricTypes": "Temperature, Pressure, Vibration, Flow rate…"
+      "metricTypes": "Temperature, Pressure, Vibration, Flow rate…",
+      "branding": "White-label the platform for this tenant: product name, logo and accent colour apply to the whole dashboard."
     },
     "lookup": {
       "name": "Name",
@@ -372,6 +374,14 @@
       "codePlaceholder": "e.g. temperature",
       "unitPlaceholder": "e.g. °C, mm/s, bar",
       "deleteConfirm": "Delete metric type \"{{name}}\"?"
+    },
+    "branding": {
+      "productName": "Product name",
+      "logoUrl": "Logo URL",
+      "accent": "Accent colour",
+      "accentDefault": "EdgePulse default",
+      "saved": "Branding saved. It applies immediately.",
+      "saveError": "Failed to save branding."
     }
   },
   "language": {

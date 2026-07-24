@@ -36,6 +36,7 @@ public class InMemoryApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<WorkOrder>            WorkOrderSet        => Set<WorkOrder>();
     public DbSet<AuditLog>             AuditLogSet         => Set<AuditLog>();
     public DbSet<WebhookSubscription>  WebhookSet          => Set<WebhookSubscription>();
+    public DbSet<TenantBranding>       BrandingSet         => Set<TenantBranding>();
     public DbSet<AlertThreshold>       AlertThresholdSet   => Set<AlertThreshold>();
     public DbSet<Alert>                AlertSet            => Set<Alert>();
     public DbSet<Locale>               LocaleSet           => Set<Locale>();
@@ -71,6 +72,7 @@ public class InMemoryApplicationDbContext : DbContext, IApplicationDbContext
     IQueryable<WorkOrder>            IApplicationDbContext.WorkOrders            => Set<WorkOrder>();
     IQueryable<AuditLog>             IApplicationDbContext.AuditLogs             => Set<AuditLog>();
     IQueryable<WebhookSubscription>  IApplicationDbContext.WebhookSubscriptions  => Set<WebhookSubscription>();
+    IQueryable<TenantBranding>       IApplicationDbContext.TenantBrandings       => Set<TenantBranding>();
 
     public new void Add<TEntity>(TEntity entity) where TEntity : class => base.Add(entity);
     public new void Update<TEntity>(TEntity entity) where TEntity : class => base.Update(entity);

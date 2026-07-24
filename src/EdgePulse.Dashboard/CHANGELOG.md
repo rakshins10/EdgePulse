@@ -16,6 +16,8 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 8–16 ships here.
 
 ### Added
+- **Branding (Sprint 28)** — Configuration → Branding tab; product name,
+  accent colour and title applied live across the shell.
 - **Floor Plan page (Sprint 27)** — live 2D mill map (pulsing critical dots,
   hover details, click-through) with drag/place/remove layout editing.
 - **Device Health page (Sprint 26)** — worst-first condition board with

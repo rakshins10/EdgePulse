@@ -19,6 +19,8 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 1–16 ships here.
 
 ### Added
+- **White-label branding (Sprint 28)** — per-tenant product name / logo /
+  accent colour (TenantBranding + /api/branding GET/PUT).
 - **2D floor plan (Sprint 27)** — Device.FloorX/FloorY + /api/floorplan
   (mill devices with live status + alert counts; position editing for
   admins/MillManager).

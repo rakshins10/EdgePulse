@@ -6,6 +6,8 @@ import { setAlertCount } from '../../store/alertsSlice';
 import { fetchAlertCount } from '../../api/alerts';
 import keycloak from '../../keycloak';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
+import { useQuery } from '@tanstack/react-query';
+import { getBranding } from '../../api/branding';
 import styles from './Sidebar.module.css';
 
 interface SidebarProps {
@@ -49,6 +51,8 @@ export default function Sidebar({
   const user = useCurrentUser();
   const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'CustomerAdmin';
   const navItems = NAV_ITEMS.filter(item => !item.adminOnly || isAdmin);
+  const { data: branding } = useQuery({ queryKey: ['branding'], queryFn: getBranding });
+  const productName = branding?.productName ?? 'EdgePulse';
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -97,8 +101,8 @@ export default function Sidebar({
         </button>
         <div className={styles.logoBrand}>
           <div className={styles.logoText}>
-            <span className={styles.logoFull}>EdgePulse</span>
-            <span className={styles.logoMark}>EP</span>
+            <span className={styles.logoFull}>{productName}</span>
+            <span className={styles.logoMark}>{productName.slice(0, 2).toUpperCase()}</span>
           </div>
           <div className={styles.logoSub}>{t('nav.appSubtitle')}</div>
         </div>

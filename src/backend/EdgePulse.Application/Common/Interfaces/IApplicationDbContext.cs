@@ -48,6 +48,9 @@ public interface IApplicationDbContext
     // Webhooks
     IQueryable<WebhookSubscription> WebhookSubscriptions { get; }
 
+    // Branding
+    IQueryable<TenantBranding> TenantBrandings { get; }
+
     // Write operations
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     void Add<TEntity>(TEntity entity) where TEntity : class;

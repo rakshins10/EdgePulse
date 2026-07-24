@@ -88,6 +88,7 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     IQueryable<WorkOrder> IApplicationDbContext.WorkOrders => Set<WorkOrder>();
     IQueryable<AuditLog> IApplicationDbContext.AuditLogs => Set<AuditLog>();
     IQueryable<WebhookSubscription> IApplicationDbContext.WebhookSubscriptions => Set<WebhookSubscription>();
+    IQueryable<TenantBranding> IApplicationDbContext.TenantBrandings => Set<TenantBranding>();
 
     // Use 'new' keyword -- these hide DbContext methods intentionally
     public new void Add<TEntity>(TEntity entity) where TEntity : class
