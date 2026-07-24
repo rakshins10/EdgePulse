@@ -25,6 +25,25 @@
     "next": "Seuraava",
     "previous": "Edellinen"
   },
+  "attachments": {
+    "title": "Liitteet",
+    "count_one": "{{count}} tiedosto",
+    "count_other": "{{count}} tiedostoa",
+    "uploadBtn": "+ Lataa tiedosto",
+    "uploading": "Ladataan…",
+    "uploaded": "\"{{name}}\" ladattu.",
+    "uploadError": "Lataus epäonnistui. Tarkista tiedostotyyppi (dokumentit/kuvat, enintään 25 Mt).",
+    "deleteConfirm": "Poistetaanko liite \"{{name}}\"?",
+    "deleteError": "Liitteen poisto epäonnistui.",
+    "downloadError": "Tiedoston lataus epäonnistui.",
+    "empty": "Ei liitteitä vielä. Lataa käyttöohjeita, datalehtiä, kuvia tai piirustuksia.",
+    "file": "Tiedosto",
+    "category": "Luokka",
+    "size": "Koko",
+    "uploadedBy": "Lataaja",
+    "uploadedAt": "Ladattu",
+    "hint": "Sallitut: PDF, kuvat, Office-dokumentit, CSV, CAD (DWG/DXF), ZIP — enintään 25 Mt."
+  },
   "notifications": {
     "title": "Ilmoitukset",
     "markAllRead": "Merkitse kaikki luetuiksi",

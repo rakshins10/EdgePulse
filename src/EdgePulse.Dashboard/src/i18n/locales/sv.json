@@ -25,6 +25,25 @@
     "next": "Nästa",
     "previous": "Föregående"
   },
+  "attachments": {
+    "title": "Bilagor",
+    "count_one": "{{count}} fil",
+    "count_other": "{{count}} filer",
+    "uploadBtn": "+ Ladda upp fil",
+    "uploading": "Laddar upp…",
+    "uploaded": "\"{{name}}\" uppladdad.",
+    "uploadError": "Uppladdningen misslyckades. Kontrollera filtypen (dokument/bilder, max 25 MB).",
+    "deleteConfirm": "Ta bort bilagan \"{{name}}\"?",
+    "deleteError": "Det gick inte att ta bort bilagan.",
+    "downloadError": "Det gick inte att ladda ner filen.",
+    "empty": "Inga bilagor ännu. Ladda upp manualer, datablad, foton eller ritningar.",
+    "file": "Fil",
+    "category": "Kategori",
+    "size": "Storlek",
+    "uploadedBy": "Uppladdad av",
+    "uploadedAt": "Uppladdad",
+    "hint": "Tillåtna: PDF, bilder, Office-dokument, CSV, CAD (DWG/DXF), ZIP — upp till 25 MB."
+  },
   "notifications": {
     "title": "Aviseringar",
     "markAllRead": "Markera alla som lästa",

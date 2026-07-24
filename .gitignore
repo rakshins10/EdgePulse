@@ -493,3 +493,6 @@ src/EdgePulse.Dashboard/playwright-report/
 # Node.js build output
 src/EdgePulse.Ingestion/dist/
 src/EdgePulse.OpcUaAgent/dist/
+
+# Uploaded attachment files (local storage root)
+src/backend/EdgePulse.API/data/

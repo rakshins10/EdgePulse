@@ -7,6 +7,7 @@ import Badge from '../../components/common/Badge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import TelemetryChartCard from '../../components/common/TelemetryChartCard';
 import TimeRangeToolbar from '../../components/common/TimeRangeToolbar';
+import AttachmentsCard from '../../components/common/AttachmentsCard';
 import { useTimeRange } from '../../hooks/useTimeRange';
 import styles from './DeviceDetailPage.module.css';
 
@@ -88,6 +89,8 @@ export default function DeviceDetailPage() {
           </div>
         )}
       </div>
+
+      <AttachmentsCard entityType="Device" entityId={id!} />
 
       <div>
         <div className={styles.stickyToolbar}>

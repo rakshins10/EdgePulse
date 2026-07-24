@@ -16,6 +16,8 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 8–16 ships here.
 
 ### Added
+- **Attachments card (Sprint 18)** — upload/download/delete files on the
+  device detail page (hidden for read-only roles).
 - **Notification bell (Sprint 17)** — topbar bell with unread badge (30 s poll),
   dropdown panel with severity dots and relative timestamps, mark-read /
   mark-all-read, deep-link to Alerts. en/fi/sv strings.

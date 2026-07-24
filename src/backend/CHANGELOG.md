@@ -19,6 +19,9 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 1–16 ships here.
 
 ### Added
+- **File attachments (Sprint 18)** — IFileStorage + LocalFileStorage, upload/
+  list/download/delete API for Device/Mill/Area attachments with role checks,
+  extension allowlist and 25 MB limit.
 - **Notifications (Sprint 17)** — `Notification` entity + Notifications API
   (list, unread count, mark read / mark all read); the TelemetryProcessor fans
   out every fired alert to an in-app notification row **and** an SMTP email

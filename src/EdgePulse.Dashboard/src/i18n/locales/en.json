@@ -25,6 +25,25 @@
     "next": "Next",
     "previous": "Previous"
   },
+  "attachments": {
+    "title": "Attachments",
+    "count_one": "{{count}} file",
+    "count_other": "{{count}} files",
+    "uploadBtn": "+ Upload file",
+    "uploading": "Uploading…",
+    "uploaded": "\"{{name}}\" uploaded.",
+    "uploadError": "Upload failed. Check the file type (documents/images, max 25 MB).",
+    "deleteConfirm": "Delete attachment \"{{name}}\"?",
+    "deleteError": "Failed to delete attachment.",
+    "downloadError": "Failed to download file.",
+    "empty": "No attachments yet. Upload manuals, datasheets, photos or drawings.",
+    "file": "File",
+    "category": "Category",
+    "size": "Size",
+    "uploadedBy": "Uploaded by",
+    "uploadedAt": "Uploaded",
+    "hint": "Accepted: PDF, images, Office documents, CSV, CAD (DWG/DXF), ZIP — up to 25 MB."
+  },
   "notifications": {
     "title": "Notifications",
     "markAllRead": "Mark all read",

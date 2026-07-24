@@ -142,3 +142,15 @@ export interface NotificationDto {
   isRead: boolean;
   createdAt: string;
 }
+
+// ── Attachments ─────────────────────────────────────────────────────────────
+
+export interface AttachmentDto {
+  id: string;
+  fileName: string;
+  fileSize: number;
+  contentType: string;
+  fileCategory: string;
+  uploadedBy: string;
+  uploadedAt: string;
+}
