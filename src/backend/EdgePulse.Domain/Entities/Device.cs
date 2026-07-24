@@ -16,6 +16,10 @@ public class Device : TenantBaseEntity
     public DateOnly? InstallDate { get; private set; }
     public DateTime? LastSeenAt { get; private set; }
     public string? Description { get; private set; }
+    // 2D floor-plan position as percentages of the mill canvas (0–100);
+    // null = not yet placed on the plan.
+    public double? FloorX { get; private set; }
+    public double? FloorY { get; private set; }
     public Mill? Mill { get; private set; }
     public Area? Area { get; private set; }
     public DeviceType? Type { get; private set; }
@@ -56,6 +60,14 @@ public class Device : TenantBaseEntity
     public void UpdateLastSeen()
     {
         LastSeenAt = DateTime.UtcNow;
+        MarkAsUpdated();
+    }
+
+    /// <summary>Place (or clear with nulls) this device on the mill floor plan.</summary>
+    public void SetFloorPosition(double? x, double? y)
+    {
+        FloorX = x is null ? null : Math.Clamp(x.Value, 0, 100);
+        FloorY = y is null ? null : Math.Clamp(y.Value, 0, 100);
         MarkAsUpdated();
     }
 

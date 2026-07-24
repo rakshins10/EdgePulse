@@ -301,3 +301,18 @@ export interface DeviceHealthDto {
   openAlerts: number;
   worstMetric: MetricHealthDto | null;
 }
+
+// ── Floor plan ──────────────────────────────────────────────────────────────
+
+export interface FloorPlanDeviceDto {
+  deviceId: string;
+  name: string;
+  code: string;
+  areaName: string;
+  statusName: string;
+  statusColor: string | null;
+  floorX: number | null;
+  floorY: number | null;
+  openAlerts: number;
+  criticalAlerts: number;
+}

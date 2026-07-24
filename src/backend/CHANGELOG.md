@@ -19,6 +19,9 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 1–16 ships here.
 
 ### Added
+- **2D floor plan (Sprint 27)** — Device.FloorX/FloorY + /api/floorplan
+  (mill devices with live status + alert counts; position editing for
+  admins/MillManager).
 - **Device health scoring (Sprint 26)** — transparent statistical condition
   score per device (alert pressure + threshold utilization + 7-day trend)
   with linear days-to-threshold estimate; /api/healthscore/devices.

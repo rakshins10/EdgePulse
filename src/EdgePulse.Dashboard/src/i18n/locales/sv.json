@@ -64,7 +64,8 @@
     "energy": "Energi & ESG",
     "audit": "Revisionslogg",
     "integrations": "Integrationer",
-    "health": "Enhetshälsa"
+    "health": "Enhetshälsa",
+    "floorplan": "Planritning"
   },
   "mills": {
     "title": "Bruk",
@@ -564,5 +565,20 @@
     "empty": "Inga enheter med aktuell telemetri.",
     "loadError": "Det gick inte att läsa in hälsopoäng.",
     "methodNote": "Metod: poäng = 100 − viktade öppna larm − gränsnärhet − trendavdrag. Dagar-till-gräns är en linjär extrapolering av 7-dagars dagsmedel — en indikator, ingen garanti."
+  },
+  "floorplan": {
+    "editLayout": "✎ Redigera layout",
+    "doneEditing": "✓ Klar",
+    "editHint": "Dra prickar för att flytta · dubbelklicka för att ta bort · välj från facket för att placera",
+    "placeHint": "Klicka på kartan för att placera {{name}}",
+    "placed": "{{name}} placerad.",
+    "removed": "{{name}} borttagen från ritningen.",
+    "saveError": "Det gick inte att spara positionen.",
+    "unplaced_one": "{{count}} oplacerad enhet",
+    "unplaced_other": "{{count}} oplacerade enheter",
+    "allPlaced": "Alla enheter är placerade på ritningen.",
+    "legendOk": "Normal",
+    "legendOpen": "Öppet larm",
+    "legendCritical": "Kritiskt larm"
   }
 }

@@ -64,7 +64,8 @@
     "energy": "Energia & ESG",
     "audit": "Tapahtumaloki",
     "integrations": "Integraatiot",
-    "health": "Laitteiden kunto"
+    "health": "Laitteiden kunto",
+    "floorplan": "Pohjapiirros"
   },
   "mills": {
     "title": "Tehtaat",
@@ -564,5 +565,20 @@
     "empty": "Ei laitteita, joilla on tuoretta telemetriaa.",
     "loadError": "Kuntopisteiden lataus epäonnistui.",
     "methodNote": "Menetelmä: pisteet = 100 − painotetut avoimet hälytykset − raja-arvon läheisyys − trendisakko. Päivät rajaan on lineaarinen ekstrapolaatio 7 päivän keskiarvoista — suuntaa antava, ei tae."
+  },
+  "floorplan": {
+    "editLayout": "✎ Muokkaa asettelua",
+    "doneEditing": "✓ Valmis",
+    "editHint": "Raahaa pisteitä · kaksoisnapsauta poistaaksesi · valitse laatikosta sijoittaaksesi",
+    "placeHint": "Napsauta karttaa sijoittaaksesi {{name}}",
+    "placed": "{{name}} sijoitettu.",
+    "removed": "{{name}} poistettu piirroksesta.",
+    "saveError": "Sijainnin tallennus epäonnistui.",
+    "unplaced_one": "{{count}} sijoittamaton laite",
+    "unplaced_other": "{{count}} sijoittamatonta laitetta",
+    "allPlaced": "Kaikki laitteet on sijoitettu piirrokseen.",
+    "legendOk": "Normaali",
+    "legendOpen": "Avoin hälytys",
+    "legendCritical": "Kriittinen hälytys"
   }
 }

@@ -64,7 +64,8 @@
     "energy": "Energy & ESG",
     "audit": "Audit Trail",
     "integrations": "Integrations",
-    "health": "Device Health"
+    "health": "Device Health",
+    "floorplan": "Floor Plan"
   },
   "mills": {
     "title": "Mills",
@@ -564,5 +565,20 @@
     "empty": "No devices with recent telemetry.",
     "loadError": "Failed to load health scores.",
     "methodNote": "Method: score = 100 − severity-weighted open alerts − threshold-proximity penalty − trend penalty. Days-to-threshold is a linear extrapolation of the 7-day daily averages — an indicator, not a guarantee."
+  },
+  "floorplan": {
+    "editLayout": "✎ Edit layout",
+    "doneEditing": "✓ Done",
+    "editHint": "Drag dots to move · double-click to remove · pick from the tray to place",
+    "placeHint": "Click the map to place {{name}}",
+    "placed": "{{name}} placed.",
+    "removed": "{{name}} removed from the plan.",
+    "saveError": "Failed to save the position.",
+    "unplaced_one": "{{count}} unplaced device",
+    "unplaced_other": "{{count}} unplaced devices",
+    "allPlaced": "Every device is placed on the plan.",
+    "legendOk": "Normal",
+    "legendOpen": "Open alert",
+    "legendCritical": "Critical alert"
   }
 }
