@@ -61,7 +61,8 @@
     "reports": "Rapporter",
     "users": "Användare",
     "workorders": "Arbetsordrar",
-    "energy": "Energi & ESG"
+    "energy": "Energi & ESG",
+    "audit": "Revisionslogg"
   },
   "mills": {
     "title": "Bruk",
@@ -493,5 +494,22 @@
     "loadError": "Det gick inte att läsa in energirapporten.",
     "empty": "Ingen effekttelemetri under perioden. Enheter måste publicera ett effektmätvärde (kW).",
     "methodNote": "Metod: energi ≈ uppmätt medeleffekt × observerad tid per dag. CO₂e använder den konfigurerade nätintensitetsfaktorn (ISO 14001 / GHG Protocol Scope 2)."
+  },
+  "audit": {
+    "when": "När",
+    "user": "Användare",
+    "actionHeader": "Åtgärd",
+    "entity": "Objekt",
+    "changes": "Ändringar",
+    "allActions": "Alla åtgärder",
+    "allEntities": "Alla objekt",
+    "exportCsv": "⤓ Logg CSV",
+    "exportError": "Exporten misslyckades.",
+    "empty": "Inga loggposter ännu. Alla skapanden, ändringar och borttagningar registreras här.",
+    "action": {
+      "CREATED": "Skapad",
+      "UPDATED": "Uppdaterad",
+      "DELETED": "Borttagen"
+    }
   }
 }

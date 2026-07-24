@@ -16,6 +16,8 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 8–16 ships here.
 
 ### Added
+- **Audit Trail page (Sprint 23)** — admin-only change log with action/entity
+  filters, old→new diff rendering and CSV export.
 - **Energy & ESG page (Sprint 22)** — KPI tiles, daily kWh bar chart,
   per-device breakdown, ESG CSV download.
 - **Work Orders page (Sprint 21)** — status-filtered board with priority/

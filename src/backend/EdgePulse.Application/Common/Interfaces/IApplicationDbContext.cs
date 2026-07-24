@@ -42,6 +42,9 @@ public interface IApplicationDbContext
     // Work Orders
     IQueryable<WorkOrder> WorkOrders { get; }
 
+    // Audit
+    IQueryable<AuditLog> AuditLogs { get; }
+
     // Write operations
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     void Add<TEntity>(TEntity entity) where TEntity : class;

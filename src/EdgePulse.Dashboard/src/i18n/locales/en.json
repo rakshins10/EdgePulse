@@ -61,7 +61,8 @@
     "reports": "Reports",
     "users": "Users",
     "workorders": "Work Orders",
-    "energy": "Energy & ESG"
+    "energy": "Energy & ESG",
+    "audit": "Audit Trail"
   },
   "mills": {
     "title": "Mills",
@@ -493,5 +494,22 @@
     "loadError": "Failed to load the energy report.",
     "empty": "No power telemetry in this period. Devices must publish a power metric (kW).",
     "methodNote": "Method: energy ≈ average measured power × observed duration per day. CO₂e uses the configured grid intensity factor (ISO 14001 / GHG Protocol Scope 2, location-based)."
+  },
+  "audit": {
+    "when": "When",
+    "user": "User",
+    "actionHeader": "Action",
+    "entity": "Entity",
+    "changes": "Changes",
+    "allActions": "All actions",
+    "allEntities": "All entities",
+    "exportCsv": "⤓ Audit CSV",
+    "exportError": "Export failed.",
+    "empty": "No audit entries yet. Every create, update and delete is recorded here.",
+    "action": {
+      "CREATED": "Created",
+      "UPDATED": "Updated",
+      "DELETED": "Deleted"
+    }
   }
 }

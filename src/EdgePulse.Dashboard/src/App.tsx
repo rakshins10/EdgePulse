@@ -13,6 +13,7 @@ import ReportsPage from './pages/reports/ReportsPage';
 import UsersPage from './pages/users/UsersPage';
 import WorkOrdersPage from './pages/workorders/WorkOrdersPage';
 import EnergyPage from './pages/energy/EnergyPage';
+import AuditPage from './pages/audit/AuditPage';
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
       { path: 'energy',        element: <EnergyPage />,        handle: { titleKey: 'nav.energy' } },
       { path: 'reports',       element: <ReportsPage />,       handle: { titleKey: 'nav.reports' } },
       { path: 'users',         element: <UsersPage />,         handle: { titleKey: 'nav.users' } },
+      { path: 'audit',         element: <AuditPage />,         handle: { titleKey: 'nav.audit' } },
       { path: 'configuration', element: <ConfigurationPage />, handle: { titleKey: 'nav.configuration' } },
     ],
   },

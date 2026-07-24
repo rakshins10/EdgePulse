@@ -61,7 +61,8 @@
     "reports": "Raportit",
     "users": "Käyttäjät",
     "workorders": "Työmääräimet",
-    "energy": "Energia & ESG"
+    "energy": "Energia & ESG",
+    "audit": "Tapahtumaloki"
   },
   "mills": {
     "title": "Tehtaat",
@@ -493,5 +494,22 @@
     "loadError": "Energiaraportin lataus epäonnistui.",
     "empty": "Ei tehotelemetriaa tällä jaksolla. Laitteiden on julkaistava tehometriikka (kW).",
     "methodNote": "Menetelmä: energia ≈ mitattu keskiteho × havaittu kesto päivässä. CO₂e käyttää konfiguroitua verkon päästökerrointa (ISO 14001 / GHG Protocol Scope 2)."
+  },
+  "audit": {
+    "when": "Aika",
+    "user": "Käyttäjä",
+    "actionHeader": "Toiminto",
+    "entity": "Kohde",
+    "changes": "Muutokset",
+    "allActions": "Kaikki toiminnot",
+    "allEntities": "Kaikki kohteet",
+    "exportCsv": "⤓ Loki CSV",
+    "exportError": "Vienti epäonnistui.",
+    "empty": "Ei lokimerkintöjä vielä. Kaikki luonnit, muutokset ja poistot kirjataan tänne.",
+    "action": {
+      "CREATED": "Luotu",
+      "UPDATED": "Päivitetty",
+      "DELETED": "Poistettu"
+    }
   }
 }

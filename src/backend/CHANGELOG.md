@@ -19,6 +19,9 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 1–16 ships here.
 
 ### Added
+- **Audit trail (Sprint 23)** — automatic capture of every EF create/update/
+  delete (property-level old→new diffs, soft-delete detection) into AuditLogs,
+  admin-only audit API + CSV export.
 - **Energy & ESG (Sprint 22)** — Mongo-aggregated daily energy (kWh) and CO2e
   from power telemetry, per-mill/per-device rollups, ESG CSV export; Esg config
   (PowerMetricKeys, Co2FactorKgPerKwh).

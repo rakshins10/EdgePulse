@@ -50,6 +50,12 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     // Notifications
     public DbSet<Notification> Notifications => Set<Notification>();
 
+    // Work Orders
+    public DbSet<WorkOrder> WorkOrders => Set<WorkOrder>();
+
+    // Audit
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+
     // IApplicationDbContext explicit implementations
     IQueryable<IndustryTemplate> IApplicationDbContext.IndustryTemplates => Set<IndustryTemplate>();
     IQueryable<TenantTemplate> IApplicationDbContext.TenantTemplates => Set<TenantTemplate>();
@@ -77,6 +83,7 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     IQueryable<Alert> IApplicationDbContext.Alerts => Set<Alert>();
     IQueryable<Notification> IApplicationDbContext.Notifications => Set<Notification>();
     IQueryable<WorkOrder> IApplicationDbContext.WorkOrders => Set<WorkOrder>();
+    IQueryable<AuditLog> IApplicationDbContext.AuditLogs => Set<AuditLog>();
 
     // Use 'new' keyword -- these hide DbContext methods intentionally
     public new void Add<TEntity>(TEntity entity) where TEntity : class
@@ -98,6 +105,86 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     public override async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
+        CaptureAuditTrail();
         return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Writes an AuditLog row for every tracked create / update / delete.
+    /// Soft deletes (IsDeleted flipping to true) are recorded as DELETED.
+    /// AuditLog itself and system-generated Notifications are excluded.
+    /// Entity ids are generated client-side (BaseEntity), so rows can be
+    /// built before the actual save and persisted in the same transaction.
+    /// </summary>
+    private void CaptureAuditTrail()
+    {
+        // Properties that change on every write and would only add noise
+        string[] noiseProps = ["UpdatedAt", "CreatedAt"];
+
+        var entries = ChangeTracker.Entries()
+            .Where(e =>
+                e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted &&
+                e.Entity is not AuditLog &&
+                e.Entity is not Notification)
+            .ToList();
+
+        if (entries.Count == 0) return;
+
+        var userName = new[] { _currentUser.FullName, _currentUser.Email, _currentUser.UserId }
+            .FirstOrDefault(v => !string.IsNullOrWhiteSpace(v)) ?? "system";
+
+        foreach (var entry in entries)
+        {
+            var entityType = entry.Entity.GetType().Name;
+            var entityId = entry.Property("Id").CurrentValue as Guid? ?? Guid.Empty;
+            var tenantId = entry.Metadata.FindProperty("TenantId") is not null
+                ? entry.Property("TenantId").CurrentValue as Guid? ?? _currentUser.TenantId
+                : _currentUser.TenantId;
+            var display = entry.Metadata.FindProperty("Name") is not null
+                ? entry.Property("Name").CurrentValue?.ToString()
+                : entry.Metadata.FindProperty("Title") is not null
+                    ? entry.Property("Title").CurrentValue?.ToString()
+                    : null;
+
+            string action;
+            string? changesJson = null;
+
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    action = "CREATED";
+                    break;
+
+                case EntityState.Deleted:
+                    action = "DELETED";
+                    break;
+
+                default: // Modified
+                    var changes = entry.Properties
+                        .Where(p => p.IsModified &&
+                                    !noiseProps.Contains(p.Metadata.Name) &&
+                                    !Equals(p.OriginalValue, p.CurrentValue))
+                        .ToDictionary(
+                            p => p.Metadata.Name,
+                            p => new
+                            {
+                                old = p.OriginalValue?.ToString(),
+                                @new = p.CurrentValue?.ToString(),
+                            });
+
+                    if (changes.Count == 0) continue; // nothing meaningful changed
+
+                    // Soft delete surfaces as Modified with IsDeleted false→true
+                    action = changes.TryGetValue("IsDeleted", out var deleted) &&
+                             deleted.@new == "True"
+                        ? "DELETED"
+                        : "UPDATED";
+                    changesJson = System.Text.Json.JsonSerializer.Serialize(changes);
+                    break;
+            }
+
+            AuditLogs.Add(AuditLog.Create(
+                tenantId, userName, action, entityType, entityId, display, changesJson));
+        }
     }
 }

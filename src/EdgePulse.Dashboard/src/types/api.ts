@@ -253,3 +253,16 @@ export interface EnergyReport {
   devices: EnergyDeviceRow[];
   daily: EnergyDailyPoint[];
 }
+
+// ── Audit ───────────────────────────────────────────────────────────────────
+
+export interface AuditLogDto {
+  id: string;
+  userName: string;
+  action: string;             // CREATED / UPDATED / DELETED
+  entityType: string;
+  entityId: string;
+  entityDisplay: string | null;
+  changesJson: string | null;
+  timestamp: string;
+}

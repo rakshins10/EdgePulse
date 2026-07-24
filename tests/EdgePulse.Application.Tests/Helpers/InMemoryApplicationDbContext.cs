@@ -34,6 +34,7 @@ public class InMemoryApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Attachment>           AttachmentSet       => Set<Attachment>();
     public DbSet<Notification>         NotificationSet     => Set<Notification>();
     public DbSet<WorkOrder>            WorkOrderSet        => Set<WorkOrder>();
+    public DbSet<AuditLog>             AuditLogSet         => Set<AuditLog>();
     public DbSet<AlertThreshold>       AlertThresholdSet   => Set<AlertThreshold>();
     public DbSet<Alert>                AlertSet            => Set<Alert>();
     public DbSet<Locale>               LocaleSet           => Set<Locale>();
@@ -67,6 +68,7 @@ public class InMemoryApplicationDbContext : DbContext, IApplicationDbContext
     IQueryable<Alert>                IApplicationDbContext.Alerts                => Set<Alert>();
     IQueryable<Notification>         IApplicationDbContext.Notifications         => Set<Notification>();
     IQueryable<WorkOrder>            IApplicationDbContext.WorkOrders            => Set<WorkOrder>();
+    IQueryable<AuditLog>             IApplicationDbContext.AuditLogs             => Set<AuditLog>();
 
     public new void Add<TEntity>(TEntity entity) where TEntity : class => base.Add(entity);
     public new void Update<TEntity>(TEntity entity) where TEntity : class => base.Update(entity);
