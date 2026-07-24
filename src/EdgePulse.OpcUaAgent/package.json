@@ -9,7 +9,8 @@
     "simulate": "node dist/index.js --simulate",
     "dev": "ts-node src/index.ts",
     "dev:simulate": "ts-node src/index.ts --simulate",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "discover": "ts-node src/index.ts --discover"
   },
   "dependencies": {
     "amqplib": "^0.10.4",

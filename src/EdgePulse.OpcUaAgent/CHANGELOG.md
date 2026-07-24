@@ -16,6 +16,9 @@ versions follow [SemVer](https://semver.org/).
 First release line.
 
 ### Added
+- **Auto-discovery (Sprint 25)** — `npm run discover` browses an OPC-UA
+  server and prints a ready-to-paste `devices[]` config snippet (one metric
+  per variable, snake_cased keys; server-internal nodes filtered).
 - Node + TypeScript **OPC-UA edge agent** — reads tags from OPC-UA servers and
   forwards readings into the EdgePulse pipeline.
 - **Device simulator** for running the agent without physical hardware.
