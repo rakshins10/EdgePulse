@@ -60,7 +60,8 @@
     "appSubtitle": "Industriell IoT-plattform",
     "reports": "Rapporter",
     "users": "Användare",
-    "workorders": "Arbetsordrar"
+    "workorders": "Arbetsordrar",
+    "energy": "Energi & ESG"
   },
   "mills": {
     "title": "Bruk",
@@ -473,5 +474,24 @@
       "HIGH": "Hög",
       "CRITICAL": "Kritisk"
     }
+  },
+  "energy": {
+    "totalEnergy": "Förbrukad energi",
+    "totalCo2": "CO₂-utsläpp",
+    "co2Factor": "Nätfaktor {{factor}} kg CO₂e/kWh (konfigurerbar)",
+    "meteredDevices": "Mätta enheter",
+    "meteredHint": "Enheter som publicerar effektmätvärde (kW)",
+    "dailyTitle": "Daglig energiförbrukning",
+    "energy": "Energi",
+    "deviceTitle": "Per enhet",
+    "device": "Enhet",
+    "avgPower": "Medeleffekt",
+    "energyKwh": "Energi (kWh)",
+    "co2Kg": "CO₂ (kg)",
+    "exportCsv": "⤓ ESG CSV",
+    "exportError": "Exporten misslyckades.",
+    "loadError": "Det gick inte att läsa in energirapporten.",
+    "empty": "Ingen effekttelemetri under perioden. Enheter måste publicera ett effektmätvärde (kW).",
+    "methodNote": "Metod: energi ≈ uppmätt medeleffekt × observerad tid per dag. CO₂e använder den konfigurerade nätintensitetsfaktorn (ISO 14001 / GHG Protocol Scope 2)."
   }
 }

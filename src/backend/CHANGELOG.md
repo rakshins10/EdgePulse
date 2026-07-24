@@ -19,6 +19,9 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 1–16 ships here.
 
 ### Added
+- **Energy & ESG (Sprint 22)** — Mongo-aggregated daily energy (kWh) and CO2e
+  from power telemetry, per-mill/per-device rollups, ESG CSV export; Esg config
+  (PowerMetricKeys, Co2FactorKgPerKwh).
 - **Maintenance work orders (Sprint 21)** — WorkOrder entity with guarded
   lifecycle (open/in-progress/on-hold/completed/cancelled), auto-creation
   from CRITICAL/HIGH alerts (config-gated, deduped per alert) + WORKORDER

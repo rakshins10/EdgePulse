@@ -22,6 +22,7 @@ const NAV_ITEMS: { to: string; icon: string; labelKey: string; adminOnly?: boole
   { to: '/mills',         icon: '🏭', labelKey: 'nav.mills'      },
   { to: '/areas',         icon: '📍', labelKey: 'nav.areas'      },
   { to: '/workorders',    icon: '🛠️', labelKey: 'nav.workorders' },
+  { to: '/energy',        icon: '⚡', labelKey: 'nav.energy'     },
   { to: '/reports',       icon: '📊', labelKey: 'nav.reports'    },
   { to: '/users',         icon: '👥', labelKey: 'nav.users', adminOnly: true },
   { to: '/configuration', icon: '⚙️', labelKey: 'nav.configuration' },

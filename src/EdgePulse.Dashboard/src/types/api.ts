@@ -215,3 +215,41 @@ export interface WorkOrderDto {
   completedBy: string | null;
   completionNotes: string | null;
 }
+
+// ── Energy / ESG ────────────────────────────────────────────────────────────
+
+export interface EnergyMillRow {
+  millId: string;
+  millName: string;
+  energyKwh: number;
+  co2Kg: number;
+}
+
+export interface EnergyDeviceRow {
+  deviceId: string;
+  deviceName: string;
+  deviceCode: string;
+  millName: string;
+  avgPowerKw: number;
+  energyKwh: number;
+  co2Kg: number;
+}
+
+export interface EnergyDailyPoint {
+  date: string;
+  energyKwh: number;
+  co2Kg: number;
+}
+
+export interface EnergyReport {
+  from: string;
+  to: string;
+  generatedAt: string;
+  co2FactorKgPerKwh: number;
+  totalEnergyKwh: number;
+  totalCo2Kg: number;
+  meteredDeviceCount: number;
+  mills: EnergyMillRow[];
+  devices: EnergyDeviceRow[];
+  daily: EnergyDailyPoint[];
+}

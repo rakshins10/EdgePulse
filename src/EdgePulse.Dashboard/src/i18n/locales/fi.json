@@ -60,7 +60,8 @@
     "appSubtitle": "Teollinen IoT-alusta",
     "reports": "Raportit",
     "users": "Käyttäjät",
-    "workorders": "Työmääräimet"
+    "workorders": "Työmääräimet",
+    "energy": "Energia & ESG"
   },
   "mills": {
     "title": "Tehtaat",
@@ -473,5 +474,24 @@
       "HIGH": "Korkea",
       "CRITICAL": "Kriittinen"
     }
+  },
+  "energy": {
+    "totalEnergy": "Kulutettu energia",
+    "totalCo2": "CO₂-päästöt",
+    "co2Factor": "Verkkokerroin {{factor}} kg CO₂e/kWh (konfiguroitava)",
+    "meteredDevices": "Mitatut laitteet",
+    "meteredHint": "Laitteet, jotka julkaisevat tehometriikan (kW)",
+    "dailyTitle": "Päivittäinen energiankulutus",
+    "energy": "Energia",
+    "deviceTitle": "Laitekohtainen erittely",
+    "device": "Laite",
+    "avgPower": "Keskiteho",
+    "energyKwh": "Energia (kWh)",
+    "co2Kg": "CO₂ (kg)",
+    "exportCsv": "⤓ ESG CSV",
+    "exportError": "Vienti epäonnistui.",
+    "loadError": "Energiaraportin lataus epäonnistui.",
+    "empty": "Ei tehotelemetriaa tällä jaksolla. Laitteiden on julkaistava tehometriikka (kW).",
+    "methodNote": "Menetelmä: energia ≈ mitattu keskiteho × havaittu kesto päivässä. CO₂e käyttää konfiguroitua verkon päästökerrointa (ISO 14001 / GHG Protocol Scope 2)."
   }
 }

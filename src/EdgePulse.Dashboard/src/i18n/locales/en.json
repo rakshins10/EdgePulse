@@ -60,7 +60,8 @@
     "appSubtitle": "Industrial IoT Platform",
     "reports": "Reports",
     "users": "Users",
-    "workorders": "Work Orders"
+    "workorders": "Work Orders",
+    "energy": "Energy & ESG"
   },
   "mills": {
     "title": "Mills",
@@ -473,5 +474,24 @@
       "HIGH": "High",
       "CRITICAL": "Critical"
     }
+  },
+  "energy": {
+    "totalEnergy": "Energy consumed",
+    "totalCo2": "CO₂ emissions",
+    "co2Factor": "Grid factor {{factor}} kg CO₂e/kWh (configurable)",
+    "meteredDevices": "Metered devices",
+    "meteredHint": "Devices publishing a power metric (kW)",
+    "dailyTitle": "Daily energy consumption",
+    "energy": "Energy",
+    "deviceTitle": "Per-device breakdown",
+    "device": "Device",
+    "avgPower": "Avg power",
+    "energyKwh": "Energy (kWh)",
+    "co2Kg": "CO₂ (kg)",
+    "exportCsv": "⤓ ESG CSV",
+    "exportError": "Export failed.",
+    "loadError": "Failed to load the energy report.",
+    "empty": "No power telemetry in this period. Devices must publish a power metric (kW).",
+    "methodNote": "Method: energy ≈ average measured power × observed duration per day. CO₂e uses the configured grid intensity factor (ISO 14001 / GHG Protocol Scope 2, location-based)."
   }
 }
