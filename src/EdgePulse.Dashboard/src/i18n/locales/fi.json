@@ -58,7 +58,8 @@
     "configuration": "Asetukset",
     "signOut": "Kirjaudu ulos",
     "appSubtitle": "Teollinen IoT-alusta",
-    "reports": "Raportit"
+    "reports": "Raportit",
+    "users": "Käyttäjät"
   },
   "mills": {
     "title": "Tehtaat",
@@ -389,5 +390,38 @@
     "empty": "Ei raportoitavia tehtaita.",
     "loadError": "Raportin lataus epäonnistui.",
     "exportError": "Vienti epäonnistui."
+  },
+  "users": {
+    "count_one": "{{count}} käyttäjä",
+    "count_other": "{{count}} käyttäjää",
+    "addBtn": "+ Lisää käyttäjä",
+    "addTitle": "Lisää käyttäjä",
+    "editTitle": "Vaihda rooli — {{name}}",
+    "resetTitle": "Nollaa salasana — {{name}}",
+    "user": "Käyttäjä",
+    "role": "Rooli",
+    "status": "Tila",
+    "mill": "Tehdas",
+    "selectMill": "Valitse tehdas…",
+    "email": "Sähköposti",
+    "firstName": "Etunimi",
+    "lastName": "Sukunimi",
+    "tempPassword": "Väliaikainen salasana",
+    "tempPasswordHint": "Väh. 8 merkkiä — vaihdettava ensimmäisellä kirjautumisella",
+    "active": "● Aktiivinen",
+    "inactive": "○ Poistettu käytöstä",
+    "changeRole": "Rooli",
+    "resetPassword": "Nollaa salasana",
+    "enable": "Ota käyttöön",
+    "disable": "Poista käytöstä",
+    "disableConfirm": "Poistetaanko tili \"{{name}}\" käytöstä?\n\nKäyttäjä ei voi kirjautua ennen kuin tili otetaan uudelleen käyttöön.",
+    "created": "Käyttäjä \"{{email}}\" luotu väliaikaisella salasanalla.",
+    "roleUpdated": "Rooli päivitetty käyttäjälle \"{{name}}\". Voimaan seuraavassa kirjautumisessa.",
+    "enabled": "\"{{name}}\" otettu käyttöön.",
+    "disabled": "\"{{name}}\" poistettu käytöstä.",
+    "passwordReset": "Väliaikainen salasana asetettu käyttäjälle \"{{name}}\".",
+    "createError": "Käyttäjän luonti epäonnistui. Sähköposti voi olla jo käytössä.",
+    "updateError": "Toiminto epäonnistui.",
+    "empty": "Käyttäjiä ei löytynyt."
   }
 }

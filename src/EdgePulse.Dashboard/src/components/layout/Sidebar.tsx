@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setAlertCount } from '../../store/alertsSlice';
 import { fetchAlertCount } from '../../api/alerts';
 import keycloak from '../../keycloak';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
 import styles from './Sidebar.module.css';
 
 interface SidebarProps {
@@ -14,13 +15,14 @@ interface SidebarProps {
   onToggleCollapse?: () => void;
 }
 
-const NAV_ITEMS = [
+const NAV_ITEMS: { to: string; icon: string; labelKey: string; adminOnly?: boolean }[] = [
   { to: '/dashboard',     icon: '⬛', labelKey: 'nav.dashboard' },
   { to: '/devices',       icon: '🔌', labelKey: 'nav.devices'   },
   { to: '/alerts',        icon: '🔔', labelKey: 'nav.alerts'    },
   { to: '/mills',         icon: '🏭', labelKey: 'nav.mills'      },
   { to: '/areas',         icon: '📍', labelKey: 'nav.areas'      },
   { to: '/reports',       icon: '📊', labelKey: 'nav.reports'    },
+  { to: '/users',         icon: '👥', labelKey: 'nav.users', adminOnly: true },
   { to: '/configuration', icon: '⚙️', labelKey: 'nav.configuration' },
 ];
 
@@ -38,6 +40,9 @@ export default function Sidebar({
     (s) => s.alerts.count
   );
   const location = useLocation();
+  const user = useCurrentUser();
+  const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'CustomerAdmin';
+  const navItems = NAV_ITEMS.filter(item => !item.adminOnly || isAdmin);
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -94,7 +99,7 @@ export default function Sidebar({
       </div>
 
       <nav className={styles.nav}>
-        {NAV_ITEMS.map(({ to, icon, labelKey }) => (
+        {navItems.map(({ to, icon, labelKey }) => (
           <NavLink
             key={to}
             to={to}

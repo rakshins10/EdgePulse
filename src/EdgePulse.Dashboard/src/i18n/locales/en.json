@@ -58,7 +58,8 @@
     "configuration": "Configuration",
     "signOut": "Sign out",
     "appSubtitle": "Industrial IoT Platform",
-    "reports": "Reports"
+    "reports": "Reports",
+    "users": "Users"
   },
   "mills": {
     "title": "Mills",
@@ -389,5 +390,38 @@
     "empty": "No mills to report on.",
     "loadError": "Failed to load the report.",
     "exportError": "Export failed."
+  },
+  "users": {
+    "count_one": "{{count}} user",
+    "count_other": "{{count}} users",
+    "addBtn": "+ Add user",
+    "addTitle": "Add user",
+    "editTitle": "Change role — {{name}}",
+    "resetTitle": "Reset password — {{name}}",
+    "user": "User",
+    "role": "Role",
+    "status": "Status",
+    "mill": "Mill",
+    "selectMill": "Select mill…",
+    "email": "Email",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "tempPassword": "Temporary password",
+    "tempPasswordHint": "Min 8 characters — user must change it at first login",
+    "active": "● Active",
+    "inactive": "○ Disabled",
+    "changeRole": "Role",
+    "resetPassword": "Reset password",
+    "enable": "Enable",
+    "disable": "Disable",
+    "disableConfirm": "Disable account \"{{name}}\"?\n\nThe user will no longer be able to sign in until re-enabled.",
+    "created": "User \"{{email}}\" created with a temporary password.",
+    "roleUpdated": "Role updated for \"{{name}}\". Takes effect at next login.",
+    "enabled": "\"{{name}}\" enabled.",
+    "disabled": "\"{{name}}\" disabled.",
+    "passwordReset": "Temporary password set for \"{{name}}\".",
+    "createError": "Failed to create user. The email may already exist.",
+    "updateError": "Operation failed.",
+    "empty": "No users found."
   }
 }

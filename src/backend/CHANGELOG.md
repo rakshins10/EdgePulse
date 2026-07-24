@@ -19,6 +19,10 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 1–16 ships here.
 
 ### Added
+- **User management (Sprint 20)** — Keycloak Admin REST integration
+  (IIdentityAdminService/KeycloakAdminService): list/create users, role +
+  mill/area scoping via user attributes, enable/disable, temp-password reset,
+  with a strict admin authorization matrix.
 - **Reports (Sprint 19)** — cross-mill comparison (devices, alert volumes,
   MTTA/MTTR) + CSV exports (comparison + alert detail); CsvBuilder; EF
   EnableRetryOnFailure for transient SQL faults.

@@ -16,6 +16,9 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 8–16 ships here.
 
 ### Added
+- **Users page (Sprint 20)** — admin-only user administration: create with
+  temporary password, role chips, change-role / reset-password modals,
+  enable/disable.
 - **Reports page (Sprint 19)** — date-range cross-mill comparison table with
   CSV downloads.
 - **Attachments card (Sprint 18)** — upload/download/delete files on the

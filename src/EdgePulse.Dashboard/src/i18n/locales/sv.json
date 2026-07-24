@@ -58,7 +58,8 @@
     "configuration": "Konfiguration",
     "signOut": "Logga ut",
     "appSubtitle": "Industriell IoT-plattform",
-    "reports": "Rapporter"
+    "reports": "Rapporter",
+    "users": "Användare"
   },
   "mills": {
     "title": "Bruk",
@@ -389,5 +390,38 @@
     "empty": "Inga bruk att rapportera om.",
     "loadError": "Det gick inte att läsa in rapporten.",
     "exportError": "Exporten misslyckades."
+  },
+  "users": {
+    "count_one": "{{count}} användare",
+    "count_other": "{{count}} användare",
+    "addBtn": "+ Lägg till användare",
+    "addTitle": "Lägg till användare",
+    "editTitle": "Ändra roll — {{name}}",
+    "resetTitle": "Återställ lösenord — {{name}}",
+    "user": "Användare",
+    "role": "Roll",
+    "status": "Status",
+    "mill": "Bruk",
+    "selectMill": "Välj bruk…",
+    "email": "E-post",
+    "firstName": "Förnamn",
+    "lastName": "Efternamn",
+    "tempPassword": "Tillfälligt lösenord",
+    "tempPasswordHint": "Minst 8 tecken — måste bytas vid första inloggningen",
+    "active": "● Aktiv",
+    "inactive": "○ Inaktiverad",
+    "changeRole": "Roll",
+    "resetPassword": "Återställ lösenord",
+    "enable": "Aktivera",
+    "disable": "Inaktivera",
+    "disableConfirm": "Inaktivera kontot \"{{name}}\"?\n\nAnvändaren kan inte logga in förrän kontot aktiveras igen.",
+    "created": "Användaren \"{{email}}\" skapad med tillfälligt lösenord.",
+    "roleUpdated": "Roll uppdaterad för \"{{name}}\". Gäller vid nästa inloggning.",
+    "enabled": "\"{{name}}\" aktiverad.",
+    "disabled": "\"{{name}}\" inaktiverad.",
+    "passwordReset": "Tillfälligt lösenord satt för \"{{name}}\".",
+    "createError": "Det gick inte att skapa användaren. E-posten kan redan finnas.",
+    "updateError": "Åtgärden misslyckades.",
+    "empty": "Inga användare hittades."
   }
 }

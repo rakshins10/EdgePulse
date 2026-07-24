@@ -1,0 +1,108 @@
+.page { display: flex; flex-direction: column; gap: 16px; }
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.count { font-size: 13px; color: var(--color-text-muted); }
+
+.addBtn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.addBtn:hover { filter: brightness(1.08); }
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 720px;
+}
+
+.table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  vertical-align: middle;
+}
+
+.table tr:last-child td { border-bottom: none; }
+.table tbody tr:hover { background: var(--color-row-hover); }
+
+.userName { font-weight: 600; }
+.userEmail {
+  display: block;
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.roleChip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
+}
+
+.roleSuperAdmin { background: color-mix(in srgb, var(--color-critical) 12%, transparent); color: var(--color-critical); }
+.roleCustomerAdmin { background: color-mix(in srgb, var(--color-high) 12%, transparent); color: var(--color-high); }
+
+.statusOn  { color: var(--color-low); font-weight: 600; font-size: 12.5px; }
+.statusOff { color: var(--color-text-muted); font-size: 12.5px; }
+
+.actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+.actionBtn {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  border-radius: 6px;
+  font-size: 12px;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.actionBtn:hover { color: var(--color-text); border-color: var(--color-border-hover); }
+
+.dangerBtn:hover { color: var(--color-critical); border-color: var(--color-critical); }
+
+.empty {
+  padding: 30px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}

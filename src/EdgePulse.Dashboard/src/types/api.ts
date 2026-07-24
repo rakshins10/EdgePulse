@@ -176,3 +176,18 @@ export interface MillComparisonReport {
   generatedAt: string;
   mills: MillReportRow[];
 }
+
+// ── Users (identity admin) ──────────────────────────────────────────────────
+
+export interface IdentityUserDto {
+  id: string;
+  username: string;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  enabled: boolean;
+  role: string | null;
+  tenantId: string | null;
+  millId: string | null;
+  areaIds: string[];
+}
