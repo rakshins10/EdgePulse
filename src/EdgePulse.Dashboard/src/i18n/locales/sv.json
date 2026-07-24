@@ -25,6 +25,11 @@
     "next": "Nästa",
     "previous": "Föregående"
   },
+  "notifications": {
+    "title": "Aviseringar",
+    "markAllRead": "Markera alla som lästa",
+    "empty": "Inga aviseringar ännu. Larmnotiser visas här."
+  },
   "nav": {
     "dashboard": "Översikt",
     "devices": "Enheter",

@@ -16,6 +16,11 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 8–16 ships here.
 
 ### Added
+- **Notification bell (Sprint 17)** — topbar bell with unread badge (30 s poll),
+  dropdown panel with severity dots and relative timestamps, mark-read /
+  mark-all-read, deep-link to Alerts. en/fi/sv strings.
+- Designed confirm dialog + toast notification system replacing native
+  `confirm()`/`alert()` across the app.
 - React + Vite single-page dashboard served via nginx.
 - **Alerts UI** wired to the alerts engine.
 - **Dark mode** with a responsive layout.

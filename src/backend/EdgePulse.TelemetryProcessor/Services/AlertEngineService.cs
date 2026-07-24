@@ -21,6 +21,7 @@ public class AlertEngineService
 {
     private readonly ThresholdCacheService _thresholds;
     private readonly string _sqlConnectionString;
+    private readonly AlertNotifier _notifier;
     private readonly ILogger<AlertEngineService> _logger;
 
     // Key: "{deviceId}:{metricKey}:{thresholdId}"
@@ -34,10 +35,12 @@ public class AlertEngineService
     public AlertEngineService(
         ThresholdCacheService thresholds,
         string sqlConnectionString,
+        AlertNotifier notifier,
         ILogger<AlertEngineService> logger)
     {
         _thresholds = thresholds;
         _sqlConnectionString = sqlConnectionString;
+        _notifier = notifier;
         _logger = logger;
     }
 
@@ -275,6 +278,19 @@ public class AlertEngineService
                 reading.DeviceId, metric.Key, metric.Value,
                 threshold.GetBreachedThresholdValue(metric.Value),
                 alertId);
+
+            // Fan out to the notification channels (in-app + email).
+            // Best-effort: the notifier logs its own failures.
+            await _notifier.NotifyAlertCreatedAsync(
+                alertId,
+                threshold.TenantId,
+                reading.DeviceId,
+                metric.Key,
+                metric.Value,
+                threshold.GetBreachedThresholdValue(metric.Value),
+                metric.Unit,
+                threshold.SeverityCode,
+                ct);
         }
         catch (Exception ex)
         {

@@ -128,3 +128,17 @@ export interface TelemetryResponse {
   count: number;
   readings: TelemetryReadingDto[];
 }
+
+// ── Notifications ───────────────────────────────────────────────────────────
+
+export interface NotificationDto {
+  id: string;
+  type: string;                       // "ALERT" | future types
+  severityCode: string | null;        // CRITICAL / HIGH / MEDIUM / LOW
+  title: string;
+  message: string;
+  linkEntityType: string | null;      // e.g. "Alert"
+  linkEntityId: string | null;
+  isRead: boolean;
+  createdAt: string;
+}

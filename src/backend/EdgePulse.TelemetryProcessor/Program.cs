@@ -27,11 +27,20 @@ var host = Host.CreateDefaultBuilder(args)
                 refreshSeconds,
                 sp.GetRequiredService<ILogger<ThresholdCacheService>>()));
 
+        // Notification fan-out (in-app rows + SMTP email) when alerts fire
+        var smtpOptions = config.GetSection("Smtp").Get<SmtpOptions>() ?? new SmtpOptions();
+        services.AddSingleton(sp =>
+            new AlertNotifier(
+                sqlConnection,
+                smtpOptions,
+                sp.GetRequiredService<ILogger<AlertNotifier>>()));
+
         // Alert engine — singleton (holds in-memory breach counters)
         services.AddSingleton(sp =>
             new AlertEngineService(
                 sp.GetRequiredService<ThresholdCacheService>(),
                 sqlConnection,
+                sp.GetRequiredService<AlertNotifier>(),
                 sp.GetRequiredService<ILogger<AlertEngineService>>()));
 
         // The RabbitMQ consumer worker

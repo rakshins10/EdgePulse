@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Sidebar from './Sidebar';
 import ThemeToggle from './ThemeToggle';
 import LanguageSwitcher from './LanguageSwitcher';
+import NotificationBell from './NotificationBell';
 import styles from './AppLayout.module.css';
 
 interface RouteHandle {
@@ -67,6 +68,7 @@ export default function AppLayout() {
           <h1 className={styles.pageTitle}>{title}</h1>
 
           <div className={styles.topbarActions}>
+            <NotificationBell />
             <LanguageSwitcher />
             <ThemeToggle />
           </div>

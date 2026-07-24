@@ -19,6 +19,10 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 1–16 ships here.
 
 ### Added
+- **Notifications (Sprint 17)** — `Notification` entity + Notifications API
+  (list, unread count, mark read / mark all read); the TelemetryProcessor fans
+  out every fired alert to an in-app notification row **and** an SMTP email
+  (MailKit 4.9.0; MailHog for local dev). New `Smtp` config section.
 - Clean Architecture .NET 9 solution — Domain, Application, Infrastructure, API —
   with NuGet versions pinned (EF Core 9.0.5, Swashbuckle 6.9.0).
 - **Configuration module**: all lookup GET endpoints and write operations

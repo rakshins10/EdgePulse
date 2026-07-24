@@ -32,6 +32,7 @@ public class InMemoryApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Area>                 AreaSet             => Set<Area>();
     public DbSet<Device>               DeviceSet           => Set<Device>();
     public DbSet<Attachment>           AttachmentSet       => Set<Attachment>();
+    public DbSet<Notification>         NotificationSet     => Set<Notification>();
 
     // IApplicationDbContext explicit interface implementations
     IQueryable<IndustryTemplate>     IApplicationDbContext.IndustryTemplates     => Set<IndustryTemplate>();
@@ -58,6 +59,7 @@ public class InMemoryApplicationDbContext : DbContext, IApplicationDbContext
     IQueryable<UiStringTranslation>  IApplicationDbContext.UiStringTranslations  => Set<UiStringTranslation>();
     IQueryable<AlertThreshold>       IApplicationDbContext.AlertThresholds       => Set<AlertThreshold>();
     IQueryable<Alert>                IApplicationDbContext.Alerts                => Set<Alert>();
+    IQueryable<Notification>         IApplicationDbContext.Notifications         => Set<Notification>();
 
     public new void Add<TEntity>(TEntity entity) where TEntity : class => base.Add(entity);
     public new void Update<TEntity>(TEntity entity) where TEntity : class => base.Update(entity);

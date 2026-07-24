@@ -25,6 +25,11 @@
     "next": "Next",
     "previous": "Previous"
   },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "empty": "No notifications yet. Alert notifications will appear here."
+  },
   "nav": {
     "dashboard": "Dashboard",
     "devices": "Devices",

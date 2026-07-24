@@ -25,6 +25,11 @@
     "next": "Seuraava",
     "previous": "Edellinen"
   },
+  "notifications": {
+    "title": "Ilmoitukset",
+    "markAllRead": "Merkitse kaikki luetuiksi",
+    "empty": "Ei ilmoituksia vielä. Hälytysilmoitukset näkyvät täällä."
+  },
   "nav": {
     "dashboard": "Kojelauta",
     "devices": "Laitteet",

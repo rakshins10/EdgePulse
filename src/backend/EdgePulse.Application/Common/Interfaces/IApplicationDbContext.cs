@@ -36,6 +36,9 @@ public interface IApplicationDbContext
     IQueryable<AlertThreshold> AlertThresholds { get; }
     IQueryable<Alert> Alerts { get; }
 
+    // Notifications
+    IQueryable<Notification> Notifications { get; }
+
     // Write operations
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     void Add<TEntity>(TEntity entity) where TEntity : class;

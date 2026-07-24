@@ -47,6 +47,9 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     public DbSet<AlertThreshold> AlertThresholds => Set<AlertThreshold>();
     public DbSet<Alert> Alerts => Set<Alert>();
 
+    // Notifications
+    public DbSet<Notification> Notifications => Set<Notification>();
+
     // IApplicationDbContext explicit implementations
     IQueryable<IndustryTemplate> IApplicationDbContext.IndustryTemplates => Set<IndustryTemplate>();
     IQueryable<TenantTemplate> IApplicationDbContext.TenantTemplates => Set<TenantTemplate>();
@@ -72,6 +75,7 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     IQueryable<DeviceApiKey> IApplicationDbContext.DeviceApiKeys => Set<DeviceApiKey>();
     IQueryable<AlertThreshold> IApplicationDbContext.AlertThresholds => Set<AlertThreshold>();
     IQueryable<Alert> IApplicationDbContext.Alerts => Set<Alert>();
+    IQueryable<Notification> IApplicationDbContext.Notifications => Set<Notification>();
 
     // Use 'new' keyword -- these hide DbContext methods intentionally
     public new void Add<TEntity>(TEntity entity) where TEntity : class
