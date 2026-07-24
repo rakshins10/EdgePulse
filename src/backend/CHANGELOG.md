@@ -19,6 +19,10 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 1–16 ships here.
 
 ### Added
+- **Maintenance work orders (Sprint 21)** — WorkOrder entity with guarded
+  lifecycle (open/in-progress/on-hold/completed/cancelled), auto-creation
+  from CRITICAL/HIGH alerts (config-gated, deduped per alert) + WORKORDER
+  notifications, and the WorkOrders API (list/create/transition/assign).
 - **User management (Sprint 20)** — Keycloak Admin REST integration
   (IIdentityAdminService/KeycloakAdminService): list/create users, role +
   mill/area scoping via user attributes, enable/disable, temp-password reset,

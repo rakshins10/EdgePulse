@@ -16,6 +16,8 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 8–16 ships here.
 
 ### Added
+- **Work Orders page (Sprint 21)** — status-filtered board with priority/
+  status chips, create/complete/assign modals, guarded transitions.
 - **Users page (Sprint 20)** — admin-only user administration: create with
   temporary password, role chips, change-role / reset-password modals,
   enable/disable.

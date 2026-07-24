@@ -191,3 +191,27 @@ export interface IdentityUserDto {
   millId: string | null;
   areaIds: string[];
 }
+
+// ── Work Orders ─────────────────────────────────────────────────────────────
+
+export interface WorkOrderDto {
+  id: string;
+  number: string;
+  title: string;
+  description: string | null;
+  deviceId: string;
+  deviceName: string;
+  deviceCode: string;
+  millId: string;
+  alertId: string | null;
+  priority: string;          // LOW / MEDIUM / HIGH / CRITICAL
+  status: string;            // OPEN / INPROGRESS / ONHOLD / COMPLETED / CANCELLED
+  assignedTo: string | null;
+  dueDate: string | null;
+  partsUsed: string | null;
+  createdBy: string;
+  createdAt: string;
+  completedAt: string | null;
+  completedBy: string | null;
+  completionNotes: string | null;
+}

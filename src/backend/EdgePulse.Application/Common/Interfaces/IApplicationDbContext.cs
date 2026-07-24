@@ -39,6 +39,9 @@ public interface IApplicationDbContext
     // Notifications
     IQueryable<Notification> Notifications { get; }
 
+    // Work Orders
+    IQueryable<WorkOrder> WorkOrders { get; }
+
     // Write operations
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     void Add<TEntity>(TEntity entity) where TEntity : class;

@@ -11,6 +11,7 @@ import AreasPage from './pages/areas/AreasPage';
 import ConfigurationPage from './pages/configuration/ConfigurationPage';
 import ReportsPage from './pages/reports/ReportsPage';
 import UsersPage from './pages/users/UsersPage';
+import WorkOrdersPage from './pages/workorders/WorkOrdersPage';
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
       { path: 'devices/:id',   element: <DeviceDetailPage />,  handle: { titleKey: 'nav.devices' } },
       { path: 'mills',         element: <MillsPage />,         handle: { titleKey: 'nav.mills' } },
       { path: 'areas',         element: <AreasPage />,         handle: { titleKey: 'nav.areas' } },
+      { path: 'workorders',    element: <WorkOrdersPage />,    handle: { titleKey: 'nav.workorders' } },
       { path: 'reports',       element: <ReportsPage />,       handle: { titleKey: 'nav.reports' } },
       { path: 'users',         element: <UsersPage />,         handle: { titleKey: 'nav.users' } },
       { path: 'configuration', element: <ConfigurationPage />, handle: { titleKey: 'nav.configuration' } },

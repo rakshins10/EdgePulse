@@ -33,6 +33,7 @@ public class InMemoryApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Device>               DeviceSet           => Set<Device>();
     public DbSet<Attachment>           AttachmentSet       => Set<Attachment>();
     public DbSet<Notification>         NotificationSet     => Set<Notification>();
+    public DbSet<WorkOrder>            WorkOrderSet        => Set<WorkOrder>();
     public DbSet<AlertThreshold>       AlertThresholdSet   => Set<AlertThreshold>();
     public DbSet<Alert>                AlertSet            => Set<Alert>();
     public DbSet<Locale>               LocaleSet           => Set<Locale>();
@@ -65,6 +66,7 @@ public class InMemoryApplicationDbContext : DbContext, IApplicationDbContext
     IQueryable<AlertThreshold>       IApplicationDbContext.AlertThresholds       => Set<AlertThreshold>();
     IQueryable<Alert>                IApplicationDbContext.Alerts                => Set<Alert>();
     IQueryable<Notification>         IApplicationDbContext.Notifications         => Set<Notification>();
+    IQueryable<WorkOrder>            IApplicationDbContext.WorkOrders            => Set<WorkOrder>();
 
     public new void Add<TEntity>(TEntity entity) where TEntity : class => base.Add(entity);
     public new void Update<TEntity>(TEntity entity) where TEntity : class => base.Update(entity);

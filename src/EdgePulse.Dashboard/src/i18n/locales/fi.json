@@ -59,7 +59,8 @@
     "signOut": "Kirjaudu ulos",
     "appSubtitle": "Teollinen IoT-alusta",
     "reports": "Raportit",
-    "users": "Käyttäjät"
+    "users": "Käyttäjät",
+    "workorders": "Työmääräimet"
   },
   "mills": {
     "title": "Tehtaat",
@@ -423,5 +424,54 @@
     "createError": "Käyttäjän luonti epäonnistui. Sähköposti voi olla jo käytössä.",
     "updateError": "Toiminto epäonnistui.",
     "empty": "Käyttäjiä ei löytynyt."
+  },
+  "workorders": {
+    "addBtn": "+ Uusi työmääräin",
+    "addTitle": "Uusi työmääräin",
+    "number": "Nro",
+    "workOrder": "Työmääräin",
+    "priority": "Prioriteetti",
+    "statusHeader": "Tila",
+    "assignedTo": "Vastuuhenkilö",
+    "due": "Määräaika",
+    "device": "Laite",
+    "selectDevice": "Valitse laite…",
+    "title": "Otsikko",
+    "titlePlaceholder": "esim. Vaihda syöttöpumpun laakeri",
+    "assignPlaceholder": "Asentajan nimi tai sähköposti (valinnainen)",
+    "completionNotes": "Valmistumismerkinnät",
+    "notesPlaceholder": "Mitä tehtiin?",
+    "partsUsed": "Käytetyt osat / materiaalit",
+    "partsPlaceholder": "esim. SKF 6205 ×1, tiivistesarja",
+    "start": "Aloita",
+    "hold": "Keskeytä",
+    "complete": "Valmis",
+    "assign": "Määrää",
+    "cancelBtn": "Peru",
+    "completeTitle": "Valmis {{number}}",
+    "assignTitle": "Määrää {{number}}",
+    "cancelConfirm": "Perutaanko työmääräin {{number}}?\n\nTätä ei voi kumota.",
+    "created": "Työmääräin luotu.",
+    "createError": "Työmääräimen luonti epäonnistui.",
+    "transitionError": "Toiminto epäonnistui. Työmääräimen tila on voinut muuttua.",
+    "startDone": "{{number}} aloitettu.",
+    "holdDone": "{{number}} keskeytetty.",
+    "completeDone": "{{number}} valmistunut.",
+    "cancelDone": "{{number}} peruttu.",
+    "assignDone": "{{number}} vastuuhenkilö päivitetty.",
+    "empty": "Ei työmääräimiä. Korkeat/kriittiset hälytykset avaavat ne automaattisesti.",
+    "status": {
+      "OPEN": "Avoin",
+      "INPROGRESS": "Käynnissä",
+      "ONHOLD": "Pidossa",
+      "COMPLETED": "Valmis",
+      "CANCELLED": "Peruttu"
+    },
+    "prio": {
+      "LOW": "Matala",
+      "MEDIUM": "Keskitaso",
+      "HIGH": "Korkea",
+      "CRITICAL": "Kriittinen"
+    }
   }
 }

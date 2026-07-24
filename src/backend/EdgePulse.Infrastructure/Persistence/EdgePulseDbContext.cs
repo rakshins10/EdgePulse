@@ -76,6 +76,7 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     IQueryable<AlertThreshold> IApplicationDbContext.AlertThresholds => Set<AlertThreshold>();
     IQueryable<Alert> IApplicationDbContext.Alerts => Set<Alert>();
     IQueryable<Notification> IApplicationDbContext.Notifications => Set<Notification>();
+    IQueryable<WorkOrder> IApplicationDbContext.WorkOrders => Set<WorkOrder>();
 
     // Use 'new' keyword -- these hide DbContext methods intentionally
     public new void Add<TEntity>(TEntity entity) where TEntity : class

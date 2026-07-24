@@ -24,6 +24,16 @@ public class SmtpOptions
 }
 
 /// <summary>
+/// Bound from "WorkOrders" config. When enabled, alerts of the listed
+/// severities automatically open a maintenance work order.
+/// </summary>
+public class WorkOrderOptions
+{
+    public bool AutoCreateFromAlerts { get; set; } = true;
+    public string[] AutoCreateSeverities { get; set; } = ["CRITICAL", "HIGH"];
+}
+
+/// <summary>
 /// Fires the two delivery channels when an alert is created:
 ///   1. In-app — inserts a row into the Notifications table (the dashboard
 ///      bell polls it). Raw SQL, consistent with the rest of this worker.
@@ -35,6 +45,7 @@ public class AlertNotifier
 {
     private readonly string _sqlConnectionString;
     private readonly SmtpOptions _smtp;
+    private readonly WorkOrderOptions _workOrders;
     private readonly ILogger<AlertNotifier> _logger;
 
     // DeviceId -> "Name (CODE)" — devices rarely rename; cache for friendliness
@@ -43,10 +54,12 @@ public class AlertNotifier
     public AlertNotifier(
         string sqlConnectionString,
         SmtpOptions smtp,
+        WorkOrderOptions workOrders,
         ILogger<AlertNotifier> logger)
     {
         _sqlConnectionString = sqlConnectionString;
         _smtp = smtp;
+        _workOrders = workOrders;
         _logger = logger;
     }
 
@@ -74,6 +87,114 @@ public class AlertNotifier
 
         if (_smtp.Enabled && _smtp.Recipients.Length > 0)
             await SendEmailAsync(title, message, severityCode, deviceLabel, ct);
+
+        if (_workOrders.AutoCreateFromAlerts &&
+            _workOrders.AutoCreateSeverities.Contains(severityCode))
+            await AutoCreateWorkOrderAsync(
+                alertId, tenantId, deviceId, deviceLabel, metricKey, severityCode, ct);
+    }
+
+    /// <summary>
+    /// Opens a maintenance work order for a fired alert (severity-gated).
+    /// One per alert — skipped if this alert already has a work order.
+    /// </summary>
+    private async Task AutoCreateWorkOrderAsync(
+        Guid alertId, Guid tenantId, Guid deviceId, string deviceLabel,
+        string metricKey, string severityCode, CancellationToken ct)
+    {
+        try
+        {
+            await using var conn = new SqlConnection(_sqlConnectionString);
+            await conn.OpenAsync(ct);
+
+            // Dedup: one work order per alert
+            const string checkSql =
+                "SELECT COUNT(1) FROM WorkOrders WHERE AlertId = @AlertId AND IsDeleted = 0";
+            await using (var check = new SqlCommand(checkSql, conn))
+            {
+                check.Parameters.AddWithValue("@AlertId", alertId);
+                if ((int)(await check.ExecuteScalarAsync(ct) ?? 0) > 0) return;
+            }
+
+            var workOrderId = Guid.NewGuid();
+            var number = $"WO-{workOrderId.ToString("N")[..8].ToUpperInvariant()}";
+            var millId = await GetDeviceMillIdAsync(conn, deviceId, ct);
+            var now = DateTime.UtcNow;
+            var title = $"Investigate {metricKey} alert on {deviceLabel}";
+
+            const string sql = """
+                INSERT INTO WorkOrders (
+                    Id, TenantId, Number, Title, Description,
+                    DeviceId, MillId, AlertId, MaintenanceTypeId,
+                    Priority, Status, AssignedTo, DueDate, PartsUsed,
+                    CreatedBy, CompletedAt, CompletedBy, CompletionNotes,
+                    CreatedAt, UpdatedAt, IsDeleted, DeletedAt
+                ) VALUES (
+                    @Id, @TenantId, @Number, @Title, @Description,
+                    @DeviceId, @MillId, @AlertId, NULL,
+                    @Priority, 'OPEN', NULL, NULL, NULL,
+                    'alert-engine', NULL, NULL, NULL,
+                    @Now, @Now, 0, NULL
+                )
+                """;
+
+            await using var cmd = new SqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@Id", workOrderId);
+            cmd.Parameters.AddWithValue("@TenantId", tenantId);
+            cmd.Parameters.AddWithValue("@Number", number);
+            cmd.Parameters.AddWithValue("@Title", Truncate(title, 200));
+            cmd.Parameters.AddWithValue("@Description",
+                $"Auto-created from a {severityCode} alert. " +
+                "Review the alert, inspect the device and record the resolution here.");
+            cmd.Parameters.AddWithValue("@DeviceId", deviceId);
+            cmd.Parameters.AddWithValue("@MillId", millId);
+            cmd.Parameters.AddWithValue("@AlertId", alertId);
+            cmd.Parameters.AddWithValue("@Priority", severityCode);
+            cmd.Parameters.AddWithValue("@Now", now);
+            await cmd.ExecuteNonQueryAsync(ct);
+
+            // Companion in-app notification
+            const string notifSql = """
+                INSERT INTO Notifications (
+                    Id, TenantId, Type, SeverityCode, Title, Message,
+                    LinkEntityType, LinkEntityId, IsRead, ReadAt,
+                    CreatedAt, UpdatedAt, IsDeleted, DeletedAt
+                ) VALUES (
+                    @Id, @TenantId, 'WORKORDER', @Severity, @Title, @Message,
+                    'WorkOrder', @WorkOrderId, 0, NULL,
+                    @Now, @Now, 0, NULL
+                )
+                """;
+            await using var notif = new SqlCommand(notifSql, conn);
+            notif.Parameters.AddWithValue("@Id", Guid.NewGuid());
+            notif.Parameters.AddWithValue("@TenantId", tenantId);
+            notif.Parameters.AddWithValue("@Severity", severityCode);
+            notif.Parameters.AddWithValue("@Title", $"Work order {number} opened");
+            notif.Parameters.AddWithValue("@Message",
+                Truncate($"{title}. Assign a technician on the Work Orders page.", 1000));
+            notif.Parameters.AddWithValue("@WorkOrderId", workOrderId);
+            notif.Parameters.AddWithValue("@Now", now);
+            await notif.ExecuteNonQueryAsync(ct);
+
+            _logger.LogInformation(
+                "Auto-created work order {Number} for alert {AlertId} ({Severity})",
+                number, alertId, severityCode);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to auto-create work order for alert {AlertId}", alertId);
+        }
+    }
+
+    private static async Task<Guid> GetDeviceMillIdAsync(
+        SqlConnection conn, Guid deviceId, CancellationToken ct)
+    {
+        const string sql = "SELECT MillId FROM Devices WHERE Id = @Id";
+        await using var cmd = new SqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("@Id", deviceId);
+        var result = await cmd.ExecuteScalarAsync(ct);
+        return result is Guid g ? g : Guid.Empty;
     }
 
     private async Task InsertInAppNotificationAsync(

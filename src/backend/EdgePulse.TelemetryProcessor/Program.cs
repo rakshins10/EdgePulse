@@ -29,10 +29,12 @@ var host = Host.CreateDefaultBuilder(args)
 
         // Notification fan-out (in-app rows + SMTP email) when alerts fire
         var smtpOptions = config.GetSection("Smtp").Get<SmtpOptions>() ?? new SmtpOptions();
+        var workOrderOptions = config.GetSection("WorkOrders").Get<WorkOrderOptions>() ?? new WorkOrderOptions();
         services.AddSingleton(sp =>
             new AlertNotifier(
                 sqlConnection,
                 smtpOptions,
+                workOrderOptions,
                 sp.GetRequiredService<ILogger<AlertNotifier>>()));
 
         // Alert engine — singleton (holds in-memory breach counters)

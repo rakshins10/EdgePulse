@@ -59,7 +59,8 @@
     "signOut": "Sign out",
     "appSubtitle": "Industrial IoT Platform",
     "reports": "Reports",
-    "users": "Users"
+    "users": "Users",
+    "workorders": "Work Orders"
   },
   "mills": {
     "title": "Mills",
@@ -423,5 +424,54 @@
     "createError": "Failed to create user. The email may already exist.",
     "updateError": "Operation failed.",
     "empty": "No users found."
+  },
+  "workorders": {
+    "addBtn": "+ New work order",
+    "addTitle": "New work order",
+    "number": "No.",
+    "workOrder": "Work order",
+    "priority": "Priority",
+    "statusHeader": "Status",
+    "assignedTo": "Assigned to",
+    "due": "Due",
+    "device": "Device",
+    "selectDevice": "Select device…",
+    "title": "Title",
+    "titlePlaceholder": "e.g. Replace bearing on feed pump",
+    "assignPlaceholder": "Technician name or email (optional)",
+    "completionNotes": "Completion notes",
+    "notesPlaceholder": "What was done?",
+    "partsUsed": "Parts / materials used",
+    "partsPlaceholder": "e.g. SKF 6205 ×1, gasket set",
+    "start": "Start",
+    "hold": "Hold",
+    "complete": "Complete",
+    "assign": "Assign",
+    "cancelBtn": "Cancel WO",
+    "completeTitle": "Complete {{number}}",
+    "assignTitle": "Assign {{number}}",
+    "cancelConfirm": "Cancel work order {{number}}?\n\nThis cannot be undone.",
+    "created": "Work order created.",
+    "createError": "Failed to create the work order.",
+    "transitionError": "Action failed. The work order may have changed state.",
+    "startDone": "{{number}} started.",
+    "holdDone": "{{number}} put on hold.",
+    "completeDone": "{{number}} completed.",
+    "cancelDone": "{{number}} cancelled.",
+    "assignDone": "{{number}} assignment updated.",
+    "empty": "No work orders. High/critical alerts open them automatically.",
+    "status": {
+      "OPEN": "Open",
+      "INPROGRESS": "In progress",
+      "ONHOLD": "On hold",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "prio": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "CRITICAL": "Critical"
+    }
   }
 }

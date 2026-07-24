@@ -59,7 +59,8 @@
     "signOut": "Logga ut",
     "appSubtitle": "Industriell IoT-plattform",
     "reports": "Rapporter",
-    "users": "Användare"
+    "users": "Användare",
+    "workorders": "Arbetsordrar"
   },
   "mills": {
     "title": "Bruk",
@@ -423,5 +424,54 @@
     "createError": "Det gick inte att skapa användaren. E-posten kan redan finnas.",
     "updateError": "Åtgärden misslyckades.",
     "empty": "Inga användare hittades."
+  },
+  "workorders": {
+    "addBtn": "+ Ny arbetsorder",
+    "addTitle": "Ny arbetsorder",
+    "number": "Nr",
+    "workOrder": "Arbetsorder",
+    "priority": "Prioritet",
+    "statusHeader": "Status",
+    "assignedTo": "Tilldelad",
+    "due": "Förfaller",
+    "device": "Enhet",
+    "selectDevice": "Välj enhet…",
+    "title": "Titel",
+    "titlePlaceholder": "t.ex. Byt lager på matarpumpen",
+    "assignPlaceholder": "Teknikerns namn eller e-post (valfritt)",
+    "completionNotes": "Slutförandeanteckningar",
+    "notesPlaceholder": "Vad gjordes?",
+    "partsUsed": "Använda delar / material",
+    "partsPlaceholder": "t.ex. SKF 6205 ×1, packningssats",
+    "start": "Starta",
+    "hold": "Pausa",
+    "complete": "Slutför",
+    "assign": "Tilldela",
+    "cancelBtn": "Avbryt AO",
+    "completeTitle": "Slutför {{number}}",
+    "assignTitle": "Tilldela {{number}}",
+    "cancelConfirm": "Avbryt arbetsorder {{number}}?\n\nDetta kan inte ångras.",
+    "created": "Arbetsorder skapad.",
+    "createError": "Det gick inte att skapa arbetsordern.",
+    "transitionError": "Åtgärden misslyckades. Arbetsordern kan ha ändrat status.",
+    "startDone": "{{number}} startad.",
+    "holdDone": "{{number}} pausad.",
+    "completeDone": "{{number}} slutförd.",
+    "cancelDone": "{{number}} avbruten.",
+    "assignDone": "{{number}} tilldelning uppdaterad.",
+    "empty": "Inga arbetsordrar. Höga/kritiska larm öppnar dem automatiskt.",
+    "status": {
+      "OPEN": "Öppen",
+      "INPROGRESS": "Pågår",
+      "ONHOLD": "Pausad",
+      "COMPLETED": "Slutförd",
+      "CANCELLED": "Avbruten"
+    },
+    "prio": {
+      "LOW": "Låg",
+      "MEDIUM": "Medel",
+      "HIGH": "Hög",
+      "CRITICAL": "Kritisk"
+    }
   }
 }
