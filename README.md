@@ -392,6 +392,16 @@ EdgePulse/
 | [Keycloak Setup](docs/keycloak-setup.md) | ✅ Complete | Realm, clients, protocol mappers, test users |
 | [Local Test Guide](docs/testing/local-test-guide.md) | ✅ Complete | Run the full stack locally, step by step |
 | [CI/CD Guide](docs/devops/01-cicd-guide.md) | ✅ Complete | GitHub Actions + GHCR, beginner-oriented |
+| [Setup Guide](docs/guides/01-setup-guide.md) | ✅ Complete | Install & run everything from scratch |
+| [Configuration Guide](docs/guides/02-configuration-guide.md) | ✅ Complete | Every setting, file and in-product config |
+| [Functionality Guide](docs/guides/03-functionality-guide.md) | ✅ Complete | Every module + role permissions |
+| [Technical Guide](docs/guides/04-technical-guide.md) | ✅ Complete | Frontend + backend architecture deep dive |
+| [API Reference](docs/reference/api-reference.md) | ✅ Complete | Endpoint catalogue (Swagger is canonical) |
+| [Authentication & AD/LDAP](docs/reference/authentication.md) | ✅ Complete | Keycloak, claims, SSO, federation |
+| [Integrations](docs/reference/integrations.md) | ✅ Complete | OPC-UA + discovery, REST ingest, webhooks |
+| [Deployment](docs/reference/deployment.md) | ✅ Complete | Local, on-premise, cloud, CI/CD |
+| [Operations](docs/reference/operations.md) | ✅ Complete | Monitoring, backup, hardening, upgrades |
+| [Strategy](docs/reference/strategy.md) | ✅ Complete | GTM summary (full: PRODUCT-ROADMAP.md) |
 | API Reference | 📋 Planned | Per-endpoint REST docs (issue #78) |
 | Operations Guide | 📋 Planned | Monitoring, backup, hardening (issue #77) |
 
