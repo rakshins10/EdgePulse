@@ -14,7 +14,11 @@ versions follow [SemVer](https://semver.org/).
 > rename the section below to `## [<next>] — YYYY-MM-DD` and start a fresh
 > `## [Unreleased]` with the next target.
 
-## [Unreleased] — v0.1.0
+## [Unreleased] — v1.1.0
+
+_Post-1.0 development._
+
+## [1.0.0] — 2026-07-24
 
 First release line. Everything built across Sprints 1–16 ships here.
 
