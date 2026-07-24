@@ -62,7 +62,8 @@
     "users": "Users",
     "workorders": "Work Orders",
     "energy": "Energy & ESG",
-    "audit": "Audit Trail"
+    "audit": "Audit Trail",
+    "integrations": "Integrations"
   },
   "mills": {
     "title": "Mills",
@@ -511,5 +512,33 @@
       "UPDATED": "Updated",
       "DELETED": "Deleted"
     }
+  },
+  "integrations": {
+    "hint": "Outbound webhooks notify external systems (Slack, Teams, your own services) when events occur. JSON payloads are signed with HMAC-SHA256 in the X-EdgePulse-Signature header.",
+    "addBtn": "+ Add webhook",
+    "addTitle": "Add webhook",
+    "editTitle": "Edit webhook",
+    "name": "Name",
+    "namePlaceholder": "e.g. Ops Slack channel",
+    "url": "Endpoint URL",
+    "secret": "Signing secret",
+    "secretPlaceholder": "Min 8 characters — used to sign payloads",
+    "secretKeep": "Leave empty to keep the current secret",
+    "events": "Events",
+    "format": "Format",
+    "active": "Active",
+    "activeYes": "Active",
+    "activeNo": "Paused",
+    "inactive": "paused",
+    "lastDelivery": "Last delivery",
+    "never": "never",
+    "test": "Send test",
+    "testOk": "Test delivered (HTTP {{status}}).",
+    "testFailed": "Test returned {{status}}.",
+    "testError": "Test failed.",
+    "deleteConfirm": "Delete webhook \"{{name}}\"?",
+    "saved": "\"{{name}}\" saved.",
+    "saveError": "Save failed. Check the URL and fields.",
+    "empty": "No webhooks yet. Add one to push alerts into Slack, Teams or your own systems."
   }
 }

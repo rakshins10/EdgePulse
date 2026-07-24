@@ -56,6 +56,9 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     // Audit
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
+    // Webhooks
+    public DbSet<WebhookSubscription> WebhookSubscriptions => Set<WebhookSubscription>();
+
     // IApplicationDbContext explicit implementations
     IQueryable<IndustryTemplate> IApplicationDbContext.IndustryTemplates => Set<IndustryTemplate>();
     IQueryable<TenantTemplate> IApplicationDbContext.TenantTemplates => Set<TenantTemplate>();
@@ -84,6 +87,7 @@ public class EdgePulseDbContext : DbContext, IApplicationDbContext
     IQueryable<Notification> IApplicationDbContext.Notifications => Set<Notification>();
     IQueryable<WorkOrder> IApplicationDbContext.WorkOrders => Set<WorkOrder>();
     IQueryable<AuditLog> IApplicationDbContext.AuditLogs => Set<AuditLog>();
+    IQueryable<WebhookSubscription> IApplicationDbContext.WebhookSubscriptions => Set<WebhookSubscription>();
 
     // Use 'new' keyword -- these hide DbContext methods intentionally
     public new void Add<TEntity>(TEntity entity) where TEntity : class

@@ -19,6 +19,7 @@ public static class DependencyInjection
         services.AddScoped<ILocaleContext, LocaleContext>();
         services.AddSingleton<IFileStorage, LocalFileStorage>();
         services.AddHttpClient<IIdentityAdminService, KeycloakAdminService>();
+        services.AddHttpClient<Application.Features.Webhooks.IWebhookSender, WebhookSender>();
 
         services.AddDbContext<EdgePulseDbContext>(options =>
             options.UseSqlServer(

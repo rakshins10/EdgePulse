@@ -45,6 +45,9 @@ public interface IApplicationDbContext
     // Audit
     IQueryable<AuditLog> AuditLogs { get; }
 
+    // Webhooks
+    IQueryable<WebhookSubscription> WebhookSubscriptions { get; }
+
     // Write operations
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     void Add<TEntity>(TEntity entity) where TEntity : class;

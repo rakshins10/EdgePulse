@@ -62,7 +62,8 @@
     "users": "Käyttäjät",
     "workorders": "Työmääräimet",
     "energy": "Energia & ESG",
-    "audit": "Tapahtumaloki"
+    "audit": "Tapahtumaloki",
+    "integrations": "Integraatiot"
   },
   "mills": {
     "title": "Tehtaat",
@@ -511,5 +512,33 @@
       "UPDATED": "Päivitetty",
       "DELETED": "Poistettu"
     }
+  },
+  "integrations": {
+    "hint": "Lähtevät webhookit ilmoittavat ulkoisille järjestelmille (Slack, Teams, omat palvelut) tapahtumista. JSON-kuormat allekirjoitetaan HMAC-SHA256:lla (X-EdgePulse-Signature).",
+    "addBtn": "+ Lisää webhook",
+    "addTitle": "Lisää webhook",
+    "editTitle": "Muokkaa webhookia",
+    "name": "Nimi",
+    "namePlaceholder": "esim. Ops Slack -kanava",
+    "url": "Päätepisteen URL",
+    "secret": "Allekirjoitusavain",
+    "secretPlaceholder": "Väh. 8 merkkiä — käytetään allekirjoitukseen",
+    "secretKeep": "Jätä tyhjäksi säilyttääksesi nykyisen",
+    "events": "Tapahtumat",
+    "format": "Muoto",
+    "active": "Tila",
+    "activeYes": "Aktiivinen",
+    "activeNo": "Pysäytetty",
+    "inactive": "pysäytetty",
+    "lastDelivery": "Viimeisin toimitus",
+    "never": "ei koskaan",
+    "test": "Lähetä testi",
+    "testOk": "Testi toimitettu (HTTP {{status}}).",
+    "testFailed": "Testi palautti {{status}}.",
+    "testError": "Testi epäonnistui.",
+    "deleteConfirm": "Poistetaanko webhook \"{{name}}\"?",
+    "saved": "\"{{name}}\" tallennettu.",
+    "saveError": "Tallennus epäonnistui. Tarkista URL ja kentät.",
+    "empty": "Ei webhookeja vielä. Lisää yksi työntääksesi hälytykset Slackiin, Teamsiin tai omiin järjestelmiin."
   }
 }

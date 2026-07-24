@@ -14,6 +14,7 @@ import UsersPage from './pages/users/UsersPage';
 import WorkOrdersPage from './pages/workorders/WorkOrdersPage';
 import EnergyPage from './pages/energy/EnergyPage';
 import AuditPage from './pages/audit/AuditPage';
+import IntegrationsPage from './pages/integrations/IntegrationsPage';
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
       { path: 'reports',       element: <ReportsPage />,       handle: { titleKey: 'nav.reports' } },
       { path: 'users',         element: <UsersPage />,         handle: { titleKey: 'nav.users' } },
       { path: 'audit',         element: <AuditPage />,         handle: { titleKey: 'nav.audit' } },
+      { path: 'integrations',  element: <IntegrationsPage />,  handle: { titleKey: 'nav.integrations' } },
       { path: 'configuration', element: <ConfigurationPage />, handle: { titleKey: 'nav.configuration' } },
     ],
   },

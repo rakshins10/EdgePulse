@@ -62,7 +62,8 @@
     "users": "Användare",
     "workorders": "Arbetsordrar",
     "energy": "Energi & ESG",
-    "audit": "Revisionslogg"
+    "audit": "Revisionslogg",
+    "integrations": "Integrationer"
   },
   "mills": {
     "title": "Bruk",
@@ -511,5 +512,33 @@
       "UPDATED": "Uppdaterad",
       "DELETED": "Borttagen"
     }
+  },
+  "integrations": {
+    "hint": "Utgående webhooks meddelar externa system (Slack, Teams, egna tjänster) när händelser inträffar. JSON-nyttolaster signeras med HMAC-SHA256 (X-EdgePulse-Signature).",
+    "addBtn": "+ Lägg till webhook",
+    "addTitle": "Lägg till webhook",
+    "editTitle": "Redigera webhook",
+    "name": "Namn",
+    "namePlaceholder": "t.ex. Ops Slack-kanal",
+    "url": "Slutpunktens URL",
+    "secret": "Signeringshemlighet",
+    "secretPlaceholder": "Minst 8 tecken — används för signering",
+    "secretKeep": "Lämna tomt för att behålla nuvarande",
+    "events": "Händelser",
+    "format": "Format",
+    "active": "Status",
+    "activeYes": "Aktiv",
+    "activeNo": "Pausad",
+    "inactive": "pausad",
+    "lastDelivery": "Senaste leverans",
+    "never": "aldrig",
+    "test": "Skicka test",
+    "testOk": "Test levererat (HTTP {{status}}).",
+    "testFailed": "Testet returnerade {{status}}.",
+    "testError": "Testet misslyckades.",
+    "deleteConfirm": "Ta bort webhooken \"{{name}}\"?",
+    "saved": "\"{{name}}\" sparad.",
+    "saveError": "Det gick inte att spara. Kontrollera URL och fält.",
+    "empty": "Inga webhooks ännu. Lägg till en för att skicka larm till Slack, Teams eller egna system."
   }
 }

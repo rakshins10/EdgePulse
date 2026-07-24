@@ -27,14 +27,19 @@ var host = Host.CreateDefaultBuilder(args)
                 refreshSeconds,
                 sp.GetRequiredService<ILogger<ThresholdCacheService>>()));
 
-        // Notification fan-out (in-app rows + SMTP email) when alerts fire
+        // Notification fan-out (in-app rows + SMTP email + webhooks) on alerts
         var smtpOptions = config.GetSection("Smtp").Get<SmtpOptions>() ?? new SmtpOptions();
         var workOrderOptions = config.GetSection("WorkOrders").Get<WorkOrderOptions>() ?? new WorkOrderOptions();
+        services.AddSingleton(sp =>
+            new WebhookDispatcher(
+                sqlConnection,
+                sp.GetRequiredService<ILogger<WebhookDispatcher>>()));
         services.AddSingleton(sp =>
             new AlertNotifier(
                 sqlConnection,
                 smtpOptions,
                 workOrderOptions,
+                sp.GetRequiredService<WebhookDispatcher>(),
                 sp.GetRequiredService<ILogger<AlertNotifier>>()));
 
         // Alert engine — singleton (holds in-memory breach counters)

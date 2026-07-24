@@ -46,6 +46,7 @@ public class AlertNotifier
     private readonly string _sqlConnectionString;
     private readonly SmtpOptions _smtp;
     private readonly WorkOrderOptions _workOrders;
+    private readonly WebhookDispatcher _webhooks;
     private readonly ILogger<AlertNotifier> _logger;
 
     // DeviceId -> "Name (CODE)" — devices rarely rename; cache for friendliness
@@ -55,11 +56,13 @@ public class AlertNotifier
         string sqlConnectionString,
         SmtpOptions smtp,
         WorkOrderOptions workOrders,
+        WebhookDispatcher webhooks,
         ILogger<AlertNotifier> logger)
     {
         _sqlConnectionString = sqlConnectionString;
         _smtp = smtp;
         _workOrders = workOrders;
+        _webhooks = webhooks;
         _logger = logger;
     }
 
@@ -87,6 +90,18 @@ public class AlertNotifier
 
         if (_smtp.Enabled && _smtp.Recipients.Length > 0)
             await SendEmailAsync(title, message, severityCode, deviceLabel, ct);
+
+        await _webhooks.DispatchAsync(tenantId, "alert.created", new
+        {
+            alertId,
+            device = deviceLabel,
+            deviceId,
+            metric = metricKey,
+            value = triggerValue,
+            threshold = thresholdValue,
+            unit,
+            severity = severityCode,
+        }, ct);
 
         if (_workOrders.AutoCreateFromAlerts &&
             _workOrders.AutoCreateSeverities.Contains(severityCode))
@@ -179,6 +194,17 @@ public class AlertNotifier
             _logger.LogInformation(
                 "Auto-created work order {Number} for alert {AlertId} ({Severity})",
                 number, alertId, severityCode);
+
+            await _webhooks.DispatchAsync(tenantId, "workorder.created", new
+            {
+                workOrderId,
+                number,
+                title,
+                device = deviceLabel,
+                deviceId,
+                priority = severityCode,
+                sourceAlertId = alertId,
+            }, ct);
         }
         catch (Exception ex)
         {

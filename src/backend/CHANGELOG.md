@@ -19,6 +19,9 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 1–16 ships here.
 
 ### Added
+- **Webhooks (Sprint 24)** — HMAC-SHA256-signed outbound webhooks
+  (alert.created, workorder.created) with Slack/Teams format option,
+  admin CRUD + test-fire API, delivery status tracking.
 - **Audit trail (Sprint 23)** — automatic capture of every EF create/update/
   delete (property-level old→new diffs, soft-delete detection) into AuditLogs,
   admin-only audit API + CSV export.

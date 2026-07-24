@@ -266,3 +266,16 @@ export interface AuditLogDto {
   changesJson: string | null;
   timestamp: string;
 }
+
+// ── Webhooks ────────────────────────────────────────────────────────────────
+
+export interface WebhookDto {
+  id: string;
+  name: string;
+  url: string;
+  events: string[];
+  format: string;            // json | slack
+  isActive: boolean;
+  lastStatus: string | null;
+  lastTriggeredAt: string | null;
+}
