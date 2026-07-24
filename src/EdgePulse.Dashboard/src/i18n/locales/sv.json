@@ -63,7 +63,8 @@
     "workorders": "Arbetsordrar",
     "energy": "Energi & ESG",
     "audit": "Revisionslogg",
-    "integrations": "Integrationer"
+    "integrations": "Integrationer",
+    "health": "Enhetshälsa"
   },
   "mills": {
     "title": "Bruk",
@@ -540,5 +541,28 @@
     "saved": "\"{{name}}\" sparad.",
     "saveError": "Det gick inte att spara. Kontrollera URL och fält.",
     "empty": "Inga webhooks ännu. Lägg till en för att skicka larm till Slack, Teams eller egna system."
+  },
+  "health": {
+    "hint": "Statistiska konditionspoäng per enhet — öppna larm, hur nära larmgränsen varje mätvärde ligger och 7-dagarstrenden. Sämst först.",
+    "device": "Enhet",
+    "score": "Hälsopoäng",
+    "grade": "Kondition",
+    "openAlerts": "Öppna larm",
+    "watchMetric": "Mätvärde att bevaka",
+    "daysToThreshold": "Est. dagar till gräns",
+    "utilization": "snitt {{avg}} — {{pct}}% av gränsen",
+    "days_one": "~{{count}} dag",
+    "days_other": "~{{count}} dagar",
+    "stable": "stabil",
+    "rowTooltip": "Öppna enhetens telemetri",
+    "grades": {
+      "GOOD": "God",
+      "WATCH": "Bevaka",
+      "DEGRADED": "Försämrad",
+      "CRITICAL": "Kritisk"
+    },
+    "empty": "Inga enheter med aktuell telemetri.",
+    "loadError": "Det gick inte att läsa in hälsopoäng.",
+    "methodNote": "Metod: poäng = 100 − viktade öppna larm − gränsnärhet − trendavdrag. Dagar-till-gräns är en linjär extrapolering av 7-dagars dagsmedel — en indikator, ingen garanti."
   }
 }

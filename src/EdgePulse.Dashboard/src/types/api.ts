@@ -279,3 +279,25 @@ export interface WebhookDto {
   lastStatus: string | null;
   lastTriggeredAt: string | null;
 }
+
+// ── Device health ───────────────────────────────────────────────────────────
+
+export interface MetricHealthDto {
+  metricKey: string;
+  recentAverage: number;
+  thresholdMax: number | null;
+  utilizationPercent: number;
+  trendPerDay: number;
+  daysToThreshold: number | null;
+}
+
+export interface DeviceHealthDto {
+  deviceId: string;
+  deviceName: string;
+  deviceCode: string;
+  millName: string;
+  score: number;
+  grade: string;             // GOOD / WATCH / DEGRADED / CRITICAL
+  openAlerts: number;
+  worstMetric: MetricHealthDto | null;
+}

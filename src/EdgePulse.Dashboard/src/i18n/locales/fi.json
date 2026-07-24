@@ -63,7 +63,8 @@
     "workorders": "Työmääräimet",
     "energy": "Energia & ESG",
     "audit": "Tapahtumaloki",
-    "integrations": "Integraatiot"
+    "integrations": "Integraatiot",
+    "health": "Laitteiden kunto"
   },
   "mills": {
     "title": "Tehtaat",
@@ -540,5 +541,28 @@
     "saved": "\"{{name}}\" tallennettu.",
     "saveError": "Tallennus epäonnistui. Tarkista URL ja kentät.",
     "empty": "Ei webhookeja vielä. Lisää yksi työntääksesi hälytykset Slackiin, Teamsiin tai omiin järjestelmiin."
+  },
+  "health": {
+    "hint": "Tilastolliset kuntopisteet laitteittain — avoimet hälytykset, kuinka lähellä raja-arvoa metriikat kulkevat ja 7 päivän trendi. Huonoin ensin.",
+    "device": "Laite",
+    "score": "Kuntopisteet",
+    "grade": "Kunto",
+    "openAlerts": "Avoimet hälytykset",
+    "watchMetric": "Seurattava metriikka",
+    "daysToThreshold": "Arvio: päiviä rajaan",
+    "utilization": "ka {{avg}} — {{pct}}% rajasta",
+    "days_one": "~{{count}} päivä",
+    "days_other": "~{{count}} päivää",
+    "stable": "vakaa",
+    "rowTooltip": "Avaa laitteen telemetria",
+    "grades": {
+      "GOOD": "Hyvä",
+      "WATCH": "Tarkkaile",
+      "DEGRADED": "Heikentynyt",
+      "CRITICAL": "Kriittinen"
+    },
+    "empty": "Ei laitteita, joilla on tuoretta telemetriaa.",
+    "loadError": "Kuntopisteiden lataus epäonnistui.",
+    "methodNote": "Menetelmä: pisteet = 100 − painotetut avoimet hälytykset − raja-arvon läheisyys − trendisakko. Päivät rajaan on lineaarinen ekstrapolaatio 7 päivän keskiarvoista — suuntaa antava, ei tae."
   }
 }

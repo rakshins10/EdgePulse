@@ -16,6 +16,8 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 8–16 ships here.
 
 ### Added
+- **Device Health page (Sprint 26)** — worst-first condition board with
+  score bars, grades and days-to-threshold indicators.
 - **Integrations page (Sprint 24)** — admin webhook management with event
   chips, delivery status and send-test.
 - **Audit Trail page (Sprint 23)** — admin-only change log with action/entity

@@ -19,6 +19,9 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 1–16 ships here.
 
 ### Added
+- **Device health scoring (Sprint 26)** — transparent statistical condition
+  score per device (alert pressure + threshold utilization + 7-day trend)
+  with linear days-to-threshold estimate; /api/healthscore/devices.
 - **Webhooks (Sprint 24)** — HMAC-SHA256-signed outbound webhooks
   (alert.created, workorder.created) with Slack/Teams format option,
   admin CRUD + test-fire API, delivery status tracking.

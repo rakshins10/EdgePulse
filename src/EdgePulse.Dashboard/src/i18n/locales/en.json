@@ -63,7 +63,8 @@
     "workorders": "Work Orders",
     "energy": "Energy & ESG",
     "audit": "Audit Trail",
-    "integrations": "Integrations"
+    "integrations": "Integrations",
+    "health": "Device Health"
   },
   "mills": {
     "title": "Mills",
@@ -540,5 +541,28 @@
     "saved": "\"{{name}}\" saved.",
     "saveError": "Save failed. Check the URL and fields.",
     "empty": "No webhooks yet. Add one to push alerts into Slack, Teams or your own systems."
+  },
+  "health": {
+    "hint": "Statistical condition scores per device — open alerts, how close each metric runs to its alert threshold, and its 7-day trend. Sorted worst-first.",
+    "device": "Device",
+    "score": "Health score",
+    "grade": "Condition",
+    "openAlerts": "Open alerts",
+    "watchMetric": "Metric to watch",
+    "daysToThreshold": "Est. days to threshold",
+    "utilization": "avg {{avg}} — {{pct}}% of limit",
+    "days_one": "~{{count}} day",
+    "days_other": "~{{count}} days",
+    "stable": "stable",
+    "rowTooltip": "Open device telemetry",
+    "grades": {
+      "GOOD": "Good",
+      "WATCH": "Watch",
+      "DEGRADED": "Degraded",
+      "CRITICAL": "Critical"
+    },
+    "empty": "No devices with recent telemetry.",
+    "loadError": "Failed to load health scores.",
+    "methodNote": "Method: score = 100 − severity-weighted open alerts − threshold-proximity penalty − trend penalty. Days-to-threshold is a linear extrapolation of the 7-day daily averages — an indicator, not a guarantee."
   }
 }
