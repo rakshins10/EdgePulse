@@ -57,7 +57,8 @@
     "areas": "Areas",
     "configuration": "Configuration",
     "signOut": "Sign out",
-    "appSubtitle": "Industrial IoT Platform"
+    "appSubtitle": "Industrial IoT Platform",
+    "reports": "Reports"
   },
   "mills": {
     "title": "Mills",
@@ -369,5 +370,24 @@
   "language": {
     "label": "Language",
     "switchTo": "Switch to {{language}}"
+  },
+  "reports": {
+    "from": "From",
+    "to": "To",
+    "exportComparison": "⤓ Comparison CSV",
+    "exportAlerts": "⤓ Alerts CSV",
+    "comparisonTitle": "Cross-mill comparison",
+    "comparisonSub": "Devices, alert volumes and response times per mill for the selected period.",
+    "mill": "Mill",
+    "devices": "Devices",
+    "alerts": "Alerts",
+    "open": "Open",
+    "critical": "Critical",
+    "high": "High",
+    "mtta": "Avg ack (min)",
+    "mttr": "Avg resolve (min)",
+    "empty": "No mills to report on.",
+    "loadError": "Failed to load the report.",
+    "exportError": "Export failed."
   }
 }

@@ -22,8 +22,17 @@ public static class DependencyInjection
         services.AddDbContext<EdgePulseDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("DefaultConnection"),
-                b => b.MigrationsAssembly(
-                    typeof(EdgePulseDbContext).Assembly.FullName)));
+                b =>
+                {
+                    b.MigrationsAssembly(
+                        typeof(EdgePulseDbContext).Assembly.FullName);
+                    // Transient network faults (e.g. Docker port relay hiccups)
+                    // are retried instead of surfacing as 500s.
+                    b.EnableRetryOnFailure(
+                        maxRetryCount: 3,
+                        maxRetryDelay: TimeSpan.FromSeconds(5),
+                        errorNumbersToAdd: null);
+                }));
 
         services.AddScoped<IApplicationDbContext>(provider =>
             provider.GetRequiredService<EdgePulseDbContext>());

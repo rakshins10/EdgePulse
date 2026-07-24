@@ -9,6 +9,7 @@ import DeviceDetailPage from './pages/devices/DeviceDetailPage';
 import MillsPage from './pages/organisation/MillsPage';
 import AreasPage from './pages/areas/AreasPage';
 import ConfigurationPage from './pages/configuration/ConfigurationPage';
+import ReportsPage from './pages/reports/ReportsPage';
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       { path: 'devices/:id',   element: <DeviceDetailPage />,  handle: { titleKey: 'nav.devices' } },
       { path: 'mills',         element: <MillsPage />,         handle: { titleKey: 'nav.mills' } },
       { path: 'areas',         element: <AreasPage />,         handle: { titleKey: 'nav.areas' } },
+      { path: 'reports',       element: <ReportsPage />,       handle: { titleKey: 'nav.reports' } },
       { path: 'configuration', element: <ConfigurationPage />, handle: { titleKey: 'nav.configuration' } },
     ],
   },

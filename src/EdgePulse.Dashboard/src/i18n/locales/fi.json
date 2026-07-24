@@ -57,7 +57,8 @@
     "areas": "Alueet",
     "configuration": "Asetukset",
     "signOut": "Kirjaudu ulos",
-    "appSubtitle": "Teollinen IoT-alusta"
+    "appSubtitle": "Teollinen IoT-alusta",
+    "reports": "Raportit"
   },
   "mills": {
     "title": "Tehtaat",
@@ -369,5 +370,24 @@
   "language": {
     "label": "Kieli",
     "switchTo": "Vaihda kieleen {{language}}"
+  },
+  "reports": {
+    "from": "Alkaen",
+    "to": "Asti",
+    "exportComparison": "⤓ Vertailu CSV",
+    "exportAlerts": "⤓ Hälytykset CSV",
+    "comparisonTitle": "Tehtaiden vertailu",
+    "comparisonSub": "Laitteet, hälytysmäärät ja vasteajat tehtaittain valitulla jaksolla.",
+    "mill": "Tehdas",
+    "devices": "Laitteet",
+    "alerts": "Hälytykset",
+    "open": "Avoimet",
+    "critical": "Kriittiset",
+    "high": "Korkeat",
+    "mtta": "Keskim. kuittaus (min)",
+    "mttr": "Keskim. ratkaisu (min)",
+    "empty": "Ei raportoitavia tehtaita.",
+    "loadError": "Raportin lataus epäonnistui.",
+    "exportError": "Vienti epäonnistui."
   }
 }

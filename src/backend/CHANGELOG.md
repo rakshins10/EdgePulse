@@ -19,6 +19,9 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 1–16 ships here.
 
 ### Added
+- **Reports (Sprint 19)** — cross-mill comparison (devices, alert volumes,
+  MTTA/MTTR) + CSV exports (comparison + alert detail); CsvBuilder; EF
+  EnableRetryOnFailure for transient SQL faults.
 - **File attachments (Sprint 18)** — IFileStorage + LocalFileStorage, upload/
   list/download/delete API for Device/Mill/Area attachments with role checks,
   extension allowlist and 25 MB limit.

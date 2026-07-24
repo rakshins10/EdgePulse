@@ -57,7 +57,8 @@
     "areas": "Områden",
     "configuration": "Konfiguration",
     "signOut": "Logga ut",
-    "appSubtitle": "Industriell IoT-plattform"
+    "appSubtitle": "Industriell IoT-plattform",
+    "reports": "Rapporter"
   },
   "mills": {
     "title": "Bruk",
@@ -369,5 +370,24 @@
   "language": {
     "label": "Språk",
     "switchTo": "Byt till {{language}}"
+  },
+  "reports": {
+    "from": "Från",
+    "to": "Till",
+    "exportComparison": "⤓ Jämförelse CSV",
+    "exportAlerts": "⤓ Larm CSV",
+    "comparisonTitle": "Jämförelse mellan bruk",
+    "comparisonSub": "Enheter, larmvolymer och svarstider per bruk för vald period.",
+    "mill": "Bruk",
+    "devices": "Enheter",
+    "alerts": "Larm",
+    "open": "Öppna",
+    "critical": "Kritiska",
+    "high": "Höga",
+    "mtta": "Snitt kvittering (min)",
+    "mttr": "Snitt lösning (min)",
+    "empty": "Inga bruk att rapportera om.",
+    "loadError": "Det gick inte att läsa in rapporten.",
+    "exportError": "Exporten misslyckades."
   }
 }

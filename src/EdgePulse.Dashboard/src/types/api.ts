@@ -154,3 +154,25 @@ export interface AttachmentDto {
   uploadedBy: string;
   uploadedAt: string;
 }
+
+// ── Reports ─────────────────────────────────────────────────────────────────
+
+export interface MillReportRow {
+  millId: string;
+  millName: string;
+  location: string;
+  deviceCount: number;
+  totalAlerts: number;
+  openAlerts: number;
+  criticalAlerts: number;
+  highAlerts: number;
+  avgAcknowledgeMinutes: number | null;
+  avgResolveMinutes: number | null;
+}
+
+export interface MillComparisonReport {
+  from: string;
+  to: string;
+  generatedAt: string;
+  mills: MillReportRow[];
+}

@@ -20,6 +20,7 @@ const NAV_ITEMS = [
   { to: '/alerts',        icon: '🔔', labelKey: 'nav.alerts'    },
   { to: '/mills',         icon: '🏭', labelKey: 'nav.mills'      },
   { to: '/areas',         icon: '📍', labelKey: 'nav.areas'      },
+  { to: '/reports',       icon: '📊', labelKey: 'nav.reports'    },
   { to: '/configuration', icon: '⚙️', labelKey: 'nav.configuration' },
 ];
 

@@ -33,6 +33,11 @@ public class InMemoryApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Device>               DeviceSet           => Set<Device>();
     public DbSet<Attachment>           AttachmentSet       => Set<Attachment>();
     public DbSet<Notification>         NotificationSet     => Set<Notification>();
+    public DbSet<AlertThreshold>       AlertThresholdSet   => Set<AlertThreshold>();
+    public DbSet<Alert>                AlertSet            => Set<Alert>();
+    public DbSet<Locale>               LocaleSet           => Set<Locale>();
+    public DbSet<LookupTranslation>    LookupTranslationSet => Set<LookupTranslation>();
+    public DbSet<UiStringTranslation>  UiStringTranslationSet => Set<UiStringTranslation>();
 
     // IApplicationDbContext explicit interface implementations
     IQueryable<IndustryTemplate>     IApplicationDbContext.IndustryTemplates     => Set<IndustryTemplate>();

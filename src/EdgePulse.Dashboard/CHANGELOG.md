@@ -16,6 +16,8 @@ versions follow [SemVer](https://semver.org/).
 First release line. Everything built across Sprints 8–16 ships here.
 
 ### Added
+- **Reports page (Sprint 19)** — date-range cross-mill comparison table with
+  CSV downloads.
 - **Attachments card (Sprint 18)** — upload/download/delete files on the
   device detail page (hidden for read-only roles).
 - **Notification bell (Sprint 17)** — topbar bell with unread badge (30 s poll),
