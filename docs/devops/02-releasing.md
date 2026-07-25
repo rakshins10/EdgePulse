@@ -28,7 +28,8 @@ line — it is the single source of truth. (The `package.json` / `Directory.Buil
 version still exists for npm / MSBuild tooling; keep it roughly in sync, but CI does
 not read it.)
 
-All four currently target **0.1.0** (pre-1.0 = "feature-complete demo, not yet GA").
+All four components were released as **1.0.0** on 2026-07-24 and now target
+**1.1.0** for ongoing development.
 
 We use **SemVer**: `MAJOR.MINOR.PATCH` — bump PATCH for fixes, MINOR for new
 backward-compatible features, MAJOR for breaking changes.
@@ -100,6 +101,21 @@ Same pattern for the others — just change the prefix:
 > been released, CI fails the beta build with a clear message telling you to bump
 > the target. This stops betas from silently regressing below a released version.
 
+> ⚠️ **Push release tags ONE AT A TIME.** GitHub Actions does not reliably create
+> a workflow run for every ref when several tags arrive in a single `git push` —
+> during the 1.0.0 release, pushing all four tags together produced **zero** tag
+> runs. Push them individually (a short pause between each) and confirm a run
+> appears before pushing the next:
+> ```bash
+> git push origin backend-v1.0.0     # wait for "Publish — Backend [backend-v1.0.0]"
+> git push origin dashboard-v1.0.0
+> git push origin ingestion-v1.0.0
+> git push origin opcua-agent-v1.0.0
+> ```
+> If a tag was pushed in a batch and no run fired, re-push it alone:
+> `git push origin :refs/tags/<tag> && git push origin <tag>`
+> (the release step is idempotent, so re-runs are safe).
+
 ---
 
 ## 4. Where artifacts live
@@ -124,11 +140,11 @@ Because components version independently, it helps to record a known-good set
 for a deployment, e.g. in a release note or a small file:
 
 ```
-EdgePulse deployment 2026-07
-  api / telemetry-processor : backend 0.2.0
-  dashboard                 : 0.3.1
-  ingestion                 : 0.1.0
-  opcua-agent               : 0.1.0
+EdgePulse deployment 2026-07 (the v1.0.0 set — all released together)
+  api / telemetry-processor : backend 1.0.0
+  dashboard                 : 1.0.0
+  ingestion                 : 1.0.0
+  opcua-agent               : 1.0.0
 ```
 
 Keep the `/api` contract backward-compatible and any recent dashboard will work
