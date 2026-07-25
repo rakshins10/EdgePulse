@@ -59,13 +59,26 @@ export default function NotificationBell() {
     await qc.invalidateQueries({ queryKey: ['notifications'] });
   }
 
+  /** Where a notification deep-links to, by linked entity type. */
+  const TARGET_PAGE: Record<string, string> = {
+    Alert: '/alerts',
+    WorkOrder: '/workorders',
+  };
+
   async function handleItemClick(n: NotificationDto) {
     if (!n.isRead) {
       try { await markNotificationRead(n.id); } catch { /* non-fatal */ }
       await invalidate();
     }
     setOpen(false);
-    if (n.linkEntityType === 'Alert') navigate('/alerts');
+
+    const page = n.linkEntityType ? TARGET_PAGE[n.linkEntityType] : undefined;
+    if (!page) return;
+
+    // Pass the entity id so the target page can highlight and scroll to the
+    // exact record. Including it also changes the URL when the user is
+    // already on that page, which re-triggers the highlight.
+    navigate(n.linkEntityId ? `${page}?highlight=${n.linkEntityId}` : page);
   }
 
   async function handleMarkAll() {

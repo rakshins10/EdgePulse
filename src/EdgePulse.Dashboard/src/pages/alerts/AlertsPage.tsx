@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppDispatch } from '../../store/hooks';
 import { setAlertCount } from '../../store/alertsSlice';
@@ -29,10 +30,24 @@ export default function AlertsPage() {
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
 
+  // Deep link from a notification: /alerts?highlight=<alertId>
+  const [searchParams] = useSearchParams();
+  const highlightId = searchParams.get('highlight');
+
   // Filters
   const [severityFilter, setSeverityFilter] = useState<SeverityCode | ''>('');
   const [statusFilter, setStatusFilter]     = useState<StatusCode | ''>('OPEN');
   const [page, setPage]                     = useState(1);
+
+  // A linked alert may already be acknowledged/resolved, which the default
+  // OPEN filter would hide — clear filters so the target is always findable.
+  useEffect(() => {
+    if (highlightId) {
+      setStatusFilter('');
+      setSeverityFilter('');
+      setPage(1);
+    }
+  }, [highlightId]);
 
   // Modal state
   const [modalAlert, setModalAlert]  = useState<AlertDto | null>(null);
@@ -175,6 +190,7 @@ export default function AlertsPage() {
                 <AlertRow
                   key={alert.id}
                   alert={alert}
+                  highlighted={alert.id === highlightId}
                   onAcknowledge={() => openModal(alert, 'acknowledge')}
                   onResolve={() => openModal(alert, 'resolve')}
                 />
@@ -228,14 +244,23 @@ interface AlertRowProps {
   alert: AlertDto;
   onAcknowledge: () => void;
   onResolve: () => void;
+  highlighted?: boolean;
 }
 
-function AlertRow({ alert, onAcknowledge, onResolve }: AlertRowProps) {
+function AlertRow({ alert, onAcknowledge, onResolve, highlighted }: AlertRowProps) {
   const canResolve =
     alert.statusCode === 'OPEN' || alert.statusCode === 'ACKNOWLEDGED';
+  const rowRef = useRef<HTMLTableRowElement>(null);
+
+  // Scroll the deep-linked row into view when arriving from a notification
+  useEffect(() => {
+    if (highlighted) {
+      rowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [highlighted]);
 
   return (
-    <tr>
+    <tr ref={rowRef} className={highlighted ? styles.rowHighlight : undefined}>
       <td>
         <SeverityPill code={alert.severityCode} />
       </td>

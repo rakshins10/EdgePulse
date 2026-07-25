@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
@@ -26,6 +27,22 @@ export default function WorkOrdersPage() {
   const readOnly = me?.role === 'Executive';
 
   const [statusFilter, setStatusFilter] = useState<string>('');
+
+  // Deep link from a notification: /workorders?highlight=<workOrderId>
+  const [searchParams] = useSearchParams();
+  const highlightId = searchParams.get('highlight');
+  const highlightRef = useRef<HTMLTableRowElement>(null);
+
+  // The linked work order may be in any state — clear the filter so it shows.
+  useEffect(() => {
+    if (highlightId) setStatusFilter('');
+  }, [highlightId]);
+
+  useEffect(() => {
+    if (highlightId) {
+      highlightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ['workorders', statusFilter],
@@ -171,7 +188,11 @@ export default function WorkOrdersPage() {
             </thead>
             <tbody>
               {orders.map(wo => (
-                <tr key={wo.id}>
+                <tr
+                  key={wo.id}
+                  ref={wo.id === highlightId ? highlightRef : undefined}
+                  className={wo.id === highlightId ? styles.rowHighlight : undefined}
+                >
                   <td className={styles.number}>{wo.number}</td>
                   <td>
                     <span className={styles.woTitle}>{wo.title}</span>

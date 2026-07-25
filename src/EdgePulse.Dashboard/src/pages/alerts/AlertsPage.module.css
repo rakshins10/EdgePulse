@@ -249,3 +249,28 @@
     align-items: flex-start;
   }
 }
+
+/* Row deep-linked from a notification — fades from an accent wash to normal
+   so the eye lands on the right record without a permanent colour change. */
+.rowHighlight > td {
+  animation: rowFlash 2.6s ease-out 1;
+}
+
+@keyframes rowFlash {
+  0%, 35% {
+    background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+    box-shadow: inset 3px 0 0 var(--color-accent);
+  }
+  100% {
+    background: transparent;
+    box-shadow: inset 3px 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rowHighlight > td {
+    animation: none;
+    background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+    box-shadow: inset 3px 0 0 var(--color-accent);
+  }
+}
