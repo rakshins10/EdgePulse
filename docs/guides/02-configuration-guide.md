@@ -16,6 +16,22 @@ Two layers, deliberately separated:
    webhook and branding choice is **data**, editable in the dashboard by the
    right role. Nothing domain-specific is hardcoded.
 
+## 1a. Where secrets come from (important)
+
+The committed `appsettings.json` files hold **placeholders** for every
+credential (`<SET-VIA-USER-SECRETS-OR-ENV>`). Both .NET hosts refuse to start
+while a placeholder is present and tell you which key is missing. Provide
+real values through one of:
+
+| Environment | Mechanism | Example |
+|---|---|---|
+| Local dev | `dotnet user-secrets` (stored outside the repo, loads only in Development) | `dotnet user-secrets set "Keycloak:ClientSecret" "…" --project src/backend/EdgePulse.API` |
+| Docker / prod | Environment variables, `__` as the section separator | `ConnectionStrings__DefaultConnection`, `Keycloak__ClientSecret` |
+
+The full one-time local set of commands is in the
+[Setup guide §4](01-setup-guide.md). Never put a real credential back into
+a committed `appsettings*.json`.
+
 ## 2. API (`src/backend/EdgePulse.API/appsettings.json`)
 
 | Section | Key | Default | Meaning |

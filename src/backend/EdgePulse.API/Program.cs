@@ -15,6 +15,19 @@ BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Fail fast if a secret is still the committed placeholder. Real values come
+// from 'dotnet user-secrets' (Development) or environment variables
+// (ConnectionStrings__DefaultConnection, Keycloak__ClientSecret, ...) — never git.
+foreach (var key in new[] { "ConnectionStrings:DefaultConnection", "ConnectionStrings:MongoDB", "Keycloak:ClientSecret" })
+{
+    var value = builder.Configuration[key];
+    if (string.IsNullOrWhiteSpace(value) || value.Contains("<SET-VIA-"))
+        throw new InvalidOperationException(
+            $"{key} is not configured. Set it via 'dotnet user-secrets' (Development) " +
+            $"or the {key.Replace(":", "__")} environment variable " +
+            "(use double underscore: Section__Key). See docs/guides/02-configuration-guide.md.");
+}
+
 // ----------------------------------------------------------------
 // Authentication — Keycloak JWT Bearer
 // ----------------------------------------------------------------

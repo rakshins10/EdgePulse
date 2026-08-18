@@ -13,9 +13,20 @@ var host = Host.CreateDefaultBuilder(args)
     {
         var config = ctx.Configuration;
 
-        var sqlConnection = config.GetConnectionString("SqlServer")
-            ?? throw new InvalidOperationException(
-                "ConnectionStrings:SqlServer is not configured.");
+        // Fail fast if any connection string is still the committed placeholder.
+        // Real values come from user-secrets (Development) or environment
+        // variables (ConnectionStrings__SqlServer etc.) — never from git.
+        foreach (var name in new[] { "SqlServer", "RabbitMQ", "MongoDB" })
+        {
+            var value = config.GetConnectionString(name);
+            if (string.IsNullOrWhiteSpace(value) || value.Contains("<SET-VIA-"))
+                throw new InvalidOperationException(
+                    $"ConnectionStrings:{name} is not configured. Set it via " +
+                    $"'dotnet user-secrets' (Development) or the ConnectionStrings__{name} " +
+                    "environment variable. See docs/guides/02-configuration-guide.md.");
+        }
+
+        var sqlConnection = config.GetConnectionString("SqlServer")!;
 
         var refreshSeconds = config.GetValue<int>(
             "AlertEngine:ThresholdCacheRefreshSeconds", 60);

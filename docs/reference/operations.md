@@ -30,6 +30,10 @@ Restore order: databases → start API (migrations no-op) → services.
 
 ## 3. Security hardening checklist
 
+- [x] Application secrets are **not** in git — `appsettings.json` ships
+      placeholders; the API and Telemetry Processor fail fast until real
+      values arrive via `dotnet user-secrets` (dev) or `Section__Key` env vars
+      (Docker/prod). *(done, v1.0.1)*
 - [ ] Change every default credential in the compose file (SQL sa, Mongo,
       RabbitMQ, Keycloak admin, client secret).
 - [ ] Keycloak in production mode behind HTTPS; disable `start-dev`.

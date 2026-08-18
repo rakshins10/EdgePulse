@@ -46,7 +46,36 @@ This starts (first run downloads images — allow a few minutes):
 
 Wait until `docker compose … ps` shows the databases healthy.
 
-## 4. Create the database schema + demo data
+## 4. Configure application secrets (one time)
+
+The committed `appsettings.json` files contain **placeholders**, not real
+credentials — the API and Telemetry Processor refuse to start until they are
+set (you get a clear message naming the missing key). For local development
+use `dotnet user-secrets`, which stores values outside the repo:
+
+```bash
+API=src/backend/EdgePulse.API/EdgePulse.API.csproj
+TP=src/backend/EdgePulse.TelemetryProcessor/EdgePulse.TelemetryProcessor.csproj
+
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,1433;Database=EdgePulse;User Id=sa;Password=EdgePulse@2026;TrustServerCertificate=True;" --project $API
+dotnet user-secrets set "ConnectionStrings:MongoDB" "mongodb://edgepulse:EdgePulse%402026@localhost:27017" --project $API
+dotnet user-secrets set "Keycloak:ClientSecret" "<edgepulse-api client secret from Keycloak>" --project $API
+dotnet user-secrets set "Keycloak:AdminPassword" "admin" --project $API
+
+dotnet user-secrets set "ConnectionStrings:SqlServer" "Server=localhost,1433;Database=EdgePulse;User Id=sa;Password=EdgePulse@2026;TrustServerCertificate=True" --project $TP
+dotnet user-secrets set "ConnectionStrings:MongoDB"   "mongodb://edgepulse:EdgePulse%402026@localhost:27017" --project $TP
+dotnet user-secrets set "ConnectionStrings:RabbitMQ"  "amqp://edgepulse:EdgePulse%402026@localhost:5672/edgepulse" --project $TP
+```
+
+These match the dev-grade credentials in `docker-compose.onpremise.yml`.
+The Keycloak client secret is under Clients → `edgepulse-api` → Credentials.
+
+> **Production / Docker:** do not use user-secrets — set the same keys as
+> environment variables with double-underscore separators, e.g.
+> `ConnectionStrings__DefaultConnection`, `Keycloak__ClientSecret`. Both hosts
+> read them automatically. Details: [Configuration guide §2](02-configuration-guide.md).
+
+## 5. Create the database schema + demo data
 
 ```bash
 # apply EF Core migrations
@@ -58,7 +87,7 @@ dotnet ef database update \
 dotnet run --project src/backend/EdgePulse.API -- --seed
 ```
 
-## 5. Keycloak one-time setup
+## 6. Keycloak one-time setup
 
 Keycloak dev-imports the `edgepulse` realm; verify at
 http://localhost:8080 (admin / admin):
@@ -74,7 +103,7 @@ http://localhost:8080 (admin / admin):
 
 Full details: [`docs/reference/authentication.md`](../reference/authentication.md).
 
-## 6. Run the backend
+## 7. Run the backend
 
 Two terminals (or use `--configuration Release`):
 
@@ -89,7 +118,7 @@ dotnet run --project src/backend/EdgePulse.TelemetryProcessor
 Expect: API `{"status":"healthy"}` at `/health`; the processor logs
 `TelemetryProcessor ready. Listening on queue 'telemetry.readings'.`
 
-## 7. Run the dashboard
+## 8. Run the dashboard
 
 ```bash
 cd src/EdgePulse.Dashboard
@@ -99,7 +128,7 @@ npm run dev          # → http://localhost:3000
 
 Sign in with a demo user (e.g. `superadmin` / `Test@1234`).
 
-## 8. Verify the whole pipeline
+## 9. Verify the whole pipeline
 
 1. **Telemetry** — Devices → any device: live charts update every 10 s
    (simulator → agent → RabbitMQ → processor → MongoDB → API).
@@ -109,7 +138,7 @@ Sign in with a demo user (e.g. `superadmin` / `Test@1234`).
 3. **Work orders** — a HIGH/CRITICAL alert auto-opens one under 🛠️ Work Orders.
 4. **Energy** — ⚡ Energy & ESG shows kWh/CO₂ for the refiners.
 
-## 9. Everyday commands
+## 10. Everyday commands
 
 ```bash
 # build + tests (backend: 130 unit tests)
@@ -126,13 +155,14 @@ cd src/EdgePulse.OpcUaAgent && npm run discover -- opc.tcp://host:4840
 docker compose -f infrastructure/docker-compose.onpremise.yml down
 ```
 
-## 10. Troubleshooting quick hits
+## 11. Troubleshooting quick hits
 
 | Symptom | Fix |
 |---------|-----|
 | Port already in use / HTTP 000 from a container | `docker restart <container>` — Docker Desktop's port relay can wedge after sleep/restart |
 | `MSB3021/3027` file-lock build errors | Stop the running API/Processor first (they hold Release DLLs) |
-| Dashboard shows zeros after login | Keycloak protocol mappers missing (step 5.2) |
+| Service exits with `… is not configured. Set it via dotnet user-secrets` | Step 4 not done (or running as Production without env vars) — run the user-secrets commands, or set the `Section__Key` env vars |
+| Dashboard shows zeros after login | Keycloak protocol mappers missing (step 6.2) |
 | SQL "pre-login handshake" 500s | Transient after container restart — EF retries automatically; persistent → restart `edgepulse-sqlserver` |
 | No telemetry charts | Is `edgepulse-opcua-agent` running? Check RabbitMQ UI (15672) queue `telemetry.readings` |
 
