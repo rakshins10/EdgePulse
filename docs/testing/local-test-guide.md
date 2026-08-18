@@ -1,7 +1,7 @@
 # EdgePulse — Local End-to-End Test Guide
 
-**Last updated:** 2026-05-31  
-**Target:** Full NordPulp demo — all 20 devices generating telemetry, alerts firing, dashboard live.
+**Last updated:** 2026-08-18 (v1.0.1) — covers the full v1.0 feature set  
+**Target:** Full NordPulp demo — all 20 devices generating telemetry, alerts firing, dashboard live — plus every v1.0 module (Step 11).
 
 ---
 
@@ -80,6 +80,27 @@ All containers should show `(healthy)`. Keycloak may take 60–90 seconds.
 | Keycloak | http://localhost:8080 (admin / admin) | Realm list visible |
 
 ---
+
+## Step 1b — Configure application secrets (one time)
+
+The committed `appsettings.json` files hold placeholders; the API and
+TelemetryProcessor **refuse to start** until real values are supplied (they
+print exactly which key is missing). For local dev, store them in
+`dotnet user-secrets` — outside the repo, loaded automatically in Development:
+
+```powershell
+$API="src/backend/EdgePulse.API/EdgePulse.API.csproj"
+$TP="src/backend/EdgePulse.TelemetryProcessor/EdgePulse.TelemetryProcessor.csproj"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,1433;Database=EdgePulse;User Id=sa;Password=EdgePulse@2026;TrustServerCertificate=True;" --project $API
+dotnet user-secrets set "ConnectionStrings:MongoDB" "mongodb://edgepulse:EdgePulse%402026@localhost:27017" --project $API
+dotnet user-secrets set "Keycloak:ClientSecret" "<Keycloak → Clients → edgepulse-api → Credentials>" --project $API
+dotnet user-secrets set "Keycloak:AdminPassword" "admin" --project $API
+dotnet user-secrets set "ConnectionStrings:SqlServer" "Server=localhost,1433;Database=EdgePulse;User Id=sa;Password=EdgePulse@2026;TrustServerCertificate=True" --project $TP
+dotnet user-secrets set "ConnectionStrings:MongoDB" "mongodb://edgepulse:EdgePulse%402026@localhost:27017" --project $TP
+dotnet user-secrets set "ConnectionStrings:RabbitMQ" "amqp://edgepulse:EdgePulse%402026@localhost:5672/edgepulse" --project $TP
+```
+
+Details and the Docker/production equivalent (env vars): [`docs/guides/02-configuration-guide.md`](../guides/02-configuration-guide.md) §1a.
 
 ## Step 2 — Run EF Migrations + Demo Seed
 
@@ -316,6 +337,27 @@ Navigate to `/alerts`:
 - Click **Resolve** → transitions to RESOLVED + removed from active counts on dashboard
 
 ---
+
+## Step 11 — Verify the v1.0 modules
+
+Log in as `superadmin` unless stated. Each row is a real behaviour to observe.
+
+| Module | Do this | Expect |
+|--------|---------|--------|
+| 🔔 Notifications | Click the bell → click an alert item | Marks read, jumps to Alerts with that row highlighted |
+| 📧 Email | Open http://localhost:8025 after an alert fires | An `EdgePulse [HIGH] …` mail |
+| 🛠️ Work Orders | Open the auto-created one → Assign → Start → Complete (notes + parts). Try Complete on an OPEN one | Lifecycle advances; the illegal move is refused (409) |
+| 📎 Attachments | Devices → any device → upload a PDF → download → delete | Byte-identical download; row disappears |
+| 📈 Reports | Change dates; both CSV buttons | Mill table with MTTA/MTTR; CSVs download |
+| ⚡ Energy & ESG | Open the page | kWh + CO₂e KPIs, daily bar chart (the two refiners publish `power_consumption`) |
+| 🩺 Device Health | Open the page | Worst-first scores; alert-laden pumps rank CRITICAL; click → telemetry |
+| 🗺️ Floor Plan | Edit layout → place a device from the tray → drag it | Dot appears; critical devices pulse red |
+| 👥 Users | Create a user, change a role, reset password | Rows update; try disabling yourself → refused |
+| 📜 Audit Trail | After the steps above | Every action listed with old → new diffs; CSV export |
+| 🔗 Integrations | Add a webhook (any Slack/Teams incoming-webhook URL) → Send test | Delivery status shows `200`; message arrives signed |
+| ⚙️ Branding | Configuration → Branding → set name + accent → Save | Sidebar name and accent colour change immediately |
+| 🌐 Language | Switch to Suomi / Svenska | Whole UI translates |
+| 🔐 Roles | Log out; log in as `millmanager` / `operator` / `executive` (all `Test@1234`) | MillManager sees Lakewood only (10 devices); Operator sees their area (4); Executive is read-only and admin pages are hidden |
 
 ## Troubleshooting
 

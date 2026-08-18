@@ -16,11 +16,22 @@ versions follow [SemVer](https://semver.org/).
 
 ## [Unreleased] — v1.1.0
 
-_Post-1.0 development._
+### Security
+- **Secrets out of git (v1.0.1 hardening)** — `appsettings.json` now ships
+  `<SET-VIA-USER-SECRETS-OR-ENV>` placeholders; API and TelemetryProcessor fail
+  fast at startup with a message naming the missing key. Local: `dotnet
+  user-secrets`; Docker/prod: `Section__Key` env vars. TelemetryProcessor gained
+  a Development launch profile so user-secrets load under `dotnet run`.
+- Redacted the Keycloak client secret from the Swagger help text.
+
+### Fixed
+- Notification bell deep-links: work-order notifications now navigate; alert
+  notifications carry `?highlight=<id>` so the target row is scrolled to and
+  flashed, and clicking works even when already on the target page.
 
 ## [1.0.0] — 2026-07-24
 
-First release line. Everything built across Sprints 1–16 ships here.
+First release line. Everything built across Sprints 1–28 ships here.
 
 ### Added
 - **White-label branding (Sprint 28)** — per-tenant product name / logo /

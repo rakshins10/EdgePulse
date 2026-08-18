@@ -1,7 +1,12 @@
 # EdgePulse -- Development Setup & Commands Guide
 
-Complete step-by-step record of all setup commands and project structure.
-Use this as reference when setting up on a new machine or onboarding new developers.
+Complete step-by-step record of the commands used to scaffold the solution
+during Sprint 1, kept as an engineering journal.
+
+> **Looking to set the project up today?** Use the current guides instead —
+> they reflect the v1.0.0 layout and the secrets model:
+> [Setup Guide](guides/01-setup-guide.md) · [Configuration Guide](guides/02-configuration-guide.md).
+> The commands below are still valid reference for *how* each project was created.
 
 ---
 
@@ -73,33 +78,32 @@ cd EdgePulse
 ```
 EdgePulse/
   src/
-    EdgePulse.Domain/           <- .NET 9 class library
-    EdgePulse.Application/      <- .NET 9 class library
-    EdgePulse.Infrastructure/   <- .NET 9 class library
-    EdgePulse.API/              <- .NET 9 Web API
-    EdgePulse.TelemetryService/ <- Node.js / NestJS (TODO)
-    EdgePulse.Processor/        <- .NET 9 Worker Service (TODO)
-    EdgePulse.Dashboard/        <- React + TypeScript (TODO)
-  tools/
-    DeviceSimulator/            <- .NET 9 console app (TODO)
+    backend/                        <- all .NET 9 (one release line)
+      EdgePulse.Domain/
+      EdgePulse.Application/
+      EdgePulse.Infrastructure/
+      EdgePulse.API/
+      EdgePulse.TelemetryProcessor/  <- Worker Service: RabbitMQ -> Mongo + alerts
+      EdgePulse.sln, Directory.Build.props, CHANGELOG.md
+    EdgePulse.Dashboard/            <- React 18 + TypeScript + Vite
+    EdgePulse.Ingestion/            <- NestJS REST telemetry ingestion
+    EdgePulse.OpcUaAgent/           <- OPC-UA agent + simulator + discovery
+  tests/
+    EdgePulse.Domain.Tests/         <- xUnit
+    EdgePulse.Application.Tests/    <- xUnit (EF InMemory + NSubstitute)
   infrastructure/
-    docker-compose.onpremise.yml
-    docker-compose.cloud.yml    <- TODO
-    haproxy/
-      haproxy.cfg
-    mongo/
-      init.js
-    sql/                        <- EF Core migration scripts
+    docker-compose.onpremise.yml    <- SQL, Mongo, RabbitMQ, Postgres, Keycloak,
+                                       MailHog, HAProxy, OPC-UA sim + agent
+    haproxy/haproxy.cfg
+    mongo/init.js
+  .github/
+    workflows/                      <- ci.yml + publish-*.yml
+    actions/component-version/
   docs/
-    01-requirements.md
-    02-architecture.md
-    03-data-design.md
-    04-api-design.md            <- TODO
-    05-identity-design.md       <- TODO
-    06-infrastructure.md        <- TODO
-  project-guide.md
-  development-setup.md               <- this file
-  DOCKER-COMMANDS.md
+    guides/    reference/    devops/    sprints/
+    01-requirements.md  02-architecture.md  03-data_design.md
+    project-guide.md  implementation-patterns.md  development-setup.md (this file)
+  ARCHITECTURE.md  PRODUCT-ROADMAP.md  DOCKER-COMMANDS.md  README.md
   README.md
   LICENSE
 ```
@@ -823,5 +827,5 @@ dotnet clean
 
 ---
 
-*Last updated: May 2026*
-*Next step: Build EdgePulse.Domain entities and enums*
+*Written May 2026 during Sprint 1 scaffolding; structure section refreshed August 2026 for v1.0.0.*
+*For current setup instructions see [guides/01-setup-guide.md](guides/01-setup-guide.md).*

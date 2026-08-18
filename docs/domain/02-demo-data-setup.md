@@ -135,10 +135,11 @@ Before running the alert scenarios you need:
 4. **Auth token:** Get a Keycloak token for the NordPulp CustomerAdmin user
 
 ```bash
-# Get token (adjust credentials to your Keycloak setup)
+# Get token — the client secret is in Keycloak → Clients → edgepulse-api → Credentials
+# (never committed; see docs/guides/02-configuration-guide.md §1a). Demo user: superadmin / Test@1234
 TOKEN=$(curl -s -X POST http://localhost:8080/realms/edgepulse/protocol/openid-connect/token \
-  -d 'grant_type=password&client_id=edgepulse-api&client_secret=lnBQYXdQnQTku1jT64LbEMyaRFRws3HS' \
-  -d 'username=nordpulp-admin&password=Test@1234' | jq -r .access_token)
+  -d 'grant_type=password&client_id=edgepulse-api&client_secret=<edgepulse-api-client-secret>' \
+  -d 'username=superadmin&password=Test@1234' | jq -r .access_token)
 ```
 
 ---

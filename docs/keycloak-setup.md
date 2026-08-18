@@ -1,7 +1,7 @@
 # EdgePulse — Keycloak Setup Guide
 
 > Complete reference for configuring the EdgePulse identity provider.
-> Last updated: May 2026 — Sprint 4 (US-020)
+> Last updated: August 2026 — written for Sprint 4; still accurate. User administration now also available in-app (👥 Users, Sprint 20) via the Keycloak Admin API — see docs/reference/authentication.md
 >
 > **Two ways to set up:**
 > - [Option A — Import (fast)](#option-a--import-from-saved-config) — 2 minutes, recommended for re-setup
@@ -107,7 +107,7 @@ Click **Save**.
 1. Still on `edgepulse-api` → click the **Credentials** tab
 2. Copy the **Client secret** value and save it — you will need it in `appsettings.json`
 
-> The current dev secret is: `lnBQYXdQnQTku1jT64LbEMyaRFRws3HS`
+> Read the secret from Keycloak → Clients → `edgepulse-api` → Credentials, then store it with `dotnet user-secrets set "Keycloak:ClientSecret" "…" --project src/backend/EdgePulse.API` (it is intentionally NOT committed).
 > ⚠️ Rotate this before any non-local deployment.
 
 ---

@@ -1,11 +1,16 @@
 # EdgePulse -- Solution Architecture Guide
 
-**Version:** 1.0
-**Last Updated:** May 2026
+**Version:** 1.1 (folder listings refreshed for the v1.0.0 release)
+**Last Updated:** August 2026
 **Author:** Rakshith N S
 
 This document explains the design principles, patterns, and
 request/response flow for every project in the EdgePulse solution.
+
+> **Scope note.** The *patterns* here have held from Sprint 1 through v1.0.0.
+> Folder listings were refreshed for v1.0 — the .NET projects now live under
+> `src/backend/`. For a module-by-module tour of the as-built system see
+> [`docs/guides/04-technical-guide.md`](docs/guides/04-technical-guide.md).
 
 ---
 
@@ -470,8 +475,10 @@ EdgePulse.Infrastructure/
 
   Services/
     CurrentUserService.cs               <- reads JWT claims from HttpContext
-    AzureBlobStorageService.cs          <- cloud file storage (TODO)
-    MinioStorageService.cs              <- on-premise file storage (TODO)
+    LocaleContext.cs                    <- Accept-Language resolution
+    LocalFileStorage.cs                 <- IFileStorage: local volume (Azure Blob = drop-in)
+    KeycloakAdminService.cs             <- IIdentityAdminService: Keycloak Admin REST
+    WebhookSender.cs                    <- IWebhookSender: signed outbound HTTP
 
   DependencyInjection.cs                <- registers all services
 ```
@@ -578,26 +585,35 @@ Swagger/OpenAPI            All endpoints documented
                            Request/response schemas auto-generated
 
 JWT Authentication         Keycloak issues JWT
-                           API validates on every request (TODO)
+                           API validates on every request
 ```
 
 ### Folder Structure
 
 ```
 EdgePulse.API/
-  Controllers/
-    ConfigurationController.cs  <- lookup table endpoints
-    DevicesController.cs        <- device CRUD (TODO)
-    MillsController.cs          <- mill management (TODO)
-    AreasController.cs          <- area management (TODO)
-    AlertsController.cs         <- alert lifecycle (TODO)
-    UsersController.cs          <- user management (TODO)
+  Controllers/                (thin: validate route → MediatR → result)
+    ConfigurationController.cs  <- lookup tables + tenant overrides
+    LocalizationController.cs   <- locales, translations, CSV round-trip
+    OrganisationController.cs   <- mills + areas
+    DevicesController.cs        <- register / edit / decommission
+    TelemetryController.cs      <- time-series reads (Mongo)
+    AlertsController.cs         <- thresholds + alert lifecycle
+    NotificationsController.cs  <- in-app notification center
+    AttachmentsController.cs    <- file upload / download
+    WorkOrdersController.cs     <- maintenance work orders
+    ReportsController.cs        <- cross-mill comparison + CSV
+    EnergyController.cs         <- kWh / CO2e (Mongo aggregation)
+    HealthScoreController.cs    <- statistical device health
+    FloorPlanController.cs      <- 2D layout positions
+    DashboardController.cs      <- role-scoped KPI summary
+    UsersController.cs          <- Keycloak user administration
+    AuditController.cs          <- audit trail + CSV
+    WebhooksController.cs       <- outbound webhook subscriptions
+    BrandingController.cs       <- per-tenant white-label
 
   Middleware/
-    ExceptionHandlingMiddleware.cs  <- global error handler (TODO)
-
-  Extensions/
-    ServiceCollectionExtensions.cs  <- DI setup helpers (TODO)
+    ExceptionHandlingMiddleware.cs  <- domain exceptions → 400/403/404/409
 
   Program.cs              <- app startup, pipeline configuration
   appsettings.json        <- configuration (no secrets)
@@ -663,7 +679,7 @@ public class ConfigurationController : ControllerBase
            |
            v
 [2] ASP.NET Core Middleware Pipeline
-    -> JWT validation (TODO: Keycloak)
+    -> JWT validation (Keycloak OIDC)
     -> Routing
     -> Controller selection
            |
@@ -805,7 +821,7 @@ HOW IT IS ENFORCED:
 Exception thrown anywhere in pipeline
           |
           v
-Global Exception Middleware (TODO: ExceptionHandlingMiddleware)
+Global Exception Middleware (ExceptionHandlingMiddleware)
           |
           v
 Maps exception to HTTP response:

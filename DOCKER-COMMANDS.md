@@ -130,6 +130,23 @@ docker system df
 
 ---
 
+## Services in the stack
+
+| Service | Container | Host port | Notes |
+|---------|-----------|-----------|-------|
+| SQL Server 2022 | `edgepulse-sqlserver` | 1433 | primary DB |
+| MongoDB 7 | `edgepulse-mongodb` | 27017 | telemetry time-series |
+| RabbitMQ 3.12 | `edgepulse-rabbitmq` | 5672 / 15672 (UI) | telemetry queue |
+| PostgreSQL 16 | `edgepulse-postgres` | 5432 | Keycloak's DB |
+| Keycloak 24 | `edgepulse-keycloak` | 8080 | identity |
+| MailHog | `edgepulse-mailhog` | 1025 (SMTP) / 8025 (UI) | catches alert emails locally |
+| HAProxy | `edgepulse-haproxy` | 80 / 8404 (stats) | load balancer |
+| OPC-UA simulator | `edgepulse-opcua-simulator` | 4840 | NordPulp plant (20 devices) |
+| OPC-UA agent | `edgepulse-opcua-agent` | — | publishes telemetry to RabbitMQ |
+| Ingestion (NestJS) | `edgepulse-ingestion` | 3000* | REST telemetry ingest |
+
+*Only when started; the dashboard dev server also uses 3000 on the host.
+
 ## Service URLs (On-Premise Mode)
 
 Service          URL                          Login
@@ -155,6 +172,23 @@ edgepulse_rabbitmq_data    -> RabbitMQ messages
 ---
 
 ## Common Issues & Fixes
+
+### Stale port binding after a long stop (Docker Desktop)
+`compose start` fails with `Bind for 0.0.0.0:27017 failed: port is already allocated`
+but nothing on the host is listening. Docker's network layer has a stale
+binding — recreate the container (named volumes keep the data):
+```powershell
+docker compose -f infrastructure/docker-compose.onpremise.yml up -d --force-recreate mongodb
+```
+A container that returns HTTP 000 / connection-refused despite "Up" is the
+same class of problem: `docker restart <container>`.
+
+### Running sqlcmd / mongosh from Git Bash
+Git Bash rewrites `/opt/...` paths to Windows paths inside `docker exec`.
+Prefix with `MSYS_NO_PATHCONV=1`:
+```bash
+MSYS_NO_PATHCONV=1 docker exec edgepulse-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'EdgePulse@2026' -C -d EdgePulse -Q "SELECT COUNT(*) FROM Devices"
+```
 
 ### Port already in use
 netstat -ano | findstr :1433

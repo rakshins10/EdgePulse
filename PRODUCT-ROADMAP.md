@@ -1,7 +1,13 @@
 # EdgePulse -- Product Roadmap
 
-**Version:** 2.0
-**Last Updated:** May 2026
+**Version:** 2.1 — annotated with v1.0.0 delivery status
+**Last Updated:** August 2026
+
+> **Reading this after v1.0.0:** the phase/sprint numbers below are the *original
+> plan* (May 2026). Actual delivery followed a different sprint sequence — each
+> phase now carries a **Delivery status** line mapping its items to what shipped
+> in v1.0.0 (2026-07-24) and what is deliberately post-v1.0. Authoritative
+> per-sprint record: `docs/sprint-history.md` and `docs/sprints/`.
 **Author:** Rakshith N S
 
 ---
@@ -239,14 +245,17 @@ REVENUE SHARE:
 
 ## 6. Phase 1 -- Foundation (Sprints 1-10)
 
-**Status: In Progress**
 **Goal:** Complete, working platform end to end
+**Delivery status: ✅ SHIPPED in v1.0.0** — every item below except the AI
+summaries (deferred to the AI epic, #9). Alerts also gained webhooks + auto
+work orders; reports gained MTTA/MTTR; the "Polish" sprint became a full
+documentation suite plus a v1.0.1 hardening pass.
 
 ```
 Sprint 1:  Configuration Module
            All lookup tables configurable from UI
            Industry templates + tenant customisation
-           STATUS: 70% complete
+           STATUS: shipped
 
 Sprint 2:  Organisation Module
            Tenant, Mill, Area management
@@ -303,6 +312,9 @@ Sprint 10: Polish & Go Live
 ## 7. Phase 2 -- Operations (Sprints 11-13)
 
 **Goal:** Make EdgePulse indispensable for day-to-day operations
+**Delivery status:** Predictive Maintenance → **shipped as statistical health
+scoring + linear RUL indicator** (v1.0, #32); Energy & ESG → **shipped** (v1.0,
+#33); Mobile App → **post-v1.0** (#31).
 
 ```
 Sprint 11: Mobile App (React Native)
@@ -344,6 +356,10 @@ Sprint 13: Energy Monitoring & ESG Reporting
 ## 8. Phase 3 -- Intelligence (Sprints 14-16)
 
 **Goal:** Deep integration with existing factory infrastructure
+**Delivery status:** OPC-UA → **shipped with auto-discovery** (v1.0, #34;
+Modbus/MQTT connectors post-v1.0); Work Orders → **shipped** (v1.0, #35);
+Compliance & Audit → **audit trail + CSV evidence shipped** (v1.0, #36; custom
+report builder / signatures post-v1.0).
 
 ```
 Sprint 14: OPC-UA & SCADA Integration
@@ -387,6 +403,9 @@ Sprint 16: Compliance & Audit Reports
 ## 9. Phase 4 -- Scale (Sprints 17-19)
 
 **Goal:** Remove barriers to European market expansion
+**Delivery status:** Multi-language → **shipped** en/fi/sv, data-driven locales
+(v1.0, #37); Digital Twin → **2D floor-plan mode shipped** (v1.0, #38; 3D
+post-v1.0); Edge AI → **post-v1.0** (#39).
 
 ```
 Sprint 17: Multi-Language Support
@@ -429,6 +448,10 @@ Sprint 19: Edge AI (On-Premise ML)
 ## 10. Phase 5 -- Platform (Sprints 20-22)
 
 **Goal:** Transform EdgePulse from product to platform
+**Delivery status:** API & Integration Hub → **public REST API + signed webhooks
+(Slack/Teams) shipped** (v1.0, #40; marketplace/SAP connectors post-v1.0);
+White Label → **branding shipped** (v1.0, #41; partner portal post-v1.0);
+Commercialisation → **post-v1.0** (#42).
 
 ```
 Sprint 20: API Marketplace & Integration Hub

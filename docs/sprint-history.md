@@ -2,10 +2,10 @@
 
 > A chronological record of what was built, why decisions were made, and what was learned.
 > Written as a technical journal — readable by anyone joining the project mid-stream.
-> Last updated: June 2026
+> Last updated: August 2026 (v1.0.0 released 2026-07-24; v1.0.1 hardening)
 >
 > Detailed narrative below covers the Foundation through Sprint 4. Sprints 5–16
-> are summarised in the "Sprints 5–16" section, with a dedicated doc per recent
+> and 17–28 are summarised in their own sections, with a dedicated doc per
 > sprint under `docs/sprints/`.
 
 ---
@@ -364,7 +364,7 @@ operator:      { role: "Operator",      tenantId: "00000099-...", areaIds: ["42c
     "Authority": "http://localhost:8080/realms/edgepulse",
     "Audience": "account",
     "ClientId": "edgepulse-api",
-    "ClientSecret": "lnBQYXdQnQTku1jT64LbEMyaRFRws3HS"
+    "ClientSecret": "<edgepulse-api-client-secret>"
   }
   ```
 - `AddAuthentication().AddJwtBearer()` in `Program.cs`
@@ -460,6 +460,77 @@ See `sprints/sprint-15-localization.md`.
 `devops/01-cicd-guide.md`.
 
 ---
+
+
+## Sprints 17–28 — v1.0 Completion Programme — Summary
+
+> July 2026. Twelve feature sprints delivered in one programme, each verified live
+> end-to-end against the running stack, each with a standalone doc in `docs/sprints/`.
+> Unit tests grew 64 → 130. Sixteen GitHub issues (epics + stories) closed.
+
+**Sprint 17 — Notifications (#6)** — `Notification` entity + API; every alert now
+fans out to the in-app 🔔 bell (unread badge, mark-read, deep link) **and** an SMTP
+email (MailKit; MailHog container for local dev).
+
+**Sprint 18 — Attachments (#10, #28)** — `IFileStorage` abstraction + local
+storage; upload/download/delete for devices with role gating, extension
+allow-list, 25 MB limit; Attachments card on device detail.
+
+**Sprint 19 — Reports (#7)** — cross-mill comparison with MTTA/MTTR, CSV exports
+(comparison + alert detail), `/reports` page. Also added EF retry-on-failure.
+
+**Sprint 20 — User Management (#71)** — Keycloak Admin REST integration:
+create/role/scope/enable/reset-password with a strict tenant-scoped authorization
+matrix; admin-only 👥 Users page. Lesson: Keycloak's partial `PUT /users/{id}`
+wipes profile fields — always read-modify-write the full representation.
+
+**Sprint 21 — Work Orders (#35)** — guarded lifecycle (Open → In progress →
+Completed / Hold / Cancel, 409 on illegal moves); CRITICAL/HIGH alerts auto-open
+one; assign, parts + completion notes; 🛠️ board.
+
+**Sprint 22 — Energy & ESG (#33)** — Mongo-side daily aggregation of power
+telemetry → kWh + CO₂e (configurable grid factor), per-mill/device, ESG CSV; ⚡ page.
+
+**Sprint 23 — Audit Trail (#36)** — automatic capture in `SaveChangesAsync` of
+every create/update/delete with property-level old→new diffs; admin 📜 page + CSV.
+
+**Sprint 24 — Webhooks (#40)** — HMAC-SHA256-signed outbound webhooks
+(`alert.created`, `workorder.created`), Slack/Teams format, admin 🔗 page with
+test-fire and delivery status. Verified with a local signature-checking receiver.
+
+**Sprint 25 — OPC-UA Auto-Discovery (#34)** — `npm run discover` browses a
+server's address space and emits the agent's `devices[]` config; found all 20
+NordPulp devices / 52 variables on the simulator.
+
+**Sprint 26 — Device Health (#32)** — transparent statistical condition score
+(alert pressure + threshold utilization + 7-day trend) with a linear
+days-to-threshold indicator; worst-first 🩺 board.
+
+**Sprint 27 — 2D Floor Plan (#38)** — `Device.FloorX/Y`; live SVG mill map with
+colour-coded health (pulsing critical), drag/place/remove layout editing.
+
+**Sprint 28 — White-Label (#41)** — per-tenant product name / logo / accent
+colour, Configuration → Branding tab, applied live across the shell.
+
+**Docs suite (#72–79)** — four end-to-end guides (Setup, Configuration,
+Functionality, Technical) + six reference docs (API, auth/AD-LDAP, deployment,
+integrations, operations, strategy).
+
+**Release — v1.0.0 (2026-07-24)** — changelogs finalised, all four components
+tagged `*-v1.0.0`, GitHub Releases + GHCR `:1.0.0 / :1.0 / :latest`. Lesson:
+pushing several release tags in one `git push` triggered **no** workflow runs;
+push tags one at a time (documented in `docs/devops/02-releasing.md`).
+
+**v1.0.1 — Hardening (August 2026)** — verify-and-harden pass: application
+secrets removed from git (`appsettings.json` placeholders; both .NET hosts fail
+fast with a helpful message; `dotnet user-secrets` locally / `Section__Key` env
+vars in Docker); Telemetry Processor given a Development launch profile (it ran
+as Production, so user-secrets never loaded); demo role users re-homed from an
+empty leftover tenant into NordPulp with correct mill/area scoping; full
+re-verification of every module on the hardened stack; all docs reviewed.
+
+**Deliberately post-v1.0:** AI features (#9, #39), Mobile app (#31),
+Commercialisation (#42), trained ML, 3D twin, pre-built SAP/ServiceNow connectors.
 
 ## Appendix: GitHub Milestones
 

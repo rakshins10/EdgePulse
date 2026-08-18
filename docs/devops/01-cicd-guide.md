@@ -104,10 +104,12 @@ Node 20 → `npm ci` (a clean, lockfile-exact install) → `npm run build` (whic
 The two jobs run **in parallel** on two separate machines, so the whole thing
 finishes in the time of the slower one.
 
-> **Why no tests?** There are no .NET unit-test projects in the repo yet, so the
-> backend job can only build. The frontend has a Playwright E2E suite, but it
-> needs the full stack (SQL Server, MongoDB, RabbitMQ, Keycloak) running — that's
-> a larger CI job documented as a future step in §8.
+> **Tests in CI:** the backend job runs `dotnet test` after the build — 130 xUnit
+> tests across `tests/EdgePulse.Domain.Tests` (entity behaviour) and
+> `tests/EdgePulse.Application.Tests` (handlers on an EF-InMemory double +
+> NSubstitute). A failing test fails the job. The frontend's Playwright E2E suite
+> still runs locally only, because it needs the full stack (SQL Server, MongoDB,
+> RabbitMQ, Keycloak) — see the future steps in §9.
 
 ---
 
@@ -262,8 +264,8 @@ public portfolio):
 - **E2E in CI:** add a workflow that spins up SQL/Mongo/RabbitMQ/Keycloak as
   service containers (or via `docker compose`), starts the API + dashboard, then
   runs Playwright. Slower but catches real regressions.
-- **.NET unit/integration tests:** add `*.Tests` projects; the CI `backend` job
-  would then run `dotnet test`.
+- **Integration tests:** unit tests already run in CI (130). Next tier is
+  `WebApplicationFactory`-based integration tests against service containers.
 - **Actual deployment (true CD):** from GHCR you can deploy by pulling the images
   on a server / Azure Container Apps / Kubernetes. That needs hosting + secrets,
   so it's intentionally out of scope here. The images being published is the

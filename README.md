@@ -39,7 +39,7 @@ It enables industrial organizations to:
 - **Register and manage** all physical devices across multiple facilities from a single platform
 - **Ingest high-frequency telemetry** from thousands of devices in real time
 - **Detect anomalies automatically** using configurable threshold rules
-- **Generate AI-powered alert summaries** using Azure OpenAI
+- **Close the loop** — alerts open maintenance work orders and reach people via in-app, email and signed webhooks
 - **Notify the right people** based on their role and operational scope
 - **Visualize** device health and performance trends on a real-time dashboard
 
@@ -133,69 +133,66 @@ Processor Service (.NET Worker)
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| **Device API** | .NET 9, ASP.NET Core | Device management, user auth, REST API |
-| **Architecture** | Clean Architecture, CQRS, MediatR | Maintainable, testable code structure |
-| **ORM** | Entity Framework Core 9 | Database access for Device API |
-| **Telemetry Service** | Node.js 20, NestJS, TypeScript | High-frequency telemetry ingestion |
-| **Background Processor** | .NET 9 Worker Service | Queue processing, anomaly detection |
-| **Identity** | Keycloak 24 + PostgreSQL 16 | SSO, JWT, RBAC, Azure AD integration |
-| **Message Queue** | Azure Service Bus | Async telemetry processing, buffering |
-| **Relational DB** | Azure SQL | Devices, users, alerts, audit logs |
-| **Time-series DB** | Azure Cosmos DB | Telemetry storage (partitioned by deviceId) |
-| **AI** | Azure OpenAI (GPT-4o-mini) | Human-readable alert summaries |
-| **Secrets** | Azure Key Vault + Managed Identity | Zero hardcoded secrets |
-| **Monitoring** | Azure Application Insights | Distributed tracing, metrics, logs |
-| **Frontend** | React 18, TypeScript | Real-time dashboard |
-| **Hosting** | Azure Container Apps | Scalable container hosting |
-| **CI/CD** | GitHub Actions | Automated build, test, deploy |
-| **Containers** | Docker, Docker Compose | Local dev and production packaging |
+EdgePulse is **on-premise first**. The left column is what ships and is verified in this repo; the cloud profile maps 1-to-1 and is selected by `DEPLOYMENT_MODE` (see [Deployment guide](docs/reference/deployment.md)).
+
+| Layer | On-premise (shipped, v1.0) | Cloud profile (Azure) |
+|-------|---------------------------|-----------------------|
+| **API** | .NET 9, ASP.NET Core — Clean Architecture, CQRS + MediatR, FluentValidation | same |
+| **ORM** | Entity Framework Core 9 (retry-on-failure, automatic audit capture) | same |
+| **Telemetry ingestion** | OPC-UA edge agent (node-opcua) + NestJS REST ingest | same |
+| **Background processor** | .NET 9 Worker Service — alert engine + notification fan-out | same |
+| **Identity** | Keycloak 24 + PostgreSQL 16 — OIDC, JWT, RBAC, Admin API | Keycloak on Container Apps / Entra External ID |
+| **Message queue** | RabbitMQ 3.12 | Azure Service Bus |
+| **Relational DB** | SQL Server 2022 | Azure SQL |
+| **Time-series DB** | MongoDB 7 (aggregation pipelines for energy/health) | Cosmos DB (Mongo API) |
+| **File storage** | Local volume behind `IFileStorage` | Azure Blob |
+| **Email** | SMTP (MailHog locally) | ACS Email / SendGrid |
+| **Secrets** | `dotnet user-secrets` (dev) / env vars (Docker) — nothing in git | Azure Key Vault + Managed Identity |
+| **Frontend** | React 18, TypeScript, Vite, CSS Modules, React Query, i18next (en/fi/sv) | same |
+| **Load balancer** | HAProxy | Azure Container Apps ingress |
+| **CI/CD** | GitHub Actions → GHCR (per-component versioning, beta + release channels) | same |
+| **Containers** | Docker Compose (full on-prem stack) | Container Apps |
 
 ---
-
 ## ✨ Features
 
+Everything below is **shipped in v1.0.0** and verified live end-to-end.
+
 ### 🔐 Identity & Access Management
-- **Keycloak SSO** — single sign-on across all services
-- **Azure Active Directory integration** — enterprise SSO via OIDC
-- **5-level RBAC** — SuperAdmin, Customer Admin, Mill Manager, Operator, Executive
-- **Tenant isolation** — row-level security, zero cross-tenant data access
-- **MFA support** — via Keycloak
+- **Keycloak** OIDC — JWT auth for the API, SSO for the dashboard
+- **5-level RBAC** — SuperAdmin, CustomerAdmin, MillManager, Operator, Executive; every handler is role-guarded and unit-tested
+- **Tenant isolation** — all queries scoped by the JWT `tenantId` claim; MillManager/Operator further scoped to their mill/areas
+- **User management UI** — create users, assign roles + mill/area scope, enable/disable, temporary passwords (Keycloak Admin API)
+- Azure AD SSO and on-prem AD/LDAP via Keycloak federation (documented; not app code)
 
 ### 🏭 Device Management
-- Register, update, and decommission industrial devices
-- Device types: Pump, Motor, Valve, Sensor, Compressor, Fan
-- Device status tracking: Online, Offline, Maintenance, Decommissioned
-- Full device history: telemetry, alerts, maintenance events
-- Search and filter by type, area, mill, status
+- Register (one-time hashed API key), edit, decommission (revokes keys, keeps telemetry)
+- Everything-is-data lookups: device types, statuses, maintenance/metric/location types — tenant custom values, protected system values
+- **File attachments** — manuals, datasheets, CAD (25 MB, allow-listed types, role-gated)
+- **Live 2D floor plan** — mill map with colour-coded device health, drag-to-place layout editing
 
 ### 📡 Telemetry Ingestion
-- REST API endpoint with per-device API key authentication
-- Supports: temperature, pressure, vibration, flow rate, power consumption
-- Handles 1,000+ messages/minute per tenant
-- Publishes to Azure Service Bus for reliable async processing
+- **OPC-UA edge agent** with **auto-discovery** (`npm run discover` browses a server and generates the device/metric mapping) + a full NordPulp plant simulator
+- REST ingestion endpoint (`X-Device-Key`) for anything that can POST JSON
+- RabbitMQ → .NET Telemetry Processor → MongoDB time-series; live Recharts per metric
 
-### 🚨 Anomaly Detection & Alerts
-- Configurable thresholds per device per metric
-- Triggers after **3 consecutive** threshold breaches (reduces false positives)
-- Alert severity: Critical, High, Medium, Low
-- **AI-generated alert summaries** via Azure OpenAI
-- Alert lifecycle: Open → Acknowledged → Assigned → Resolved → Closed
-- Email + in-app notifications (Critical and High severity)
+### 🚨 Alerts, Notifications & Work Orders
+- Configurable per-device thresholds; fires after **3 consecutive** breaches (noise filter); one open alert per (device, metric, threshold)
+- Lifecycle Open → Acknowledged → Resolved with audit fields
+- **Delivery on every alert:** in-app notification bell (deep-links to the record) + SMTP email + HMAC-signed webhooks (Slack/Teams-compatible)
+- **Maintenance work orders** auto-opened from CRITICAL/HIGH alerts — guarded lifecycle, assignment, parts + completion notes, per-device history
 
-### 📊 Dashboard & Reporting
-- Real-time device status overview
-- Live telemetry charts (last 24 hours per device)
-- Active alert log with AI summaries
-- Mill-level reports: uptime, alert frequency, telemetry trends
-- Cross-mill comparison reports (all metrics, custom configurable)
-- Export as PDF and CSV
+### 📊 Dashboards, Reports & Analytics
+- Role-scoped KPI dashboard and executive view
+- **Cross-mill comparison** with MTTA/MTTR + CSV exports (comparison + alert detail)
+- **Energy & ESG** — kWh and CO₂e from power telemetry, per-mill/device breakdowns, daily chart, ESG CSV (GHG Protocol Scope 2)
+- **Device health scoring** — transparent statistical condition score + linear days-to-threshold indicator, worst-first board
 
-### 🔍 Audit Trail
-- Immutable log of all user actions
-- Retained for 24 months
-- Accessible to SuperAdmin, Customer Admin, Mill Manager
+### 🔍 Compliance & Platform
+- **Audit trail** — every create/update/delete captured automatically with property-level old→new diffs; admin page + CSV evidence export
+- **Localization** — full UI in English, Finnish, Swedish; locales are data (add any language in-app, DB-backed strings, CSV translation round-trip)
+- **White-label branding** — per-tenant product name, logo, accent colour applied live
+- Independent per-component versioning, changelog-driven beta images, tag-cut releases to GHCR
 
 ---
 
@@ -274,22 +271,34 @@ cd EdgePulse
 
 # 2. Start infrastructure (SQL Server, MongoDB, RabbitMQ, Keycloak)
 docker compose -f infrastructure/docker-compose.onpremise.yml up -d `
-    sqlserver mongodb rabbitmq postgres keycloak
+    sqlserver mongodb rabbitmq postgres keycloak mailhog
 
-# 3. Apply EF migrations + seed NordPulp demo data
+# 3. One-time: application secrets (committed appsettings hold placeholders;
+#    the services refuse to start without these — see docs/guides/01-setup-guide.md §4)
+$API="src/backend/EdgePulse.API/EdgePulse.API.csproj"
+$TP="src/backend/EdgePulse.TelemetryProcessor/EdgePulse.TelemetryProcessor.csproj"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,1433;Database=EdgePulse;User Id=sa;Password=EdgePulse@2026;TrustServerCertificate=True;" --project $API
+dotnet user-secrets set "ConnectionStrings:MongoDB" "mongodb://edgepulse:EdgePulse%402026@localhost:27017" --project $API
+dotnet user-secrets set "Keycloak:ClientSecret" "<from Keycloak: Clients > edgepulse-api > Credentials>" --project $API
+dotnet user-secrets set "Keycloak:AdminPassword" "admin" --project $API
+dotnet user-secrets set "ConnectionStrings:SqlServer" "Server=localhost,1433;Database=EdgePulse;User Id=sa;Password=EdgePulse@2026;TrustServerCertificate=True" --project $TP
+dotnet user-secrets set "ConnectionStrings:MongoDB" "mongodb://edgepulse:EdgePulse%402026@localhost:27017" --project $TP
+dotnet user-secrets set "ConnectionStrings:RabbitMQ" "amqp://edgepulse:EdgePulse%402026@localhost:5672/edgepulse" --project $TP
+
+# 4. Apply EF migrations + seed NordPulp demo data
 dotnet run --project src/backend/EdgePulse.API -- --seed
 
-# 4. Start the API (new terminal — leave running)
+# 5. Start the API (new terminal — leave running)
 dotnet run --project src/backend/EdgePulse.API
 
-# 5. Start the TelemetryProcessor (new terminal — leave running)
+# 6. Start the TelemetryProcessor (new terminal — leave running)
 dotnet run --project src/backend/EdgePulse.TelemetryProcessor
 
-# 6. Start the OPC-UA simulator + agent (publishes telemetry to RabbitMQ)
+# 7. Start the OPC-UA simulator + agent (publishes telemetry to RabbitMQ)
 docker compose -f infrastructure/docker-compose.onpremise.yml up -d `
     opcua-simulator opcua-agent
 
-# 7. Start the Dashboard (new terminal — leave running)
+# 8. Start the Dashboard (new terminal — leave running)
 cd src/EdgePulse.Dashboard
 npm install   # first time only
 npm run dev
@@ -331,51 +340,38 @@ docker compose -f infrastructure/docker-compose.onpremise.yml down -v
 EdgePulse/
 │
 ├── src/
-│   ├── EdgePulse.API/              # .NET 9 Device Management API
-│   │   ├── Domain/                 # Entities, value objects
-│   │   ├── Application/            # CQRS handlers, interfaces
-│   │   ├── Infrastructure/         # EF Core, Azure services
-│   │   └── API/                    # Controllers, middleware
+│   ├── backend/                        # All .NET 9 — one "backend" release line
+│   │   ├── EdgePulse.Domain/           # Entities with behaviour, no framework refs
+│   │   ├── EdgePulse.Application/      # CQRS handlers (MediatR), validators, pure logic
+│   │   ├── EdgePulse.Infrastructure/   # EF Core + SQL Server, migrations, Keycloak admin,
+│   │   │                               #   file storage, webhook sender, audit capture
+│   │   ├── EdgePulse.API/              # REST API (JWT, Swagger, Mongo read-side)
+│   │   ├── EdgePulse.TelemetryProcessor/  # RabbitMQ → MongoDB + alert engine + fan-out
+│   │   ├── EdgePulse.sln · Directory.Build.props · CHANGELOG.md
 │   │
-│   ├── EdgePulse.TelemetryService/ # Node.js / NestJS ingestion service
-│   │   ├── src/
-│   │   │   ├── telemetry/          # Telemetry module
-│   │   │   ├── auth/               # API key validation
-│   │   │   └── queue/              # Service Bus publisher
-│   │   └── Dockerfile
-│   │
-│   ├── EdgePulse.Processor/        # .NET 9 Worker Service
-│   │   ├── Consumers/              # Service Bus consumers
-│   │   ├── Detectors/              # Anomaly detection logic
-│   │   ├── AI/                     # Azure OpenAI integration
-│   │   └── Dockerfile
-│   │
-│   └── EdgePulse.Dashboard/        # React + TypeScript frontend
-│       ├── src/
-│       │   ├── pages/              # Dashboard, Devices, Alerts
-│       │   ├── components/         # Reusable UI components
-│       │   └── services/           # API clients
-│       └── Dockerfile
+│   ├── EdgePulse.Dashboard/            # React 18 + TypeScript + Vite (CSS Modules)
+│   ├── EdgePulse.Ingestion/            # NestJS REST telemetry ingestion
+│   └── EdgePulse.OpcUaAgent/           # OPC-UA edge agent + simulator + auto-discovery
 │
-├── docs/                           # Project documentation
-│   ├── 01-requirements.md          # Requirements document ✅
-│   ├── 02-architecture.md          # Architecture document (in progress)
-│   ├── 03-data-design.md           # Data design (coming soon)
-│   ├── 04-api-design.md            # API design (coming soon)
-│   ├── 05-identity-design.md       # Identity design (coming soon)
-│   └── 06-infrastructure.md        # Infrastructure design (coming soon)
+├── tests/
+│   ├── EdgePulse.Domain.Tests/         # xUnit — entity behaviour
+│   └── EdgePulse.Application.Tests/    # xUnit — handlers (EF InMemory + NSubstitute)
 │
 ├── infrastructure/
-│   ├── docker-compose.yml          # Local development stack
-│   ├── docker-compose.override.yml # Local overrides
-│   └── bicep/                      # Azure infrastructure as code
-│
+│   └── docker-compose.onpremise.yml    # SQL Server, MongoDB, RabbitMQ, Postgres, Keycloak,
+│                                       #   MailHog, HAProxy, OPC-UA simulator + agent
 ├── .github/
-│   └── workflows/
-│       ├── api.yml                 # Device API CI/CD
-│       ├── telemetry.yml           # Telemetry Service CI/CD
-│       └── processor.yml           # Processor CI/CD
+│   ├── workflows/                      # ci.yml + publish-{backend,dashboard,ingestion,opcua-agent}.yml
+│   └── actions/component-version/      # changelog-driven version resolution
 │
+├── docs/
+│   ├── guides/                         # Setup · Configuration · Functionality · Technical
+│   ├── reference/                      # API · Auth · Deployment · Integrations · Operations · Strategy
+│   ├── devops/                         # CI/CD guide · Releasing guide
+│   ├── sprints/                        # Per-sprint delivery journals (4 → 28)
+│   └── 01-requirements · 02-architecture · 03-data_design … (original design docs)
+│
+├── ARCHITECTURE.md · PRODUCT-ROADMAP.md · DOCKER-COMMANDS.md
 └── README.md
 ```
 
@@ -383,59 +379,74 @@ EdgePulse/
 
 ## 📄 Documentation
 
-| Document | Status | Description |
-|----------|--------|-------------|
-| [Requirements](docs/01-requirements.md) | ✅ Complete | Functional & non-functional requirements |
-| [Architecture](docs/02-architecture.md) | ✅ Complete | System design & component architecture |
-| [Data Design](docs/03-data_design.md) | ✅ Complete | Database schemas & data flow |
-| [Sprint History](docs/sprint-history.md) | ✅ Ongoing | Per-sprint journal; details in `docs/sprints/` |
-| [Keycloak Setup](docs/keycloak-setup.md) | ✅ Complete | Realm, clients, protocol mappers, test users |
-| [Local Test Guide](docs/testing/local-test-guide.md) | ✅ Complete | Run the full stack locally, step by step |
-| [CI/CD Guide](docs/devops/01-cicd-guide.md) | ✅ Complete | GitHub Actions + GHCR, beginner-oriented |
-| [Setup Guide](docs/guides/01-setup-guide.md) | ✅ Complete | Install & run everything from scratch |
-| [Configuration Guide](docs/guides/02-configuration-guide.md) | ✅ Complete | Every setting, file and in-product config |
-| [Functionality Guide](docs/guides/03-functionality-guide.md) | ✅ Complete | Every module + role permissions |
-| [Technical Guide](docs/guides/04-technical-guide.md) | ✅ Complete | Frontend + backend architecture deep dive |
-| [API Reference](docs/reference/api-reference.md) | ✅ Complete | Endpoint catalogue (Swagger is canonical) |
-| [Authentication & AD/LDAP](docs/reference/authentication.md) | ✅ Complete | Keycloak, claims, SSO, federation |
-| [Integrations](docs/reference/integrations.md) | ✅ Complete | OPC-UA + discovery, REST ingest, webhooks |
-| [Deployment](docs/reference/deployment.md) | ✅ Complete | Local, on-premise, cloud, CI/CD |
-| [Operations](docs/reference/operations.md) | ✅ Complete | Monitoring, backup, hardening, upgrades |
-| [Strategy](docs/reference/strategy.md) | ✅ Complete | GTM summary (full: PRODUCT-ROADMAP.md) |
-| API Reference | 📋 Planned | Per-endpoint REST docs (issue #78) |
-| Operations Guide | 📋 Planned | Monitoring, backup, hardening (issue #77) |
+**Start here** — the four end-to-end guides cover everything needed to understand, configure and run the platform from scratch:
+
+| Guide | What it covers |
+|-------|----------------|
+| [Setup Guide](docs/guides/01-setup-guide.md) | Install & run everything from a fresh clone, verify the pipeline, troubleshoot |
+| [Configuration Guide](docs/guides/02-configuration-guide.md) | Every setting — appsettings, secrets, env, compose — plus all in-product configuration |
+| [Functionality Guide](docs/guides/03-functionality-guide.md) | Every module, role permissions, ingestion paths |
+| [Technical Guide](docs/guides/04-technical-guide.md) | Full frontend + backend architecture breakdown |
+
+**Reference**
+
+| Document | Description |
+|----------|-------------|
+| [API Reference](docs/reference/api-reference.md) | Endpoint catalogue with role legend (Swagger UI is canonical) |
+| [Authentication & AD/LDAP](docs/reference/authentication.md) | Keycloak, claims model, Azure AD SSO, LDAP federation |
+| [Integrations](docs/reference/integrations.md) | OPC-UA + auto-discovery, simulator, REST ingest, signed webhooks |
+| [Deployment](docs/reference/deployment.md) | Local, on-premise Docker, cloud mapping, CI/CD |
+| [Operations](docs/reference/operations.md) | Monitoring, backup, security-hardening checklist, upgrades |
+| [Strategy](docs/reference/strategy.md) | GTM summary — full narrative in `PRODUCT-ROADMAP.md` |
+| [Keycloak Setup](docs/keycloak-setup.md) | Realm, clients, protocol mappers, demo users |
+| [Demo Data Setup](docs/domain/02-demo-data-setup.md) | The NordPulp seed: fixed GUIDs, devices, thresholds |
+| [Local Test Guide](docs/testing/local-test-guide.md) | Manual test walkthrough of the full stack |
+
+**Engineering & process**
+
+| Document | Description |
+|----------|-------------|
+| [Project Guide](docs/project-guide.md) | Engineering standards, architecture rules, conventions |
+| [Implementation Patterns](docs/implementation-patterns.md) | Code patterns used across handlers, controllers, UI |
+| [Development Setup](docs/development-setup.md) | Toolchain, commands, and the original scaffolding journal |
+| [CI/CD Guide](docs/devops/01-cicd-guide.md) | GitHub Actions + GHCR, beginner-oriented |
+| [Releasing Guide](docs/devops/02-releasing.md) | Per-component versioning, changelog-driven betas, cutting a release |
+| [Sprint History](docs/sprint-history.md) | Chronological journal; per-sprint detail in [`docs/sprints/`](docs/sprints/) |
+
+**Original design documents** (written before Sprint 1 — point-in-time, kept for provenance)
+
+| Document | Description |
+|----------|-------------|
+| [Requirements](docs/01-requirements.md) | Functional & non-functional requirements |
+| [Architecture](docs/02-architecture.md) | System design & component architecture |
+| [Data Design](docs/03-data_design.md) | Database schemas & data flow |
 
 ---
 
 ## 🗺️ Roadmap
 
-### Delivered (Sprints 1–16)
-- [x] Configuration module — configurable lookup tables (industry templates + tenant overrides)
-- [x] Organisation hierarchy — Tenant → Mill → Area, role-scoped
-- [x] Device management — registration, hashed API keys, full CRUD
-- [x] Keycloak JWT auth — 5 roles, tenant/mill/area-scoped claims
-- [x] Telemetry pipeline — NestJS ingestion → RabbitMQ → .NET processor → MongoDB
-- [x] OPC-UA edge agent + simulator (on-premise telemetry path)
-- [x] Alerts engine — thresholds, 3-breach rule, state machine
-- [x] React dashboard — alerts, device telemetry charts, executive KPIs
-- [x] Dark mode + responsive layout
-- [x] Full CRUD UI for Devices / Mills / Areas + Configuration screen
-- [x] Localization (i18n) — data-driven locales, server-resolved lookup
-      translations, DB-backed UI overrides, CSV import/export
-- [x] CI/CD — GitHub Actions build checks + Docker images published to GHCR
+### ✅ v1.0.0 — delivered (Sprints 1–28, released 2026-07-24)
+All four components are tagged `*-v1.0.0` with images on GHCR. Highlights:
+- Configuration system, organisation hierarchy, device management with attachments
+- Keycloak identity + RBAC + **user management UI**
+- Telemetry pipeline: OPC-UA agent **with auto-discovery**, REST ingest, RabbitMQ → MongoDB
+- Alert engine with **in-app / email / signed-webhook delivery** and **auto-created work orders**
+- Dashboards, **cross-mill reports (MTTA/MTTR)**, **Energy & ESG**, **device health scoring**, **live 2D floor plan**
+- **Audit trail**, **white-label branding**, en/fi/sv localization
+- 130 unit tests in CI, per-component versioning, complete documentation suite
 
-### Next candidates
-- [ ] Reports & exports (cross-mill comparison, PDF/CSV)
-- [ ] Notifications delivery (email / in-app) for alerts
-- [ ] File attachments for devices (Azure Blob / MinIO)
-- [ ] User management (role assignment, AD group mapping)
-- [ ] AI alert summaries (Azure OpenAI / Ollama)
-- [ ] E2E tests in CI + .NET unit/integration tests
-- [ ] Deployment from GHCR (Azure Container Apps / Kubernetes)
+### v1.0.1 — hardening (in progress)
+- [x] Application secrets out of git (`dotnet user-secrets` / env vars; services fail fast on placeholders)
+- [x] Demo role users homed in the NordPulp tenant with correct scoping
+- [ ] Remaining production checklist — see [Operations guide](docs/reference/operations.md)
 
-> Longer-term product epics (Predictive Maintenance, Digital Twin, Energy/ESG,
-> Mobile, API Marketplace, etc.) are tracked in `PRODUCT-ROADMAP.md` and the
-> GitHub EPIC issues.
+### Post-v1.0 (deliberately deferred)
+- **AI features** — alert summaries + natural-language device Q&A (Ollama on-prem / Azure OpenAI) — [#9](https://github.com/rakshins10/EdgePulse/issues/9), [#39](https://github.com/rakshins10/EdgePulse/issues/39)
+- **Mobile app** (React Native) — [#31](https://github.com/rakshins10/EdgePulse/issues/31)
+- **Commercialisation** — website, self-service trial, billing — [#42](https://github.com/rakshins10/EdgePulse/issues/42)
+- Trained ML models, 3D digital twin, pre-built SAP/ServiceNow connectors — each has its v1.0 foundation shipped
+
+> Full product vision and market strategy: `PRODUCT-ROADMAP.md`.
 
 ---
 

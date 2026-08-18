@@ -7,6 +7,14 @@
 **Author:** Rakshith N S
 **Depends On:** 01-requirements.md v1.0, 02-architecture.md v1.0
 
+> **📌 As-built note (August 2026, v1.0.0 shipped).** This is the original
+> pre-Sprint-1 design document, kept as approved for provenance. The design
+> held; three things differ in what was actually built and shipped:
+> (1) the **on-premise profile is what runs and is verified** — RabbitMQ,
+> MongoDB and SQL Server (the Azure Service Bus / Cosmos DB / Azure SQL
+> profile is the documented cloud mapping, selected by `DEPLOYMENT_MODE`);
+> (2) the .NET projects live under `src/backend/`; (3) AI features are deferred
+> post-v1.0. For the as-built system see `docs/guides/04-technical-guide.md`.
 ---
 
 ## Table of Contents

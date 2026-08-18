@@ -2,7 +2,7 @@
 
 > Engineering standards, architecture rules, and project conventions for EdgePulse.
 > Keep it updated. It is the single source of truth for project context.
-> Last updated: May 2026 | Sprint 11 complete — Sprint 12 next
+> Last updated: August 2026 | v1.0.0 released (Sprints 1–28 complete) — v1.0.1 hardening in progress
 
 ---
 
@@ -427,7 +427,7 @@ POST                  {id}/resolve
 ```
 Realm:         edgepulse
 Client ID:     edgepulse-api
-Client Secret: lnBQYXdQnQTku1jT64LbEMyaRFRws3HS  (dev — rotate before prod)
+Client Secret: (from Keycloak → Clients → edgepulse-api → Credentials; stored via dotnet user-secrets, never committed)
 Authority:     http://localhost:8080/realms/edgepulse
 Audience:      account
 ```

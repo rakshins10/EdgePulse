@@ -13,11 +13,14 @@ versions follow [SemVer](https://semver.org/).
 
 ## [Unreleased] — v1.1.0
 
-_Post-1.0 development._
+### Fixed
+- Notification bell: work-order notifications now navigate to the Work Orders
+  board; alert notifications deep-link with `?highlight=<id>` (row scrolled into
+  view + accent flash; works when already on the page).
 
 ## [1.0.0] — 2026-07-24
 
-First release line. Everything built across Sprints 8–16 ships here.
+First release line. Everything built across Sprints 7–28 ships here.
 
 ### Added
 - **Branding (Sprint 28)** — Configuration → Branding tab; product name,

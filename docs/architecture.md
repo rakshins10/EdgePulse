@@ -2,7 +2,7 @@
 
 > This document explains not just what was built, but why each decision was made.
 > For each major decision: the context, options considered, and final choice.
-> Last updated: May 2026
+> Last updated: August 2026 (v1.0.0 shipped) — the decisions below held through v1.0; see docs/guides/04-technical-guide.md for the as-built module map
 
 ---
 
@@ -384,7 +384,7 @@ The system has 5 roles with different scopes. Operators are restricted to specif
 MillManagers are restricted to their mill. This level of fine-grained access control needs
 a proper identity provider, not custom JWT code.
 
-### Decision: Keycloak (Sprint 4 — not yet built)
+### Decision: Keycloak (shipped in Sprint 4; user-management UI added in Sprint 20)
 
 Keycloak handles:
 - JWT issuance and validation

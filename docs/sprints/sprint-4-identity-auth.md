@@ -165,7 +165,7 @@ Run these commands to verify the sprint is working. Keycloak must be running.
 ```bash
 TOKEN=$(curl -s -X POST "http://localhost:8080/realms/edgepulse/protocol/openid-connect/token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "grant_type=password&client_id=edgepulse-api&client_secret=lnBQYXdQnQTku1jT64LbEMyaRFRws3HS&username=superadmin&password=Test@1234" \
+  -d "grant_type=password&client_id=edgepulse-api&client_secret=<edgepulse-api-client-secret>&username=superadmin&password=Test@1234" \
   | grep -o '"access_token":"[^"]*"' | cut -d'"' -f4)
 ```
 

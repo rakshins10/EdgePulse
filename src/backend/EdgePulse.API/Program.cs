@@ -98,7 +98,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme       = "bearer",
         BearerFormat = "JWT",
         In           = ParameterLocation.Header,
-        Description  = "Paste your Keycloak access token here.\n\nGet one with:\ncurl -s -X POST http://localhost:8080/realms/edgepulse/protocol/openid-connect/token -d 'grant_type=password&client_id=edgepulse-api&client_secret=lnBQYXdQnQTku1jT64LbEMyaRFRws3HS&username=superadmin&password=Test@1234' | jq -r .access_token"
+        Description  = "Paste your Keycloak access token here.\n\nGet one with:\ncurl -s -X POST http://localhost:8080/realms/edgepulse/protocol/openid-connect/token -d 'grant_type=password&client_id=edgepulse-api&client_secret=<edgepulse-api-client-secret>&username=superadmin&password=Test@1234' | jq -r .access_token"
     });
 
     // Apply the Bearer scheme globally to all operations

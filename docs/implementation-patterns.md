@@ -2,7 +2,7 @@
 
 > This document extracts the recurring patterns from how we implement stories.
 > A new developer should be able to read this and know exactly how we work.
-> Last updated: May 2026
+> Last updated: August 2026 — patterns unchanged through v1.0.0; newer modules (notifications, work orders, webhooks, audit) follow the same handler/controller/validator shapes
 
 ---
 

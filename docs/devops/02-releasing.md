@@ -43,17 +43,17 @@ backward-compatible features, MAJOR for breaking changes.
         │
         ▼
    BETA image published automatically for THAT component only
-   version = <Unreleased target>-beta.<N>     e.g. 0.1.0-beta.3
-   tags:  :0.1.0-beta.3  (immutable, the exact beta)
+   version = <Unreleased target>-beta.<N>     e.g. 1.1.0-beta.3
+   tags:  :1.1.0-beta.3  (immutable, the exact beta)
           :beta          (moves to the newest beta)
           :main          (moves to the newest beta — legacy alias)
           :sha-<commit>  (immutable, traceable)
         │
-   you decide it's ready ──► push a version tag, e.g.  dashboard-v0.1.0
+   you decide it's ready ──► push a version tag, e.g.  dashboard-v1.1.0
         │
         ▼
    RELEASE image for that component
-   tags:  :0.1.0   :0.1   :latest
+   tags:  :1.1.0   :1.1   :latest
    + a GitHub Release with auto-generated notes
 ```
 
@@ -65,37 +65,37 @@ backward-compatible features, MAJOR for breaking changes.
 - **Release** = a curated version *you* cut by pushing a tag. The maintainer
   controls when a real version exists.
 
-**Semver ordering holds:** `0.1.0-beta.1` < `0.1.0-beta.2` < … < `0.1.0`. Betas are
+**Semver ordering holds:** `1.1.0-beta.1` < `1.1.0-beta.2` < … < `1.1.0`. Betas are
 pre-releases *of* their Unreleased target and correctly sort before it.
 
 ---
 
 ## 3. How to cut a release (step by step)
 
-Example: releasing the **dashboard** as `0.1.0`.
+Example: releasing the **dashboard** as `1.1.0` (the current Unreleased target).
 
 1. **Finalize the CHANGELOG** on a branch — in `src/EdgePulse.Dashboard/CHANGELOG.md`,
-   rename the `## [Unreleased] — v0.1.0` heading to `## [0.1.0] — YYYY-MM-DD`, then
-   add a fresh `## [Unreleased] — v0.1.1` (or your next target) above it. Bump the
+   rename the `## [Unreleased] — v1.1.0` heading to `## [1.1.0] — YYYY-MM-DD`, then
+   add a fresh `## [Unreleased] — v1.2.0` (or `v1.1.1` for a patch) above it. Bump the
    `package.json` version to match if you like it in sync.
 2. **Open a PR, get CI green, merge to main.** (This publishes a final *beta* of the
    about-to-be-released version.)
 3. **Create and push the tag** matching the component + version:
    ```bash
    git checkout main && git pull
-   git tag dashboard-v0.1.0
-   git push origin dashboard-v0.1.0
+   git tag dashboard-v1.1.0
+   git push origin dashboard-v1.1.0
    ```
    (Or on GitHub: **Releases → Draft a new release → Choose a tag → create
-   `dashboard-v0.1.0`**.)
+   `dashboard-v1.1.0`**.)
 4. The **Publish — Dashboard** workflow fires on the tag and:
-   - builds + pushes `ghcr.io/<owner>/edgepulse-dashboard:0.1.0`, `:0.1`, `:latest`
-   - creates a **GitHub Release** named "Dashboard 0.1.0" with auto notes
-5. The next merge to main starts betas at `0.1.1-beta.1` (against your new
+   - builds + pushes `ghcr.io/<owner>/edgepulse-dashboard:1.1.0`, `:1.1`, `:latest`
+   - creates a **GitHub Release** named "Dashboard 1.1.0" with auto notes
+5. The next merge to main starts betas at `1.2.0-beta.1` (against your new
    Unreleased target).
 
 Same pattern for the others — just change the prefix:
-`backend-v0.1.0`, `ingestion-v0.1.0`, `opcua-agent-v0.1.0`.
+`backend-v1.1.0`, `ingestion-v1.1.0`, `opcua-agent-v1.1.0`.
 
 > **Guard:** if the `## [Unreleased]` target still equals a version that's already
 > been released, CI fails the beta build with a clear message telling you to bump
@@ -128,8 +128,8 @@ Same pattern for the others — just change the prefix:
 Pull the newest beta, a specific beta, or a release:
 ```bash
 docker pull ghcr.io/rakshins10/edgepulse-dashboard:beta            # newest beta
-docker pull ghcr.io/rakshins10/edgepulse-dashboard:0.1.0-beta.3    # exact beta
-docker pull ghcr.io/rakshins10/edgepulse-dashboard:0.1.0           # release
+docker pull ghcr.io/rakshins10/edgepulse-dashboard:1.1.0-beta.3    # exact beta
+docker pull ghcr.io/rakshins10/edgepulse-dashboard:1.0.0           # release (the shipped version)
 ```
 
 ---
@@ -163,7 +163,7 @@ after a release it resets to `beta.1` again.
 No. `paths:` filters mean only `Publish — Dashboard` ran.
 
 **Q: Do betas overwrite each other?**
-`:beta` and `:main` move to the newest; `:0.1.0-beta.N` and `:sha-<commit>` are
+`:beta` and `:main` move to the newest; `:1.1.0-beta.N` and `:sha-<commit>` are
 immutable, so any past beta is still pullable.
 
 **Q: I forgot to bump the Unreleased target after releasing — what happens?**
