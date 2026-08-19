@@ -14,7 +14,14 @@ versions follow [SemVer](https://semver.org/).
 > rename the section below to `## [<next>] — YYYY-MM-DD` and start a fresh
 > `## [Unreleased]` with the next target.
 
-## [Unreleased] — v1.1.0
+## [Unreleased] — v1.2.0
+
+_Post-1.1 development._
+
+## [1.1.0] — 2026-08-19
+
+The AI release (Sprints 29–30): alert explanations and grounded natural-language
+Q&A with an on-premise model, plus the v1.0.1 hardening below.
 
 ### Added
 - **Ask EdgePulse (Sprint 30)** — `POST /api/ai/ask`: natural-language

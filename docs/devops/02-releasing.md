@@ -28,8 +28,9 @@ line — it is the single source of truth. (The `package.json` / `Directory.Buil
 version still exists for npm / MSBuild tooling; keep it roughly in sync, but CI does
 not read it.)
 
-All four components were released as **1.0.0** on 2026-07-24 and now target
-**1.1.0** for ongoing development.
+All four components were released as **1.0.0** on 2026-07-24. **Backend and
+dashboard shipped 1.1.0 on 2026-08-19** (the AI release) and now target **1.2.0**;
+ingestion and opcua-agent were unchanged and remain at 1.0.0, targeting 1.1.0.
 
 We use **SemVer**: `MAJOR.MINOR.PATCH` — bump PATCH for fixes, MINOR for new
 backward-compatible features, MAJOR for breaking changes.

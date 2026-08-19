@@ -444,14 +444,11 @@ All four components are tagged `*-v1.0.0` with images on GHCR. Highlights:
 - **Audit trail**, **white-label branding**, en/fi/sv localization
 - 130 unit tests in CI, per-component versioning, complete documentation suite
 
-### v1.0.1 — hardening (in progress)
-- [x] Application secrets out of git (`dotnet user-secrets` / env vars; services fail fast on placeholders)
-- [x] Demo role users homed in the NordPulp tenant with correct scoping
-- [ ] Remaining production checklist — see [Operations guide](docs/reference/operations.md)
-
-### v1.1.0 — AI features (in progress)
+### ✅ v1.1.0 — the AI release (Sprints 29–30, released 2026-08-19)
+Backend and dashboard are tagged `backend-v1.1.0` / `dashboard-v1.1.0` (ingestion and OPC-UA agent are unchanged and stay at 1.0.0). Includes the v1.0.1 hardening (secrets out of git, fail-fast placeholders, demo users re-scoped). 149 unit tests.
 - [x] **Sprint 29 — AI alert explanations**: ✦ Explain on every alert (WHAT HAPPENED / LIKELY CAUSES / RECOMMENDED ACTION), on-demand + cached, on-prem **Ollama (llama3.2)** in compose or Azure OpenAI via config, graceful degradation — [#9](https://github.com/rakshins10/EdgePulse/issues/9), [#39](https://github.com/rakshins10/EdgePulse/issues/39). See the [AI Guide](docs/guides/05-ai-guide.md).
 - [x] **Sprint 30 — Ask EdgePulse**: natural-language questions grounded in live device/alert/work-order data (RAG over scoped data), Ask page + per-device entry point
+- [ ] Remaining production checklist — see [Operations guide](docs/reference/operations.md)
 
 ### Post-v1.1 (deliberately deferred)
 - **Mobile app** (React Native) — [#31](https://github.com/rakshins10/EdgePulse/issues/31)
