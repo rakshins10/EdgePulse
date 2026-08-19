@@ -36,13 +36,13 @@ mapped centrally; ill-formed requests never reach handlers.
 
 **Multi-tenancy:** every tenant entity carries `TenantId`; handlers filter by
 `ICurrentUserService.TenantId` (from JWT claims). Role guards live in
-handlers, not controllers, so they are unit-tested (137 tests).
+handlers, not controllers, so they are unit-tested (149 tests).
 
 **Auditing:** `SaveChangesAsync` inspects the change tracker and writes
 `AuditLogs` rows (property-level diffs, soft-delete detection) in the same
 transaction.
 
-**AI layer (Sprint 29):** follows the same layering — the LLM is a pluggable
+**AI layer (Sprints 29–30):** follows the same layering — the LLM is a pluggable
 `Infrastructure` service behind an `Application` interface.
 
 | Layer | File | Role |
@@ -50,13 +50,16 @@ transaction.
 | Application | `Common/Interfaces/IAiAssistant.cs` | The contract: `IsEnabled`, `Description`, `CompleteAsync(system, user)` |
 | Application | `Features/Ai/AlertSummaryPrompts.cs` | Both prompts (system + per-alert user prompt) |
 | Application | `Features/Ai/GetAlertSummaryQuery.cs` | The handler: cache → enabled? → facts → model → cache |
+| Application | `Features/Ai/AskPrompts.cs` | Ask EdgePulse prompts (Sprint 30): system prompt + DATA-block rendering |
+| Application | `Features/Ai/AskQuestionQuery.cs` | Ask handler: scoped device catalogue → focus → DATA block → model → answer + grounding |
 | Infrastructure | `Services/Ai/OllamaAiAssistant.cs` | Talks to Ollama `/api/chat` (stream=false, temp 0.2, num_predict 300) |
 | Infrastructure | `Services/Ai/AzureOpenAiAssistant.cs` | Same job against Azure OpenAI (cloud profile) |
 | Infrastructure | `Services/Ai/NullAiAssistant.cs` | Used when `Ai:Provider = none` |
 | Infrastructure | `Services/Ai/AiOptions.cs` | Binds the `Ai` config section |
 | Infrastructure | `DependencyInjection.cs` | Picks the provider from `Ai:Provider` (`AddHttpClient` per provider) |
-| API | `Controllers/AiController.cs` | `GET /api/ai/status`, `GET /api/ai/alerts/{id}/summary?regenerate` |
+| API | `Controllers/AiController.cs` | `GET /api/ai/status`, `GET /api/ai/alerts/{id}/summary?regenerate`, `POST /api/ai/ask` |
 | Dashboard | `api/ai.ts`, `components/alerts/AiSummaryPanel.tsx` (+ `.module.css`), `pages/alerts/AlertsPage.tsx` | Client, panel, ✦ Explain button; i18n `ai` block in en/fi/sv |
+| Dashboard | `pages/ask/AskPage.tsx` (+ `api/ai.ts` `askQuestion()`) | ✦ Ask EdgePulse page (`/ask`): thread, example prompts, "Grounded on" line, focused-device chip; sidebar entry `nav.ask` + i18n `ask` block in en/fi/sv; device detail "✦ Ask about this device" link |
 
 Flow: `GET /api/ai/alerts/{id}/summary` → `AiController` → MediatR →
 `GetAlertSummaryQueryHandler`: `Alert.AiSummary` set? → return (cache hit,
@@ -67,6 +70,27 @@ On demand (never in the telemetry hot path), cached on the alert,
 `?regenerate=true` bypasses the cache, and the handler never throws — the
 alert page works unchanged when the model is down. Details, prompts and
 design rationale: [AI guide](05-ai-guide.md).
+
+**Ask EdgePulse (Sprint 30) — retrieval-then-generate (RAG) over scoped
+data.** `POST /api/ai/ask` → `AiController` → MediatR →
+`AskQuestionQueryHandler`: (1) build the device catalogue the caller may see
+(tenant + role scoping: MillManager → their mill, Operator → their areas);
+(2) pick the focus — an explicit `deviceId` (404 if not visible), else
+device codes/names mentioned in the question (deterministic string match,
+max 3), else a tenant-wide snapshot; (3) render a compact plain-text DATA
+block — per device: type/status/mill/area/last seen/installed, alerts
+(last 30 days + any still open) with a severity breakdown and the latest 5,
+open work orders; plant snapshot: open alerts by severity + latest 8,
+top-3 devices by alerts in the last 7 days, open work orders; (4) the
+system prompt (`AskPrompts.cs`) tells the model to answer **only** from
+DATA, say what is missing, cite device name + code, stay under ~150 words
+and hedge; (5) the response carries `grounding` (devices, alert and
+work-order counts, scope) so the UI can show what the answer rests on.
+Nothing is cached or written; validation (empty / > 500 chars → 400) and
+the disabled/failed-model paths (`available:false` + `reason`) mirror the
+alert summary. Why RAG rather than tool-calling: small local models (3B)
+handle tool use poorly, whereas retrieve-then-generate is deterministic on
+the retrieval side, cheap and unit-testable without a model.
 
 ## 3. Frontend (`src/EdgePulse.Dashboard`)
 
@@ -117,12 +141,15 @@ fields). AD/LDAP arrives via Keycloak federation, not app code
 
 ## 7. Testing
 
-- 137 xUnit tests (Domain entity behaviour + Application handlers with an
-  EF-InMemory double of `IApplicationDbContext` and NSubstitute for
+- 149 xUnit tests (30 Domain entity behaviour + 119 Application handlers
+  with an EF-InMemory double of `IApplicationDbContext` and NSubstitute for
   interfaces) — run in CI on every push/PR. Includes 7 AI tests
   (`Features/Ai/AlertSummaryTests.cs`) using an NSubstitute fake
   `IAiAssistant` — caching, regenerate, disabled/failure paths, prompt
-  contents, tenant isolation — no model needed.
-- Playwright E2E specs for CRUD/i18n flows (run locally against the stack).
+  contents, tenant isolation — and 12 Ask EdgePulse tests
+  (`Features/Ai/AskQuestionTests.cs`) — grounding content, role scoping,
+  device matching, validation, disabled/null-answer paths — no model needed.
+- Playwright E2E specs for CRUD/i18n flows (run locally against the stack),
+  including `e2e/sprint30-ask.spec.ts` (3 tests) for the Ask page.
 - Every sprint was additionally **verified live** end-to-end; see
   `docs/sprints/` for the evidence trail.

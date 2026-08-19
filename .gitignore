@@ -496,3 +496,6 @@ src/EdgePulse.OpcUaAgent/dist/
 
 # Uploaded attachment files (local storage root)
 src/backend/EdgePulse.API/data/
+
+# Playwright local artefacts
+src/EdgePulse.Dashboard/e2e-results/

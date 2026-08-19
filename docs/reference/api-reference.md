@@ -85,6 +85,17 @@ alert is not in the caller's tenant, otherwise always 200 (`available:false`
 generated on demand and cached on the alert; `regenerate=true` bypasses the
 cache. Provider (Ollama on-prem / Azure OpenAI) is selected by `Ai:Provider`.
 
+`POST ask` 🔓 (Sprint 30, any role) — body `{ question: string (required,
+≤ 500 chars), deviceId?: guid }` → `{ available, answer, provider, reason,
+grounding: { devices: string[], alerts: number, workOrders: number,
+scope: "device" | "mentioned-devices" | "tenant" } }`. 400 on an empty or
+over-long question; 404 if `deviceId` is not visible to the caller; otherwise
+always 200 (`available:false` + `reason` when AI is disabled or the model
+did not answer). The answer is grounded in the caller's scoped device /
+alert / work-order data (explicit `deviceId` → that device; else device
+codes/names mentioned in the question, max 3; else a tenant-wide snapshot).
+Not cached, nothing is written; one model call per request.
+
 ## Ingestion service (separate host, `:3000`)
 `POST /ingest` — header `X-Device-Key` (no JWT); body `{ metrics: [...] }`.
 

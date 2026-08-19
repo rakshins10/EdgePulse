@@ -23,7 +23,8 @@
     "actions": "Toiminnot",
     "back": "Takaisin",
     "next": "Seuraava",
-    "previous": "Edellinen"
+    "previous": "Edellinen",
+    "clear": "Tyhjennä"
   },
   "attachments": {
     "title": "Liitteet",
@@ -65,7 +66,8 @@
     "audit": "Tapahtumaloki",
     "integrations": "Integraatiot",
     "health": "Laitteiden kunto",
-    "floorplan": "Pohjapiirros"
+    "floorplan": "Pohjapiirros",
+    "ask": "Kysy EdgePulselta"
   },
   "mills": {
     "title": "Tehtaat",
@@ -604,5 +606,29 @@
       "LIKELY CAUSES": "Todennäköiset syyt",
       "RECOMMENDED ACTION": "Suositeltu toimenpide"
     }
+  },
+  "ask": {
+    "hint": "Kysy laitoksestasi selkokielellä. Vastaukset perustuvat niihin laitteisiin, hälytyksiin ja työmääräyksiin, jotka sinulla on oikeus nähdä — avustaja kertoo, jos tietoa ei ole.",
+    "placeholder": "esim. Millä laitteilla on avoimia hälytyksiä juuri nyt?",
+    "placeholderDevice": "Kysy laitteesta {{device}}…",
+    "ask": "Kysy",
+    "thinking": "Miettii…",
+    "thinkingLong": "Avustaja lukee laitoksen tiedot ja kirjoittaa vastausta… (ensimmäisellä kerralla jopa ~40 s)",
+    "focusedOn": "Kohdistettu: {{device}}",
+    "ex1": "Millä laitteilla on avoimia hälytyksiä juuri nyt?",
+    "ex2": "Millä laitteella oli eniten hälytyksiä tällä viikolla?",
+    "ex3": "Onko avoimilla työmääräyksillä tekijää?",
+    "ex4": "Mitkä hälytykset ovat KRIITTISIÄ ja mitä pitäisi tarkistaa ensin?",
+    "groundedOn": "Perustuu",
+    "groundPlant": "koko laitoksen tilannekuva",
+    "groundAlerts": "{{count}} hälytys",
+    "groundAlerts_other": "{{count}} hälytystä",
+    "groundWorkOrders": "{{count}} työmääräys",
+    "groundWorkOrders_other": "{{count}} työmääräystä",
+    "unavailable": "Avustaja ei ole juuri nyt käytettävissä.",
+    "requestFailed": "Pyyntö epäonnistui. Yritä uudelleen.",
+    "disabled": "Tekoälyavustaja ei ole käytössä tässä asennuksessa (Ai:Provider = none).",
+    "askAboutDevice": "Kysy tästä laitteesta",
+    "disclaimer": "Vastaukset tuottaa {{provider}} EdgePulsen nykyisistä tiedoista, ja niissä voi olla virheitä. Varmista ennen toimenpiteitä."
   }
 }

@@ -187,6 +187,8 @@ Everything below is **shipped in v1.0.0** and verified live end-to-end.
 - Lifecycle Open → Acknowledged → Resolved with audit fields
 - **Delivery on every alert:** in-app notification bell (deep-links to the record) + SMTP email + HMAC-signed webhooks (Slack/Teams-compatible)
 - **Maintenance work orders** auto-opened from CRITICAL/HIGH alerts — guarded lifecycle, assignment, parts + completion notes, per-device history
+- **✦ Explain** — on-demand, cached AI explanation of any alert (WHAT HAPPENED / LIKELY CAUSES / RECOMMENDED ACTION) from a local LLM (Ollama) or Azure OpenAI
+- **✦ Ask EdgePulse** — natural-language questions answered only from live, role-scoped device/alert/work-order data (RAG), with a "Grounded on" line per answer and a per-device entry point
 
 ### 📊 Dashboards, Reports & Analytics
 - Role-scoped KPI dashboard and executive view
@@ -449,7 +451,7 @@ All four components are tagged `*-v1.0.0` with images on GHCR. Highlights:
 
 ### v1.1.0 — AI features (in progress)
 - [x] **Sprint 29 — AI alert explanations**: ✦ Explain on every alert (WHAT HAPPENED / LIKELY CAUSES / RECOMMENDED ACTION), on-demand + cached, on-prem **Ollama (llama3.2)** in compose or Azure OpenAI via config, graceful degradation — [#9](https://github.com/rakshins10/EdgePulse/issues/9), [#39](https://github.com/rakshins10/EdgePulse/issues/39). See the [AI Guide](docs/guides/05-ai-guide.md).
-- [ ] **Sprint 30 — natural-language device Q&A** (grounded in live device/alert data)
+- [x] **Sprint 30 — Ask EdgePulse**: natural-language questions grounded in live device/alert/work-order data (RAG over scoped data), Ask page + per-device entry point
 
 ### Post-v1.1 (deliberately deferred)
 - **Mobile app** (React Native) — [#31](https://github.com/rakshins10/EdgePulse/issues/31)

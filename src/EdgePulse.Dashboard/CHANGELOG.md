@@ -13,6 +13,15 @@ versions follow [SemVer](https://semver.org/).
 
 ## [Unreleased] — v1.1.0
 
+### Added
+- **Ask EdgePulse page (Sprint 30)** — sidebar ✦ entry; chat-style Q&A over
+  `/api/ai/ask` with example prompts, per-answer "Grounded on" line and
+  disclaimer; "✦ Ask about this device" from the device page focuses the
+  conversation. en/fi/sv strings. Playwright spec `sprint30-ask.spec.ts`.
+- **✦ Explain on alerts (Sprint 29)** — per-row button (shown only when
+  `/api/ai/status` is enabled) opening an AI summary panel with parsed
+  WHAT HAPPENED / LIKELY CAUSES / RECOMMENDED ACTION sections, Retry /
+  Regenerate, cached indicator and disclaimer. en/fi/sv strings.
 ### Fixed
 - Notification bell: work-order notifications now navigate to the Work Orders
   board; alert notifications deep-link with `?highlight=<id>` (row scrolled into

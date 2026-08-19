@@ -17,6 +17,7 @@ import HealthPage from './pages/health/HealthPage';
 import FloorPlanPage from './pages/floorplan/FloorPlanPage';
 import AuditPage from './pages/audit/AuditPage';
 import IntegrationsPage from './pages/integrations/IntegrationsPage';
+import AskPage from './pages/ask/AskPage';
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
       { path: 'workorders',    element: <WorkOrdersPage />,    handle: { titleKey: 'nav.workorders' } },
       { path: 'floorplan',     element: <FloorPlanPage />,     handle: { titleKey: 'nav.floorplan' } },
       { path: 'health',        element: <HealthPage />,        handle: { titleKey: 'nav.health' } },
+      { path: 'ask',           element: <AskPage />,           handle: { titleKey: 'nav.ask' } },
       { path: 'energy',        element: <EnergyPage />,        handle: { titleKey: 'nav.energy' } },
       { path: 'reports',       element: <ReportsPage />,       handle: { titleKey: 'nav.reports' } },
       { path: 'users',         element: <UsersPage />,         handle: { titleKey: 'nav.users' } },

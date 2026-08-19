@@ -47,6 +47,23 @@ public class AiController : ControllerBase
         [FromQuery] bool regenerate = false,
         CancellationToken cancellationToken = default)
         => Ok(await _mediator.Send(new GetAlertSummaryQuery(alertId, regenerate), cancellationToken));
+
+    /// <summary>
+    /// Ask a natural-language question about the plant ("Which pumps alerted
+    /// this week?", "What is wrong with PUMP-LW-001?"). The answer is grounded
+    /// in live device / alert / work-order data the caller is allowed to see.
+    /// Optionally pass deviceId to focus on one device. Nothing is stored.
+    /// </summary>
+    [HttpPost("ask")]
+    [ProducesResponseType(typeof(AskResult), 200)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> Ask(
+        [FromBody] AskRequest request,
+        CancellationToken cancellationToken = default)
+        => Ok(await _mediator.Send(new AskQuestionQuery(request.Question, request.DeviceId), cancellationToken));
 }
 
 public record AiStatusDto(bool Enabled, string Provider);
+
+/// <summary>Body for POST /api/ai/ask.</summary>
+public record AskRequest(string Question, Guid? DeviceId = null);

@@ -16,6 +16,20 @@ versions follow [SemVer](https://semver.org/).
 
 ## [Unreleased] — v1.1.0
 
+### Added
+- **Ask EdgePulse (Sprint 30)** — `POST /api/ai/ask`: natural-language
+  questions answered by the configured LLM but grounded (RAG) in live,
+  role-scoped device / alert / work-order data; deterministic device matching
+  by code or name, plant-wide snapshot fallback, grounding metadata in the
+  response; never throws (available:false + reason). 12 unit tests.
+- **AI alert explanations (Sprint 29)** — `IAiAssistant` abstraction with
+  Ollama (on-premise, `llama3.2`), Azure OpenAI and Null providers selected by
+  the new `Ai` config section; `GET /api/ai/status`,
+  `GET /api/ai/alerts/{id}/summary?regenerate` producing WHAT HAPPENED /
+  LIKELY CAUSES / RECOMMENDED ACTION on demand, cached on `Alert.AiSummary`,
+  graceful degradation. `ollama` + `ollama-pull` services in the on-prem
+  compose file. 7 unit tests.
+
 ### Security
 - **Secrets out of git (v1.0.1 hardening)** — `appsettings.json` now ships
   `<SET-VIA-USER-SECRETS-OR-ENV>` placeholders; API and TelemetryProcessor fail

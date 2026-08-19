@@ -102,13 +102,21 @@ Sizing and behaviour:
   errors the alert page — the API returns `available:false` + `reason`.
 - To disable cleanly set `Ai:Provider=none` (`Ai__Provider` env var); the
   ✦ Explain button disappears and nothing else changes.
+- **Ask EdgePulse** (`POST /api/ai/ask`, Sprint 30): **not cached** — every
+  question is one model call plus a handful of scoped SQL reads (devices,
+  alerts last 30 days + open, open work orders). Expect **~40–65 s** cold
+  (model load) and **6–17 s** warm on CPU; nothing is written. Load therefore
+  scales with how often users ask, not with telemetry volume; the same
+  `Ai:TimeoutSeconds` applies and a failure returns `available:false` +
+  `reason`. With `Ai:Provider=none` the page shows a disabled message.
 
 Data sovereignty:
 
 - **Ollama (on-prem):** alert text and prompts never leave the network;
   no account, no API key, no internet after the model download.
 - **Azure OpenAI (cloud profile):** the prompt — device name/code/type,
-  metric, measured value, threshold and recent readings — is sent to the
-  Azure endpoint. Confirm this is acceptable under the site's data-handling
+  metric, measured value, threshold and recent readings, and for Ask
+  EdgePulse the scoped device/alert/work-order DATA block plus the user's
+  question — is sent to the Azure endpoint. Confirm this is acceptable under the site's data-handling
   policy before enabling it; keep the API key in env/user-secrets, never
   in git.

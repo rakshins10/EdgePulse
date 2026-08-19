@@ -67,6 +67,13 @@ export default function DeviceDetailPage() {
           <div className={styles.deviceCode}>{device.code}</div>
         </div>
         <Badge label={device.statusName} color={device.statusColor} variant="status" />
+        <Link
+          className={styles.askLink}
+          to={`/ask?deviceId=${device.id}&deviceLabel=${encodeURIComponent(`${device.name} (${device.code})`)}`}
+          title={t('ask.askAboutDevice')}
+        >
+          ✦ {t('ask.askAboutDevice')}
+        </Link>
       </div>
 
       <div className={styles.infoGrid}>

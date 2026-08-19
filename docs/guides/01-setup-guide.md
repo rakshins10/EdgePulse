@@ -166,11 +166,16 @@ Sign in with a demo user (e.g. `superadmin` / `Test@1234`).
    **✦ Explain**: the panel fills with WHAT HAPPENED / LIKELY CAUSES /
    RECOMMENDED ACTION. The first call takes ~40 s while the model loads;
    later calls 5–15 s, and repeat views are served from cache.
+6. **Ask EdgePulse** (if Ollama is running) — sidebar **✦ Ask EdgePulse** →
+   ask "which devices have the most alerts this week?": the answer cites
+   real device codes and a **Grounded on: …** line lists what was in scope
+   (first call ~40–65 s while the model loads, then 6–17 s). From any
+   device page, **✦ Ask about this device** opens the page focused on it.
 
 ## 10. Everyday commands
 
 ```bash
-# build + tests (backend: 137 unit tests)
+# build + tests (backend: 149 unit tests)
 dotnet build src/backend/EdgePulse.sln -c Release
 dotnet test  src/backend/EdgePulse.sln
 

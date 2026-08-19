@@ -162,3 +162,16 @@
   text-transform: none;
   letter-spacing: 0;
 }
+
+.askLink {
+  margin-left: auto;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-radius: 8px;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+.askLink:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }

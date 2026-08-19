@@ -2,7 +2,7 @@
 
 > Written for someone who has never worked with AI/LLMs before. It explains
 > every concept the first time it appears, using EdgePulse's own AI features
-> as the worked example. Read it top to bottom once; afterwards the section
+> as the worked example — alert explanations (Part 2) and Ask EdgePulse (Part 2B). Read it top to bottom once; afterwards the section
 > headings work as a reference.
 
 ---
@@ -213,6 +213,150 @@ Azure or nothing is behind it. Two wins:
 
 ---
 
+## Part 2B — "Ask EdgePulse": questions answered from live data (Sprint 30)
+
+### 2B.1 The feature
+
+A new sidebar page, **✦ Ask EdgePulse**, where you type a question in plain
+English and get an answer that is based on *your* current devices, alerts
+and work orders:
+
+> **Q:** Which devices have open alerts right now?
+> **A:** Open alerts: 13 — Feed Water Pump (PUMP-LW-001): vibration,
+> bearing_temp · Feed Water Pump (PUMP-RV-001): vibration · Batch Digester
+> (DGST-RV-001): temperature · PM1 Drive Motor (MOTOR-LW-002): vibration …
+
+> **Q:** What was the oil pressure on MOTOR-LW-002 yesterday afternoon?
+> **A:** I have no readings for MOTOR-LW-002 in the data provided.
+
+Under every answer the page shows **"Grounded on: …"** — which devices, how
+many alerts and work orders the assistant was actually looking at. The
+device detail page has an **✦ Ask about this device** button that opens the
+page focused on that device.
+
+### 2B.2 The big idea: RAG ("retrieve, then generate")
+
+Part 1 said the model is *autocomplete, not a database*. So how can it
+answer questions about your plant? By **us** doing the database part:
+
+```
+  1. RETRIEVE   EdgePulse queries SQL for the devices/alerts/work orders the
+                user may see, and renders them as a short plain-text block.
+  2. AUGMENT    That block is pasted into the prompt, under a "DATA:" heading,
+                followed by "QUESTION:" and the user's question.
+  3. GENERATE   The model writes an answer — and is instructed to use ONLY the
+                DATA block and to say when something is not in it.
+```
+
+This is called **Retrieval-Augmented Generation (RAG)**. It's the standard
+way to make a general model answer questions about private, changing data
+without training it on that data. Three things follow:
+
+- **Accuracy comes from the retrieval, not the model.** If the DATA block
+  is right, a small model does well. The 3B llama3.2 answered the examples
+  above correctly.
+- **Nothing is learned or stored.** Every question re-reads the database;
+  the model has no memory between questions.
+- **Security is enforced by us.** The DATA block is built with the same
+  role scoping as the Alerts/Devices APIs — an Operator's question can
+  only ever be answered from their own areas, because that's all we
+  retrieve. The model never has a way to "look further".
+
+> **Why not let the model query the database itself ("tool use" / "function
+> calling")?** Big cloud models can do this; 3B local models do it
+> unreliably — they invent function arguments or skip the call. RAG is
+> simpler, deterministic and, crucially, **unit-testable**: we can assert
+> exactly what data went into the prompt.
+
+### 2B.3 The flow (what the code does)
+
+```
+POST /api/ai/ask { question, deviceId? }
+  │
+  ├─ 1. Validate (non-empty, ≤ 500 chars)
+  ├─ 2. Device catalogue the caller may see   (tenant + role scoping)
+  ├─ 3. Focus:  deviceId given?            → that device           scope=device
+  │             device code/name in text?  → up to 3 matches       scope=mentioned-devices
+  │             otherwise                  → plant-wide snapshot   scope=tenant
+  ├─ 4. Build DATA block
+  │       per device:  type, status, mill, area, last seen, installed;
+  │                    alerts (last 30 d + any still open) with severity
+  │                    breakdown + latest 5; open work orders
+  │       snapshot:    open alerts by severity + latest 8; top-3 devices by
+  │                    alerts in 7 d; open work orders
+  ├─ 5. AI disabled? → available=false (no model call)
+  ├─ 6. model.CompleteAsync(system, DATA + QUESTION)
+  └─ 7. → { available, answer, provider, reason, grounding }
+```
+
+Step 3's device matching is deliberately *literal* (code or full name,
+case-insensitive). It is cheap, predictable and testable; the trade-off is
+that "the feed pump" won't match "Feed Water Pump" — use the code, or the
+per-device button.
+
+### 2B.4 The Ask prompts
+
+**System** (`AskPrompts.System`):
+```
+You are EdgePulse Assistant, a plant-monitoring helper for operators and
+maintenance staff at an industrial site.
+
+Rules:
+- Answer ONLY from the DATA section of the message. It is the live,
+  authoritative state of the plant. Never invent devices, numbers, dates or causes.
+- If the DATA does not contain what is needed, say exactly what is missing
+  (for example: "I have no readings for PUMP-LW-001 in the data provided").
+- Refer to devices by name and code (e.g. Feed Water Pump (PUMP-LW-001)).
+- Be concise: plain English, short sentences or a short bullet list, under 150 words.
+- When asked for advice, hedge ("likely", "consider") — you are not a diagnosis.
+- No preamble, no sign-off.
+```
+
+**User** (built by `AskPrompts.ForQuestion`) — a real one, trimmed:
+```
+Current time (UTC): 2026-08-19 19:05
+
+DATA:
+DEVICE: Feed Water Pump (PUMP-LW-001)
+  type: Centrifugal Pump; status: Active; mill: Lakewood Mill; area: Fiberline
+  last seen: 2026-08-19 18:59 UTC; installed: 2021-03-10
+  alerts (last 30 days + any still open): 2 total, 2 open (1 HIGH, 1 MEDIUM)
+    - 2026-08-19 17:44 HIGH vibration 11.4mm/s (threshold 8mm/s), status OPEN
+    - 2026-08-18 09:12 MEDIUM bearing_temp 78C (threshold 75C), status ACKNOWLEDGED
+  open work orders: 1
+    - WO-3CC25E83 "Investigate vibration alert on Feed Water Pump (PUMP-LW-001)" OPEN priority HIGH, unassigned
+
+QUESTION:
+What is going on with PUMP-LW-001 and is anyone working on it?
+```
+
+The "Current time" line lets the model answer "today"/"this week" questions;
+labelled fields and the explicit *status* per alert stop it confusing open
+with resolved.
+
+### 2B.5 Code map (additions)
+
+| Layer | File | Role |
+|---|---|---|
+| Application | `Features/Ai/AskPrompts.cs` | System + user prompt (with the RAG explanation in comments) |
+| Application | `Features/Ai/AskQuestionQuery.cs` | Scoping, device matching, DATA block, model call, grounding |
+| API | `Controllers/AiController.cs` | `POST /api/ai/ask` |
+| Dashboard | `pages/ask/AskPage.tsx` (+ `.module.css`) | Chat-style page, examples, grounding line, device focus chip |
+| Dashboard | `pages/devices/DeviceDetailPage.tsx` | "✦ Ask about this device" |
+| Dashboard | `api/ai.ts` | `askQuestion()` |
+| Tests | `tests/…/Features/Ai/AskQuestionTests.cs` | 12 tests: what goes INTO the prompt, scoping, matching, validation, unavailable paths |
+| E2E | `src/EdgePulse.Dashboard/e2e/sprint30-ask.spec.ts` | Sidebar → Ask → grounded answer; device focus |
+
+### 2B.6 Extending it
+
+Want the assistant to know about something new (e.g. last 10 telemetry
+readings, attachments, health score)? You don't touch the model or the
+prompt rules — you add a few lines to `BuildDeviceDataAsync` that query the
+data and append it to the DATA block, plus a unit test asserting it appears
+in the prompt. That is the whole extension model of RAG.
+
+---
+
 ## Part 3 — Running, configuring, extending
 
 ### 3.1 Turn it on / off
@@ -261,6 +405,9 @@ curl http://localhost:11434/api/chat -d '{"model":"llama3.2","stream":false,"mes
 curl -H "Authorization: Bearer $TOKEN" http://localhost:5104/api/ai/status
 curl -H "Authorization: Bearer $TOKEN" http://localhost:5104/api/ai/alerts/<alertId>/summary
 curl -H "Authorization: Bearer $TOKEN" "http://localhost:5104/api/ai/alerts/<alertId>/summary?regenerate=true"
+
+# 3. Ask EdgePulse (Sprint 30)
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \n  -d '{"question":"Which devices have open alerts right now?"}' http://localhost:5104/api/ai/ask
 ```
 
 ### 3.4 Tuning the answers
@@ -300,6 +447,13 @@ then set `Ai:Ollama:Model`. Bigger models = better reasoning, slower, more RAM.
   fallback), and regenerate usually fixes it.
 - **CPU inference is slow.** A GPU (or a cloud provider) makes it
   near-instant; on a laptop expect 5–40 s.
-- **No memory between alerts.** Each summary is independent. Cross-alert
-  reasoning ("this pump has alerted 3 times this week") is what the next
-  feature — natural-language device Q&A — adds.
+- **No conversation memory.** Each alert summary and each Ask question is
+  independent; the server re-grounds every question from scratch. Follow-up
+  questions must restate the subject ("and PUMP-LW-001?" will not work).
+- **Ask only sees what we put in the DATA block.** Raw telemetry readings,
+  attachments and audit history are not included (yet) — the assistant will
+  say so. Adding a data source means adding a few lines to
+  `AskQuestionQuery.cs`, not retraining anything.
+- **Device matching is literal.** "the feed pump" won't match "Feed Water
+  Pump"; use the code or the full name, or open the device page and click
+  *Ask about this device*.

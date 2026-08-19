@@ -31,7 +31,9 @@ trend, severity split, top offending devices. Auto-refreshes.
 Register devices (issues a one-time **API key**), edit, decommission
 (revokes keys, preserves telemetry). Device detail = live Recharts
 telemetry per metric with global/per-chart time ranges + **file
-attachments** (manuals, datasheets, CAD; 25 MB, role-gated).
+attachments** (manuals, datasheets, CAD; 25 MB, role-gated). The header
+carries a **✦ Ask about this device** link (Sprint 30) that opens Ask
+EdgePulse focused on that device.
 
 ### 🔔 Alerts (`/alerts`)
 The alert engine (Telemetry Processor) fires when a metric breaches its
@@ -52,6 +54,22 @@ cached on the alert (a "cached" note shows when served from cache;
 unavailable). A disclaimer reminds that it is a structured starting point,
 not a diagnosis. Available to every role that can view alerts. Full detail:
 [AI guide](05-ai-guide.md).
+
+### ✦ Ask EdgePulse (`/ask`)
+Natural-language questions answered from **live** data (Sprint 30): a
+chat-style thread with example prompts (Enter to send). Ask "which devices
+have the most alerts this week?", "what is wrong with MOTOR-LW-002?" or
+"any open work orders?" — the API gathers only the devices, alerts (last 30
+days + still open) and open work orders the caller is allowed to see
+(tenant + role scoping), hands that data to the model and instructs it to
+answer **only** from it, cite devices by name + code and say when something
+is missing. Each answer shows a **Grounded on: …** line (which devices /
+how many alerts and work orders were in scope) and a disclaimer naming the
+provider. Arriving from a device page shows a clearable **Focused on
+<device>** chip; mentioning device codes/names in the question focuses on
+those (max 3); otherwise a plant-wide snapshot is used. Nothing is cached
+or written. Available to every role; when `Ai:Provider=none` the page
+explains that AI is disabled. Full detail: [AI guide](05-ai-guide.md).
 
 ### 🛠️ Work Orders (`/workorders`)
 CRITICAL/HIGH alerts auto-open a work order (config-gated). Guarded

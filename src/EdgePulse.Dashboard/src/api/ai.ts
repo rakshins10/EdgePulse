@@ -25,3 +25,26 @@ export const getAlertSummary = (alertId: string, regenerate = false): Promise<Al
       timeout: 120_000,
     })
     .then(r => r.data);
+
+// ---- Ask EdgePulse (Sprint 30) ---------------------------------------------
+
+export interface AskGrounding {
+  devices: string[];         // "Feed Water Pump (PUMP-LW-001)"
+  alerts: number;
+  workOrders: number;
+  scope: 'device' | 'mentioned-devices' | 'tenant';
+}
+
+export interface AskResult {
+  available: boolean;
+  answer: string | null;
+  provider: string;
+  reason: string | null;
+  grounding: AskGrounding;
+}
+
+/** Natural-language question, answered from live data the caller may see. */
+export const askQuestion = (question: string, deviceId?: string): Promise<AskResult> =>
+  apiClient
+    .post<AskResult>('/ai/ask', { question, deviceId }, { timeout: 120_000 })
+    .then(r => r.data);

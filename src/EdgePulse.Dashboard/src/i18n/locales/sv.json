@@ -23,7 +23,8 @@
     "actions": "Åtgärder",
     "back": "Tillbaka",
     "next": "Nästa",
-    "previous": "Föregående"
+    "previous": "Föregående",
+    "clear": "Rensa"
   },
   "attachments": {
     "title": "Bilagor",
@@ -65,7 +66,8 @@
     "audit": "Revisionslogg",
     "integrations": "Integrationer",
     "health": "Enhetshälsa",
-    "floorplan": "Planritning"
+    "floorplan": "Planritning",
+    "ask": "Fråga EdgePulse"
   },
   "mills": {
     "title": "Bruk",
@@ -604,5 +606,29 @@
       "LIKELY CAUSES": "Troliga orsaker",
       "RECOMMENDED ACTION": "Rekommenderad åtgärd"
     }
+  },
+  "ask": {
+    "hint": "Ställ frågor om din anläggning på vanligt språk. Svaren bygger på de enheter, larm och arbetsordrar du har behörighet att se — assistenten säger till när data saknas.",
+    "placeholder": "t.ex. Vilka enheter har öppna larm just nu?",
+    "placeholderDevice": "Fråga om {{device}}…",
+    "ask": "Fråga",
+    "thinking": "Tänker…",
+    "thinkingLong": "Assistenten läser anläggningsdata och skriver ett svar… (upp till ~40 s första gången)",
+    "focusedOn": "Fokus: {{device}}",
+    "ex1": "Vilka enheter har öppna larm just nu?",
+    "ex2": "Vad hade flest larm den här veckan?",
+    "ex3": "Jobbar någon på de öppna arbetsordrarna?",
+    "ex4": "Vilka larm är KRITISKA och vad bör jag kontrollera först?",
+    "groundedOn": "Baserat på",
+    "groundPlant": "ögonblicksbild av hela anläggningen",
+    "groundAlerts": "{{count}} larm",
+    "groundAlerts_other": "{{count}} larm",
+    "groundWorkOrders": "{{count}} arbetsorder",
+    "groundWorkOrders_other": "{{count}} arbetsordrar",
+    "unavailable": "Assistenten är inte tillgänglig just nu.",
+    "requestFailed": "Begäran misslyckades. Försök igen.",
+    "disabled": "AI-assistenten är inte aktiverad i den här installationen (Ai:Provider = none).",
+    "askAboutDevice": "Fråga om den här enheten",
+    "disclaimer": "Svaren genereras av {{provider}} utifrån aktuella EdgePulse-data och kan innehålla fel. Verifiera innan du agerar."
   }
 }
