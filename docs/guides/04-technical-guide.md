@@ -36,11 +36,37 @@ mapped centrally; ill-formed requests never reach handlers.
 
 **Multi-tenancy:** every tenant entity carries `TenantId`; handlers filter by
 `ICurrentUserService.TenantId` (from JWT claims). Role guards live in
-handlers, not controllers, so they are unit-tested (130 tests).
+handlers, not controllers, so they are unit-tested (137 tests).
 
 **Auditing:** `SaveChangesAsync` inspects the change tracker and writes
 `AuditLogs` rows (property-level diffs, soft-delete detection) in the same
 transaction.
+
+**AI layer (Sprint 29):** follows the same layering — the LLM is a pluggable
+`Infrastructure` service behind an `Application` interface.
+
+| Layer | File | Role |
+|---|---|---|
+| Application | `Common/Interfaces/IAiAssistant.cs` | The contract: `IsEnabled`, `Description`, `CompleteAsync(system, user)` |
+| Application | `Features/Ai/AlertSummaryPrompts.cs` | Both prompts (system + per-alert user prompt) |
+| Application | `Features/Ai/GetAlertSummaryQuery.cs` | The handler: cache → enabled? → facts → model → cache |
+| Infrastructure | `Services/Ai/OllamaAiAssistant.cs` | Talks to Ollama `/api/chat` (stream=false, temp 0.2, num_predict 300) |
+| Infrastructure | `Services/Ai/AzureOpenAiAssistant.cs` | Same job against Azure OpenAI (cloud profile) |
+| Infrastructure | `Services/Ai/NullAiAssistant.cs` | Used when `Ai:Provider = none` |
+| Infrastructure | `Services/Ai/AiOptions.cs` | Binds the `Ai` config section |
+| Infrastructure | `DependencyInjection.cs` | Picks the provider from `Ai:Provider` (`AddHttpClient` per provider) |
+| API | `Controllers/AiController.cs` | `GET /api/ai/status`, `GET /api/ai/alerts/{id}/summary?regenerate` |
+| Dashboard | `api/ai.ts`, `components/alerts/AiSummaryPanel.tsx` (+ `.module.css`), `pages/alerts/AlertsPage.tsx` | Client, panel, ✦ Explain button; i18n `ai` block in en/fi/sv |
+
+Flow: `GET /api/ai/alerts/{id}/summary` → `AiController` → MediatR →
+`GetAlertSummaryQueryHandler`: `Alert.AiSummary` set? → return (cache hit,
+~60 ms) · `IAiAssistant.IsEnabled` false? → `available=false` · load device
+name/type + recent readings → build prompts → `CompleteAsync` → `null`? →
+`available=false` + reason · else `alert.SetAiSummary(text)` + SaveChanges.
+On demand (never in the telemetry hot path), cached on the alert,
+`?regenerate=true` bypasses the cache, and the handler never throws — the
+alert page works unchanged when the model is down. Details, prompts and
+design rationale: [AI guide](05-ai-guide.md).
 
 ## 3. Frontend (`src/EdgePulse.Dashboard`)
 
@@ -91,9 +117,12 @@ fields). AD/LDAP arrives via Keycloak federation, not app code
 
 ## 7. Testing
 
-- 130 xUnit tests (Domain entity behaviour + Application handlers with an
+- 137 xUnit tests (Domain entity behaviour + Application handlers with an
   EF-InMemory double of `IApplicationDbContext` and NSubstitute for
-  interfaces) — run in CI on every push/PR.
+  interfaces) — run in CI on every push/PR. Includes 7 AI tests
+  (`Features/Ai/AlertSummaryTests.cs`) using an NSubstitute fake
+  `IAiAssistant` — caching, regenerate, disabled/failure paths, prompt
+  contents, tenant isolation — no model needed.
 - Playwright E2E specs for CRUD/i18n flows (run locally against the stack).
 - Every sprint was additionally **verified live** end-to-end; see
   `docs/sprints/` for the evidence trail.

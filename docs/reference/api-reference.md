@@ -76,6 +76,15 @@ MillManager auto-scoped to their mill.
 ## Dashboard (`/api/dashboard`)
 `GET summary` 🔓 — role-scoped KPI payload.
 
+## AI (`/api/ai`)
+`GET status` 🔓 — `{ enabled, provider }` (e.g. `"ollama/llama3.2"` or
+`"disabled"`) · `GET alerts/{alertId}/summary?regenerate=false` 🔓 —
+`{ alertId, available, summary, fromCache, provider, reason }`; 404 if the
+alert is not in the caller's tenant, otherwise always 200 (`available:false`
++ `reason` when AI is disabled or the model did not answer). Summaries are
+generated on demand and cached on the alert; `regenerate=true` bypasses the
+cache. Provider (Ollama on-prem / Azure OpenAI) is selected by `Ai:Provider`.
+
 ## Ingestion service (separate host, `:3000`)
 `POST /ingest` — header `X-Device-Key` (no JWT); body `{ metrics: [...] }`.
 

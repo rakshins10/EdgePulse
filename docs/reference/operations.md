@@ -13,6 +13,7 @@ Monitoring, backup, security hardening, upgrade and troubleshooting.
 | Webhook deliveries | 🔗 Integrations — last status + timestamp per subscription |
 | Business health | 🩺 Device Health, 📈 Reports (MTTA/MTTR) |
 | HAProxy | stats UI :8404 |
+| AI assistant (Ollama) | `GET /api/ai/status` → `enabled/provider`; `curl localhost:11434/api/tags` lists the loaded model; `docker logs edgepulse-ollama` |
 
 Log destinations are console (container logs); ship them with your
 platform's collector (Loki/App Insights per deployment profile).
@@ -73,9 +74,41 @@ DB backup if a migration must be reverted.
 | Webhook `error: timeout` | Receiver unreachable from the processor host | Network/URL; use Send test |
 | Build `MSB3021` file locks (dev) | Running API/processor holds DLLs | Stop processes, rebuild |
 | `dotnet ef` warnings about tool version | Newer CLI vs pinned EF 9.0.5 | Harmless; commands complete |
+| Explain panel: "did not return a summary" | Model still loading (first call ~40 s) or Ollama down/timed out | Retry; `docker logs edgepulse-ollama`; `curl localhost:11434/api/tags`; raise `Ai:TimeoutSeconds` (default 90) |
+| API log `model 'llama3.2' not found` | Model pull did not finish / volume removed | Re-run `docker compose -f infrastructure/docker-compose.onpremise.yml up -d ollama-pull`, wait for `/api/tags` to list it |
+| Every AI call slow (not just first) | RAM pressure — model evicted each call | Free RAM / stop other containers; Docker VM ≥ 6–8 GB for the full stack |
+| No ✦ Explain button in the dashboard | `Ai:Provider` = `none` or `/api/ai/status` unreachable | Check the `Ai` config and restart the API |
 
 ## 6. Data retention
 
 Telemetry grows unbounded by default. Options: Mongo TTL index on
 `Timestamp` (e.g. 180 d), or scheduled `deleteMany` before a dump. Alerts,
 work orders and audit rows are small; keep them for compliance.
+
+## 7. AI alert explanations (Ollama / Azure OpenAI)
+
+Sizing and behaviour:
+
+- The default on-prem model (`llama3.2`, 3B) needs **~3 GB RAM**; the
+  `ollama` service is capped at 4 GB (`mem_limit`). Plan **≥ 6–8 GB** for
+  the Docker VM when running the full stack plus the model.
+- The first request after start takes **~40 s** (model load); subsequent
+  requests 5–15 s on CPU. Summaries are generated **on demand** and cached
+  on `Alert.AiSummary`, so there is no steady-state load — the alert engine
+  never calls the model.
+- Model download (~2 GB) happens once via the one-shot `ollama-pull` service
+  and persists in the `edgepulse_ollama_models` volume.
+- Timeouts: `Ai:TimeoutSeconds` (default 90). A failed or timed-out call never
+  errors the alert page — the API returns `available:false` + `reason`.
+- To disable cleanly set `Ai:Provider=none` (`Ai__Provider` env var); the
+  ✦ Explain button disappears and nothing else changes.
+
+Data sovereignty:
+
+- **Ollama (on-prem):** alert text and prompts never leave the network;
+  no account, no API key, no internet after the model download.
+- **Azure OpenAI (cloud profile):** the prompt — device name/code/type,
+  metric, measured value, threshold and recent readings — is sent to the
+  Azure endpoint. Confirm this is acceptable under the site's data-handling
+  policy before enabling it; keep the API key in env/user-secrets, never
+  in git.

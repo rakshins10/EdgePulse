@@ -75,7 +75,25 @@ Every alert also emails the configured recipients
 (`Smtp` section, TelemetryProcessor). Local dev captures everything in
 MailHog (http://localhost:8025).
 
-## 7. Roadmap (not yet implemented)
+## 7. AI providers (alert explanations)
+
+The ✦ Explain button on the Alerts page asks a language model for a short
+"what happened / likely causes / recommended action" text. The API talks to
+the model through one abstraction, `IAiAssistant`, and the provider is
+chosen by `Ai:Provider`:
+
+| Provider | `Ai:Provider` | Where the model runs | Data leaves the network? |
+|----------|---------------|----------------------|--------------------------|
+| Ollama (default on-prem) | `ollama` | `edgepulse-ollama` container, `http://ollama:11434`, model `llama3.2` | No |
+| Azure OpenAI (cloud profile) | `azureopenai` | Azure endpoint + deployment (key via env/user-secrets) | Yes — alert facts (device, metric, values) are sent to Azure |
+| Disabled | `none` | — | — |
+
+Endpoints: `GET /api/ai/status` and `GET /api/ai/alerts/{id}/summary`
+(see the API reference). Summaries are generated on demand and cached on the
+alert; the provider can be swapped by configuration without code changes.
+Details: [AI guide](../guides/05-ai-guide.md).
+
+## 8. Roadmap (not yet implemented)
 
 Modbus TCP and MQTT broker ingestion are planned post-v1.0; until then the
 REST path covers those sources via a small adapter at the edge.

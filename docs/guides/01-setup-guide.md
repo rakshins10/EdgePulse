@@ -43,8 +43,33 @@ This starts (first run downloads images — allow a few minutes):
 | `edgepulse-opcua-agent` | Edge agent publishing telemetry | — |
 | `edgepulse-ingestion` | REST telemetry ingestion (NestJS) | 3000* |
 | `edgepulse-haproxy` | Load balancer (stats UI) | 8404 |
+| `edgepulse-ollama` | Ollama — local LLM for AI alert explanations (**optional**, Sprint 29) | 11434 |
 
 Wait until `docker compose … ps` shows the databases healthy.
+
+### 3a. (Optional) Start Ollama and fetch the model — AI alert explanations
+
+The **✦ Explain** button on the Alerts page uses a local LLM served by
+Ollama (`ollama/ollama:0.5.7`). The platform runs fine without it — with no
+model the button simply does not appear. To enable it:
+
+```bash
+docker compose -f infrastructure/docker-compose.onpremise.yml up -d ollama ollama-pull
+```
+
+First time: ~1 GB Ollama image + **~2 GB llama3.2 download** (once; kept in
+the `edgepulse_ollama_models` volume). `ollama-pull` is a one-shot helper
+that pulls `llama3.2` and exits. Watch progress:
+`docker logs -f edgepulse-ollama-pull`. Ready when:
+
+```bash
+curl http://localhost:11434/api/tags        # → lists llama3.2
+```
+
+**RAM:** Ollama is capped at 4 GB (`mem_limit`). Docker Desktop's VM needs
+≥ 6–8 GB total for the full stack + model; stop other Docker projects if
+answers time out. Full explanation, config and tuning:
+[AI guide](05-ai-guide.md).
 
 ## 4. Configure application secrets (one time)
 
@@ -137,11 +162,15 @@ Sign in with a demo user (e.g. `superadmin` / `Test@1234`).
    (http://localhost:8025) for the alert email.
 3. **Work orders** — a HIGH/CRITICAL alert auto-opens one under 🛠️ Work Orders.
 4. **Energy** — ⚡ Energy & ESG shows kWh/CO₂ for the refiners.
+5. **AI explanations** (if Ollama is running, step 3a) — Alerts → any row →
+   **✦ Explain**: the panel fills with WHAT HAPPENED / LIKELY CAUSES /
+   RECOMMENDED ACTION. The first call takes ~40 s while the model loads;
+   later calls 5–15 s, and repeat views are served from cache.
 
 ## 10. Everyday commands
 
 ```bash
-# build + tests (backend: 130 unit tests)
+# build + tests (backend: 137 unit tests)
 dotnet build src/backend/EdgePulse.sln -c Release
 dotnet test  src/backend/EdgePulse.sln
 
@@ -165,5 +194,8 @@ docker compose -f infrastructure/docker-compose.onpremise.yml down
 | Dashboard shows zeros after login | Keycloak protocol mappers missing (step 6.2) |
 | SQL "pre-login handshake" 500s | Transient after container restart — EF retries automatically; persistent → restart `edgepulse-sqlserver` |
 | No telemetry charts | Is `edgepulse-opcua-agent` running? Check RabbitMQ UI (15672) queue `telemetry.readings` |
+| Keycloak "port 8080 already allocated" / 404 on the realm | Another Docker project (e.g. another stack's keycloak or React app) holds 8080/3000 — `docker ps` to find it, stop it, then `up -d` again |
+| Keycloak crash-loops with "Failed to obtain JDBC connection" after `--force-recreate` | Recreating keycloak alone can bring it up with no network attached — recreate it together with its DB: `docker compose -f infrastructure/docker-compose.onpremise.yml up -d --force-recreate postgres keycloak` |
+| AI panel says "did not return a summary" | First call loads the model (~40 s) — click Retry; check `docker ps` for `edgepulse-ollama`; raise `Ai:TimeoutSeconds`. More: [AI guide §3.6](05-ai-guide.md) |
 
 More: [`docs/reference/operations.md`](../reference/operations.md).

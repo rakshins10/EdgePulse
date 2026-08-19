@@ -39,6 +39,7 @@ docker compose -f infrastructure/docker-compose.onpremise.yml logs -f sqlserver
 docker compose -f infrastructure/docker-compose.onpremise.yml logs -f mongodb
 docker compose -f infrastructure/docker-compose.onpremise.yml logs -f rabbitmq
 docker compose -f infrastructure/docker-compose.onpremise.yml logs -f haproxy
+docker compose -f infrastructure/docker-compose.onpremise.yml logs -f ollama
 
 ### Pull latest images (update all services)
 docker compose -f infrastructure/docker-compose.onpremise.yml pull
@@ -108,6 +109,36 @@ docker exec -it edgepulse-rabbitmq \
 
 ---
 
+## Ollama / AI Commands (alert explanations)
+
+### Start Ollama and pull the llama3.2 model (~2 GB, once; kept in the model volume)
+docker compose -f infrastructure/docker-compose.onpremise.yml up -d ollama ollama-pull
+
+### Watch the model download
+docker logs -f edgepulse-ollama-pull
+
+### Check which models are available (ready when llama3.2 is listed)
+curl http://localhost:11434/api/tags
+
+### Ollama logs
+docker logs edgepulse-ollama --tail 50
+docker logs edgepulse-ollama -f
+
+### Test the model directly (no EdgePulse involved)
+curl http://localhost:11434/api/chat -d '{"model":"llama3.2","stream":false,"messages":[{"role":"user","content":"Say hello in five words"}]}'
+
+### Re-run the pull if the API logs "model 'llama3.2' not found"
+docker compose -f infrastructure/docker-compose.onpremise.yml up -d ollama-pull
+
+### Stop Ollama (model stays in the volume)
+docker compose -f infrastructure/docker-compose.onpremise.yml stop ollama
+
+### Remove the downloaded model (frees ~2 GB; next start re-pulls)
+docker compose -f infrastructure/docker-compose.onpremise.yml rm -sf ollama ollama-pull
+docker volume rm edgepulse_ollama_models
+
+---
+
 ## Docker System Commands
 
 ### List all running containers
@@ -144,6 +175,8 @@ docker system df
 | OPC-UA simulator | `edgepulse-opcua-simulator` | 4840 | NordPulp plant (20 devices) |
 | OPC-UA agent | `edgepulse-opcua-agent` | — | publishes telemetry to RabbitMQ |
 | Ingestion (NestJS) | `edgepulse-ingestion` | 3000* | REST telemetry ingest |
+| Ollama | `edgepulse-ollama` | 11434 | local LLM for alert explanations (llama3.2) |
+| Ollama pull | `edgepulse-ollama-pull` | — | one-shot: downloads the model, then exits |
 
 *Only when started; the dashboard dev server also uses 3000 on the host.
 
@@ -158,6 +191,7 @@ SQL Server       localhost:1433               sa / EdgePulse@2026
 MongoDB          localhost:27017              edgepulse / EdgePulse@2026
 Device API       http://localhost:5000        (JWT from Keycloak)
 Telemetry Svc    http://localhost:3000        (Device API Key)
+Ollama           http://localhost:11434       (no auth, local only)
 React Dashboard  http://localhost:4000        (JWT from Keycloak)
 
 ---
@@ -168,6 +202,7 @@ edgepulse_postgres_data    -> Keycloak database
 edgepulse_sqlserver_data   -> Devices, alerts, users
 edgepulse_mongodb_data     -> Telemetry readings
 edgepulse_rabbitmq_data    -> RabbitMQ messages
+edgepulse_ollama_models    -> Ollama model files (llama3.2, ~2 GB)
 
 ---
 
@@ -203,6 +238,11 @@ docker logs edgepulse-sqlserver --tail 20
 ### Keycloak not starting
 # Check postgres is healthy first:
 docker compose -f infrastructure/docker-compose.onpremise.yml ps postgres
+
+### AI "Explain" says it did not return a summary
+# First call loads the model (~40 s); retry. Then check Ollama is up and has the model:
+docker logs edgepulse-ollama --tail 20
+curl http://localhost:11434/api/tags
 
 ### Reset everything and start fresh (DELETES ALL DATA)
 docker compose -f infrastructure/docker-compose.onpremise.yml down -v

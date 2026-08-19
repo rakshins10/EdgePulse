@@ -92,7 +92,7 @@ By the time a problem is identified, significant damage, unplanned downtime, or 
 │  │ Processor Svc   │───────►│   Azure Cosmos DB            │    │
 │  │ (.NET 9 Worker) │        │   (Telemetry Storage)        │    │
 │  │ Anomaly detect  │        └──────────────────────────────┘    │
-│  │ + OpenAI alerts │                                            │
+│  │ + alert engine  │                                            │
 │  └─────────────────┘                                            │
 │                                                                 │
 │  ┌──────────────────────────────────────────────────────────┐   │
@@ -123,10 +123,16 @@ Processor Service (.NET Worker)
   → Checks against thresholds
   → Detects anomaly?
         ├── NO  → Store telemetry in Cosmos DB
-        └── YES → Generate AI alert summary (Azure OpenAI)
-                → Create alert
+        └── YES → Create alert
                 → Store in Cosmos DB
-                → Send notifications (in-app + email)
+                → Send notifications (in-app + email + webhooks)
+                        │
+                        ▼ (later, on demand — never in the hot path)
+        Operator clicks "✦ Explain" on the alert
+          → API builds a prompt from the alert facts + recent readings
+          → Local LLM (Ollama / llama3.2) or Azure OpenAI writes
+            WHAT HAPPENED / LIKELY CAUSES / RECOMMENDED ACTION
+          → Cached on the alert (Alert.AiSummary)
 ```
 
 ---
@@ -379,7 +385,7 @@ EdgePulse/
 
 ## 📄 Documentation
 
-**Start here** — the four end-to-end guides cover everything needed to understand, configure and run the platform from scratch:
+**Start here** — the five end-to-end guides cover everything needed to understand, configure and run the platform from scratch:
 
 | Guide | What it covers |
 |-------|----------------|
@@ -387,6 +393,7 @@ EdgePulse/
 | [Configuration Guide](docs/guides/02-configuration-guide.md) | Every setting — appsettings, secrets, env, compose — plus all in-product configuration |
 | [Functionality Guide](docs/guides/03-functionality-guide.md) | Every module, role permissions, ingestion paths |
 | [Technical Guide](docs/guides/04-technical-guide.md) | Full frontend + backend architecture breakdown |
+| [AI Guide](docs/guides/05-ai-guide.md) | Beginner-level explanation of the AI features: LLM concepts, Ollama, prompts, design decisions, running & tuning |
 
 **Reference**
 
@@ -440,8 +447,11 @@ All four components are tagged `*-v1.0.0` with images on GHCR. Highlights:
 - [x] Demo role users homed in the NordPulp tenant with correct scoping
 - [ ] Remaining production checklist — see [Operations guide](docs/reference/operations.md)
 
-### Post-v1.0 (deliberately deferred)
-- **AI features** — alert summaries + natural-language device Q&A (Ollama on-prem / Azure OpenAI) — [#9](https://github.com/rakshins10/EdgePulse/issues/9), [#39](https://github.com/rakshins10/EdgePulse/issues/39)
+### v1.1.0 — AI features (in progress)
+- [x] **Sprint 29 — AI alert explanations**: ✦ Explain on every alert (WHAT HAPPENED / LIKELY CAUSES / RECOMMENDED ACTION), on-demand + cached, on-prem **Ollama (llama3.2)** in compose or Azure OpenAI via config, graceful degradation — [#9](https://github.com/rakshins10/EdgePulse/issues/9), [#39](https://github.com/rakshins10/EdgePulse/issues/39). See the [AI Guide](docs/guides/05-ai-guide.md).
+- [ ] **Sprint 30 — natural-language device Q&A** (grounded in live device/alert data)
+
+### Post-v1.1 (deliberately deferred)
 - **Mobile app** (React Native) — [#31](https://github.com/rakshins10/EdgePulse/issues/31)
 - **Commercialisation** — website, self-service trial, billing — [#42](https://github.com/rakshins10/EdgePulse/issues/42)
 - Trained ML models, 3D digital twin, pre-built SAP/ServiceNow connectors — each has its v1.0 foundation shipped

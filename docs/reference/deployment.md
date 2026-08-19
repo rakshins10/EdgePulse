@@ -30,9 +30,20 @@ The demo compose file is the blueprint
 7. Apply migrations on upgrade:
    `dotnet ef database update` (or run the API with migrations gate)
    before starting the new API/processor version.
+8. **AI alert explanations (optional).** The on-prem stack includes an
+   `ollama` service (`ollama/ollama:0.5.7`, container `edgepulse-ollama`,
+   port 11434, model volume `edgepulse_ollama_models`, `mem_limit: 4g`) and a
+   one-shot `ollama-pull` service that downloads `llama3.2` (~2 GB) once.
+   Point the API at it with `Ai__Provider=ollama` and
+   `Ai__Ollama__BaseUrl=http://ollama:11434` (in-network name). No internet
+   is needed after the pull and alert text never leaves the host. Sites that
+   do not want the feature set `Ai__Provider=none` and may drop both
+   services — the API and dashboard degrade cleanly (no ✦ Explain button).
 
 Sizing (demo-scale, 20 devices @ 5 s): everything fits in 4 vCPU / 8 GB.
 MongoDB disk grows ~1–2 GB/month at that rate — plan retention.
+With Ollama enabled add ~3 GB RAM for the model (first call ~40 s, then
+5–15 s on CPU; on demand + cached, so no steady-state load).
 
 ## 3. Cloud (Azure) sketch
 
@@ -47,6 +58,7 @@ The architecture doc's cloud profile maps 1-to-1:
 | Containers | Azure Container Apps (images from GHCR) |
 | Attachments volume | Azure Blob (implement `IFileStorage` for blob) |
 | MailHog | ACS Email / SendGrid |
+| Ollama (`Ai:Provider=ollama`) | Azure OpenAI (`Ai:Provider=azureopenai`, endpoint + deployment + key via env) |
 
 `DEPLOYMENT_MODE` selects DI registrations where the implementations differ.
 

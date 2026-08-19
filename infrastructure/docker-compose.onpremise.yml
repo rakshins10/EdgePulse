@@ -13,6 +13,8 @@
 #   RabbitMQ AMQP   -> localhost:5672            (message queue)
 #   OPC-UA Simulator -> opc.tcp://localhost:4840  (NordPulp demo data)
 #   OPC-UA Agent     -> (internal)               (simulator → RabbitMQ bridge)
+#   Ollama           -> http://localhost:11434    (local LLM, alert explanations)
+#   Ollama Pull      -> (one-shot)               (downloads llama3.2 into the model volume)
 
 name: edgepulse-onpremise
 

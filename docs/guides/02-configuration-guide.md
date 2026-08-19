@@ -45,6 +45,15 @@ a committed `appsettings*.json`.
 | Keycloak | `Authority` | http://localhost:8080/realms/edgepulse | OIDC authority |
 | Keycloak | `Audience`, `ClientId`, `ClientSecret` | — | JWT validation |
 | Keycloak | `AdminUsername` / `AdminPassword` | admin/admin | **Dev only** — user-management admin API. Production: a service account with `manage-users` |
+| Ai | `Provider` | `ollama` | `none` / `ollama` / `azureopenai` — which LLM backs the ✦ Explain feature; `none` hides it in the UI |
+| Ai | `TimeoutSeconds` | 90 | Per-request model timeout (first Ollama call loads the model, ~40 s) |
+| Ai | `Ollama:BaseUrl` / `Ollama:Model` | http://localhost:11434 / `llama3.2` | Local Ollama endpoint + model (`http://ollama:11434` inside the compose network) |
+| Ai | `AzureOpenAi:Endpoint`, `Deployment`, `ApiKey`, `ApiVersion` | — / `gpt-4o-mini` / placeholder / `2024-10-21` | Cloud profile; `ApiKey` is a placeholder — set it via user-secrets or env |
+
+AI env vars (Docker/prod): `Ai__Provider`, `Ai__Ollama__BaseUrl`,
+`Ai__AzureOpenAi__ApiKey`. Local Azure key:
+`dotnet user-secrets set "Ai:AzureOpenAi:ApiKey" "…" --project src/backend/EdgePulse.API`.
+Full detail (prompts, tuning, troubleshooting): [AI guide](05-ai-guide.md).
 
 ## 3. Telemetry Processor (`src/backend/EdgePulse.TelemetryProcessor/appsettings.json`)
 
@@ -74,6 +83,12 @@ a committed `appsettings*.json`.
 All service credentials live here (defaults are development-grade:
 `EdgePulse@2026` etc. — change for anything internet-facing). MailHog
 captures all SMTP locally: UI at http://localhost:8025.
+
+Optional AI services (Sprint 29): `ollama` (`ollama/ollama:0.5.7`,
+container `edgepulse-ollama`, port 11434, model volume
+`edgepulse_ollama_models`, `mem_limit: 4g`, healthcheck) and the one-shot
+`ollama-pull` (pulls `llama3.2`, ~2 GB, once). Start them with
+`docker compose -f infrastructure/docker-compose.onpremise.yml up -d ollama ollama-pull`.
 
 ## 6. In-product configuration (dashboard)
 

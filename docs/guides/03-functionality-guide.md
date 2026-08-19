@@ -43,6 +43,16 @@ one open alert per (device, metric, threshold).
 (topbar 🔔 bell — badge, mark-read, deep link) **and** an SMTP email; plus
 signed **webhooks** (see Integrations).
 
+**✦ Explain** (Sprint 29): every alert row has an **✦ Explain** button
+(shown only when the API reports AI as enabled via `/api/ai/status`). It
+opens a panel with three sections written by a local LLM — **WHAT
+HAPPENED / LIKELY CAUSES / RECOMMENDED ACTION** — generated on demand and
+cached on the alert (a "cached" note shows when served from cache;
+**Regenerate** bypasses the cache; **Retry** when the model is
+unavailable). A disclaimer reminds that it is a structured starting point,
+not a diagnosis. Available to every role that can view alerts. Full detail:
+[AI guide](05-ai-guide.md).
+
 ### 🛠️ Work Orders (`/workorders`)
 CRITICAL/HIGH alerts auto-open a work order (config-gated). Guarded
 lifecycle OPEN → INPROGRESS → COMPLETED (hold/cancel), assignment,
