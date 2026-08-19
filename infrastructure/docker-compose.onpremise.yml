@@ -181,6 +181,55 @@ services:
       retries: 5
 
   # ============================================================
+  # Ollama — local Large Language Model runtime (AI features).
+  # Runs the model entirely inside this container: alert text never
+  # leaves the mill network. The EdgePulse.API talks to it over HTTP
+  # (http://localhost:11434 from the host, http://ollama:11434 in-network).
+  #
+  # Model: llama3.2 (3B parameters, ~2 GB download on first start, ~3 GB RAM
+  # while answering). Downloaded once into the ollama_models volume.
+  # mem_limit keeps it from starving SQL Server on small machines.
+  #
+  # To disable AI entirely: just don't start this service — the platform
+  # degrades gracefully (summaries show "AI unavailable", nothing else breaks).
+  # ============================================================
+  ollama:
+    image: ollama/ollama:0.5.7
+    container_name: edgepulse-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    networks:
+      - edgepulse-network
+    restart: unless-stopped
+    mem_limit: 4g
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
+
+  # One-shot helper: pulls the model into the shared volume, then exits.
+  # `docker compose up -d ollama-pull` (or it runs automatically with `up -d`).
+  ollama-pull:
+    image: ollama/ollama:0.5.7
+    container_name: edgepulse-ollama-pull
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    volumes:
+      - ollama_models:/root/.ollama
+    networks:
+      - edgepulse-network
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["ollama pull llama3.2 && echo 'llama3.2 ready'"]
+    restart: "no"
+
+  # ============================================================
   # MailHog — local SMTP catcher for alert email notifications.
   # The TelemetryProcessor sends alert emails to SMTP :1025;
   # browse every captured mail at http://localhost:8025
@@ -303,3 +352,5 @@ volumes:
     name: edgepulse_mongodb_data
   rabbitmq_data:
     name: edgepulse_rabbitmq_data
+  ollama_models:
+    name: edgepulse_ollama_models

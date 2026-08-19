@@ -590,5 +590,19 @@
     "legendOk": "Normaali",
     "legendOpen": "Avoin hälytys",
     "legendCritical": "Kriittinen hälytys"
+  },
+  "ai": {
+    "summaryTitle": "Tekoälyn selitys",
+    "thinking": "Avustaja analysoi hälytystä… (muutama sekunti ensimmäisellä kerralla)",
+    "unavailable": "Tekoälyselitys ei ole saatavilla.",
+    "retry": "Yritä uudelleen",
+    "regenerate": "Luo uudelleen",
+    "cached": "välimuistista",
+    "disclaimer": "Paikallisen kielimallin tuottama yllä olevan hälytystiedon perusteella. Lähtökohta — varmista paikan päällä ennen toimia.",
+    "sections": {
+      "WHAT HAPPENED": "Mitä tapahtui",
+      "LIKELY CAUSES": "Todennäköiset syyt",
+      "RECOMMENDED ACTION": "Suositeltu toimenpide"
+    }
   }
 }

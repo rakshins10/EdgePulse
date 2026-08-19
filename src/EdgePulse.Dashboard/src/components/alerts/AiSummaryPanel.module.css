@@ -1,0 +1,101 @@
+.panelRow > td {
+  padding: 0 !important;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.panel {
+  margin: 0 14px 12px 14px;
+  padding: 14px 16px;
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 8px 8px 0;
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface));
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.provider {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-text-muted);
+  margin-left: auto;
+}
+
+.section { margin: 6px 0; }
+.sectionTitle { font-weight: 600; color: var(--color-text); }
+.section ul { margin: 2px 0 0 18px; padding: 0; }
+.section li { margin: 1px 0; color: var(--color-text-secondary); }
+.plain { white-space: pre-line; color: var(--color-text-secondary); }
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text-muted);
+  font-size: 12.5px;
+}
+
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.unavailable {
+  color: var(--color-text-muted);
+  font-size: 12.5px;
+  font-style: italic;
+}
+
+.footer {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.smallBtn {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  border-radius: 6px;
+  font-size: 11.5px;
+  padding: 3px 9px;
+  cursor: pointer;
+}
+.smallBtn:hover { color: var(--color-text); border-color: var(--color-border-hover); }
+
+.disclaimer {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--color-text-faint);
+}
+
+/* the trigger button lives in the alert row's actions cell */
+.explainBtn {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
+  color: var(--color-accent);
+  border-radius: 6px;
+  font-size: 12px;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.explainBtn:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.explainBtnActive { background: color-mix(in srgb, var(--color-accent) 15%, transparent); }

@@ -590,5 +590,19 @@
     "legendOk": "Normal",
     "legendOpen": "Öppet larm",
     "legendCritical": "Kritiskt larm"
+  },
+  "ai": {
+    "summaryTitle": "AI-förklaring",
+    "thinking": "Assistenten analyserar larmet… (några sekunder första gången)",
+    "unavailable": "AI-förklaring är inte tillgänglig.",
+    "retry": "Försök igen",
+    "regenerate": "Generera om",
+    "cached": "cachad",
+    "disclaimer": "Genererad av en lokal språkmodell utifrån larmdata ovan. Se det som en utgångspunkt — verifiera på plats innan åtgärd.",
+    "sections": {
+      "WHAT HAPPENED": "Vad hände",
+      "LIKELY CAUSES": "Troliga orsaker",
+      "RECOMMENDED ACTION": "Rekommenderad åtgärd"
+    }
   }
 }

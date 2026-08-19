@@ -6,6 +6,9 @@ import { setAlertCount } from '../../store/alertsSlice';
 import { fetchAlerts, fetchAlertCount } from '../../api/alerts';
 import AlertActionModal from '../../components/alerts/AlertActionModal';
 import type { AlertDto, SeverityCode, StatusCode } from '../../types/alerts';
+import { getAiStatus } from '../../api/ai';
+import AiSummaryPanel from '../../components/alerts/AiSummaryPanel';
+import aiStyles from '../../components/alerts/AiSummaryPanel.module.css';
 import styles from './AlertsPage.module.css';
 
 const SEVERITY_OPTIONS: Array<{ value: SeverityCode | ''; label: string }> = [
@@ -29,6 +32,10 @@ const PAGE_SIZE = 50;
 export default function AlertsPage() {
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
+
+  // AI: is a provider configured? (hides the Explain button otherwise)
+  const { data: aiStatus } = useQuery({ queryKey: ['ai-status'], queryFn: getAiStatus, staleTime: 5 * 60_000 });
+  const [explainedId, setExplainedId] = useState<string | null>(null);
 
   // Deep link from a notification: /alerts?highlight=<alertId>
   const [searchParams] = useSearchParams();
@@ -193,6 +200,9 @@ export default function AlertsPage() {
                   highlighted={alert.id === highlightId}
                   onAcknowledge={() => openModal(alert, 'acknowledge')}
                   onResolve={() => openModal(alert, 'resolve')}
+                  aiEnabled={!!aiStatus?.enabled}
+                  explained={explainedId === alert.id}
+                  onExplain={() => setExplainedId(explainedId === alert.id ? null : alert.id)}
                 />
               ))
             )}
@@ -245,9 +255,12 @@ interface AlertRowProps {
   onAcknowledge: () => void;
   onResolve: () => void;
   highlighted?: boolean;
+  aiEnabled?: boolean;
+  explained?: boolean;
+  onExplain?: () => void;
 }
 
-function AlertRow({ alert, onAcknowledge, onResolve, highlighted }: AlertRowProps) {
+function AlertRow({ alert, onAcknowledge, onResolve, highlighted, aiEnabled, explained, onExplain }: AlertRowProps) {
   const canResolve =
     alert.statusCode === 'OPEN' || alert.statusCode === 'ACKNOWLEDGED';
   const rowRef = useRef<HTMLTableRowElement>(null);
@@ -260,6 +273,7 @@ function AlertRow({ alert, onAcknowledge, onResolve, highlighted }: AlertRowProp
   }, [highlighted]);
 
   return (
+    <>
     <tr ref={rowRef} className={highlighted ? styles.rowHighlight : undefined}>
       <td>
         <SeverityPill code={alert.severityCode} />
@@ -301,9 +315,20 @@ function AlertRow({ alert, onAcknowledge, onResolve, highlighted }: AlertRowProp
               Resolve
             </button>
           )}
+          {aiEnabled && (
+            <button
+              className={`${aiStyles.explainBtn} ${explained ? aiStyles.explainBtnActive : ''}`}
+              onClick={onExplain}
+              title="AI explanation"
+            >
+              ✦ Explain
+            </button>
+          )}
         </div>
       </td>
     </tr>
+    {explained && <AiSummaryPanel alertId={alert.id} colSpan={8} />}
+    </>
   );
 }
 
